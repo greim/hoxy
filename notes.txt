@@ -1,0 +1,21 @@
+10/14/10
+
+request: $headers['foo'].delete()
+request: if $header['origin'] not undefined, $.log()
+request: if $header['origin'] equals 'http://example.com', $.set('bar')
+request: if $url matches /business/, $.sub('foo', 'bar')
+request: if $host matches /foo/, @internal_redirect('http://foo.example.com')
+request: if $host matches /bar/, @external_redirect('http://bar.example.com')
+request: if $host matches /baz/, @eval('...')
+
+	shorten names, e.g. $request_url => $url
+	allow empty parens
+	allow brackets or parens
+	implement dot syntax
+	change it to lone dollar sign
+	switch to lower case
+	add comma
+	accept regexp literals
+	add $hostname, differentiate from $host
+	add $port
+	implement alternate actions

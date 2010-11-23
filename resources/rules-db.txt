@@ -1,0 +1,25 @@
+################################################################################
+#
+#	RULES FILE
+#
+#	This file contains rules that are executed for the web hacking proxy
+#
+#	Rules follow the form:
+#
+#       <phase>: [<conditions>,] <actions>
+#
+#	Actions will be executed in the given phase, if the given conditions are
+#	met. If no conditions are given, the actions will always be executed. When
+#	multiple conditions are chained using 'and' or 'or', for example:
+#
+#	    condition1 and condition2 or condition3 and condition4
+#
+#	evaluation is left-to-right, with implied grouping like this:
+#
+#	    ((condition1 and condition2) or condition3) and condition4
+#
+################################################################################
+
+#example rules. uncomment to activate
+#response: if $content-type contains 'html', @banner("note: you're currently browsing through a web hacking proxy")
+#response: @throttle(100, 512)
