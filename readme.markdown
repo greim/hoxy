@@ -39,7 +39,7 @@ Features
     * perform internal and external redirects
     * run other plugins
 * Extensible via a plugin API
-* Comes with several out-of-the-box plugins
+* Comes with several out-of-the-box plugins (see usage examples of each file under the `plugins` dir)
 
 Getting Started
 ---------------
@@ -48,6 +48,6 @@ To start hoxy, stand in the project dir and type:
 
     node hoxy.js
 
-Make a note of the port that hoxy is running on, and use this information to configure your browser's proxy settings.
+Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
 
-Meanwhile, in your text editor, open resources/rules-db.txt and edit rules as needed. There's no need to restart hoxy each time you save the rules file.
+Meanwhile, in your text editor, open `resources/rules-db.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.

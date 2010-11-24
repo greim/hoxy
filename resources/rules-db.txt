@@ -18,8 +18,37 @@
 #
 #	    ((condition1 and condition2) or condition3) and condition4
 #
+#-------------------------------------------------------------------------------
+#
+#	EXAMPLES
+#
+#	make minified js easier to debug
+#	    response: if $file-name ends-with '.min.js', @js-beautify
+#
+#	remove http conditional get headers for feeds
+#	    request: if $url eq 'feed.atom' or $ eq feed.rss, @unconditional
+#
+#	make jpgs load slow
+#	    response: if $content-type contains 'jpeg', @throttle(100, 512)
+#
+#	don't pass metrics requests through, just return empty responses
+#	    request: if $hostname contains '2o7', @empty-text
+#
+#	use js files on stage
+#	    request: if $hostname eq 'example.com' and $content-type contains 'javascript', $hostname.set-to('stage.example.com')
+#
+#	make everything load slow
+#	    response: @throttle(100, 512)
+#
+#	NOTE: simple actions take the form:
+#	    $thing.act()
+#
+#	...whereas plugins take the form:
+#	    @plugin()
+#
 ################################################################################
 
-#example rules. uncomment to activate
-#response: if $content-type contains 'html', @banner("note: you're currently browsing through a web hacking proxy")
-#response: @throttle(100, 512)
+# EXAMPLE RULES. UNCOMMENT TO ACTIVATE
+
+#add a visible banner alerting user of proxy
+#response: if $content-type contains 'html', @banner("currently browsing through a web hacking proxy")
