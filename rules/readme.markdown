@@ -1,8 +1,6 @@
 Rule Syntax Overview
 ====================
 
-This file contains rules that are executed for the web hacking proxy
-
 Rules must be on a single line and follow the form:
 
     <phase>: [<conditions>,] <actions>
