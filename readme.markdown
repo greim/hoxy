@@ -22,20 +22,22 @@ Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used tha
 Features
 --------
 
-* Manipulate aspects of HTTP conversation, during either request or response phases, including:
+* Rule-driven operation, see comments and examples in `resources/rules-db.txt`
+* Rules have simple, human-readable syntax
+* Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including ability to:
     * add/delete/modify request/response headers
     * add/delete/modify request params
     * add/delete/modify request cookies
-    * altering hostname
+    * alter the request hostname
     * manipulate request/response bodies (as strings, won't work on binary data)
-    * changing request url and method
-    * changing response status code
-    * introducing latency to request/response
-    * throttling request/response body transfer speed
-    * ability to beautify HTML/CSS/JS code (makes it easier to debug)
-    * internal and external redirects
-* Rule-driven operation, see comments and examples in `resources/rules-db.txt`
-* Rules have simple, human-readable syntax
+    * change request url
+    * change request method
+    * change response status code
+    * introduce latency to request/response
+    * throttle request/response body transfer speed
+    * beautify HTML/CSS/JS code (makes it easier to debug)
+    * perform internal and external redirects
+    * run other plugins
 * Extensible via a plugin API
 * Comes with several out-of-the-box plugins
 
