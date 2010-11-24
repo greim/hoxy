@@ -20,6 +20,17 @@ var proxyPort = 8080;
 
 // done declaring vars
 // #############################################################################
+// read command line args
+
+try{
+	var portArg = parseInt(process.argv[2]);
+	if(portArg && portArg > 0){
+		proxyPort = portArg;
+	}
+}catch(ex){}
+
+// done reading args
+// #############################################################################
 // create proxy server
 
 function turl(url){
@@ -79,10 +90,6 @@ HTTP.createServer(function(request, response) {
 						response.end();
 					});
 					respQ.start();
-//					respInfo.body.forEach(function(chunk){
-//						response.write(chunk);
-//					});
-//					response.end();
 				});
 				respPhaseQ.start();
 			}
@@ -114,10 +121,6 @@ HTTP.createServer(function(request, response) {
 					proxyReq.end();
 				});
 				reqQ.start();
-//				reqInfo.body.forEach(function(chunk){
-//					proxyReq.write(chunk);
-//				});
-//				proxyReq.end();
 				proxyReq.on('response', function(proxyResp){
 					proxyResp.socket.on("error",function(err){
 						logError(err,'PROXY RESPONSE', request.url);

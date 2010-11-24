@@ -57,8 +57,6 @@ If you've ever asked the age-old question *Why do all the store pages have this 
 
 If a small part of your soul dies every time you try to set a breakpoint on a YUI-compressed JS file in Firebug, then you should check out hoxy.
 
-If you're crying after reading the above three paragraphs, then welcome friend, you've found hoxy.
-
 Hoxy exploits the fact that an HTTP proxy is transparent. Cookies, url-resolution and things like AJAX same-domain restrictions behave exactly the same whether you're going through a proxy or not, so when you load a production page through hoxy, your browser *thinks* it's looking at the production environment.
 
-But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the HTML of a page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
+But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the markup of an HTML page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
