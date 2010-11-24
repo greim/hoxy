@@ -6,13 +6,15 @@ Hoxy is a web hacking proxy for node.js, intended for use by web developers.
 Getting Started
 ---------------
 
-To start hoxy, stand in the project dir and type:
+Clone this project. Then, stand in the project dir and type:
 
     node hoxy.js
 
-Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
+This will start the proxy server and will print an informative message. Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
 
 Meanwhile, in your text editor, open `resources/rules-db.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
+
+As you're using hoxy, you may find it convenient to find a way to switch on and off your proxy settings at the click of a button, such as a browser add-on, however it's not required.
 
 System Requirements
 --------------------
