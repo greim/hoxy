@@ -1,0 +1,14 @@
+# EXAMPLE RULES. UNCOMMENT TO ACTIVATE
+# SEE readme.markdown IN THIS DIR FOR SYNTAX
+
+# add a visible banner alerting user of proxy
+#response: if $content-type contains 'html', @banner("currently browsing through a web hacking proxy")
+
+# break the response into chunks of size 1024 bytes
+# pause 60ms between sending each chunk to the browser
+#response: @throttle(60, 1024)
+
+# use css and js from the staging server
+#request: if $content-type contains "javascript" and $hostname eq "www.example.com", $hostname.set-to('www-stage.example.com')
+#request: if $content-type contains "css" and $hostname eq "www.example.com", $hostname.set-to('www-stage.example.com')
+
