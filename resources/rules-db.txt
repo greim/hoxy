@@ -26,7 +26,7 @@
 #	    response: if $file-name ends-with '.min.js', @js-beautify
 #
 #	remove http conditional get headers for feeds
-#	    request: if $url eq 'feed.atom' or $ eq feed.rss, @unconditional
+#	    request: if $url eq 'feed.atom' or $ eq 'feed.rss', @unconditional
 #
 #	make jpgs load slow
 #	    response: if $content-type contains 'jpeg', @throttle(100, 512)
