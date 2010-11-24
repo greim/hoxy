@@ -9,7 +9,6 @@ http://github.com/greim
 
 var HTTP  = require('http');
 var URL   = require('url');
-var MIME  = require('./lib/mime-types.js');
 var HTS   = require('./lib/http-transaction-state.js');
 var Q     = require('./lib/asynch-queue.js');
 var RULES = require('./lib/rules.js');
