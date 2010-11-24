@@ -24,12 +24,17 @@ Features
 
 * Manipulate aspects of HTTP conversation, during either request or response phases, including:
     * add/delete/modify request/response headers
-    * arbitrarily manipulate request/response bodies (as strings, won't work on binary data)
+    * add/delete/modify request params
+    * add/delete/modify request cookies
+    * altering hostname
+    * manipulate request/response bodies (as strings, won't work on binary data)
     * changing request url and method
     * changing response status code
     * introducing latency to request/response
     * throttling request/response body transfer speed
-* Rule-driven operation, see resources/rules-db.txt
+    * ability to beautify HTML/CSS/JS code (makes it easier to debug)
+    * internal and external redirects
+* Rule-driven operation, see comments and examples in `resources/rules-db.txt`
 * Rules have simple, human-readable syntax
 * Extensible via a plugin API
 * Comes with several out-of-the-box plugins
