@@ -6,40 +6,49 @@ Hoxy is a web hacking proxy for node.js, intended for use by web developers.
 How it Works
 ------------
 
-Hoxy lets you to manipulate the HTTP conversation between your browser and the server. Normally, an HTTP proxy is transparent—cookies, url-resolution and other origin-sensitive rules operate the same whether you're going through a proxy or not.
+Hoxy lets you to manipulate the HTTP conversation between your browser and the server. You can either manipulate the request as it's going out, or the response as it's coming in.
 
-Hoxy capitalizes upon this fact. After the browser has sent the request to the proxy, but before the proxy has forwarded the request to the server, hoxy lets you manipulate the details of the request in arbitrary ways, such as adding or removing headers.
+The Idea Behind Hoxy
+--------------------
 
-Likewise, after the server has returned the response to the proxy, but before the proxy has forwarded the response to the browser, hoxy lets you manipulate the details of the response in arbitrary ways, for example by running js-beautify against a response body containing minified JavaScript code.
+If you've ever been caught between *we won't know what will break until we put it into production* and *we can't put it into production until we know it won't break*, then you may like what hoxy has to offer.
 
-This may come in useful in all sorts of scenarios, especially for complex production environments that are hard to debug and test against.
+If you've ever asked the age-old question *Why do all the store pages have this extra CSS file? Did a vendor put it there? Will anything break if it goes away?* then hoxy may be for you.
+
+If a small part of your soul dies every time you try to set a breakpoint on a YUI-compressed JS file in Firebug, then you should check out hoxy.
+
+---------------
+
+Hoxy exploits the fact that an HTTP proxy is transparent. Cookies, url-resolution and things like AJAX same-domain restrictions behave exactly the same whether you're going through a proxy or not, so when you load a production page through hoxy, your browser *thinks* it's looking at the production environment.
+
+But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the HTML of a page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
 
 System Requirements
 --------------------
 
-Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used that can be configured to use a proxy, and that can see hoxy over the network. Since it's a typical client/server relationship, there's no need for the browser to be running on the same machine as the server.
+Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
 
 Features
 --------
 
-* Rule-driven operation, see comments and examples in `resources/rules-db.txt`
+* Hoxy's operation is rule-driven, see comments and examples in `resources/rules-db.txt`
 * Rules have simple, human-readable syntax
-* Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including ability to:
+* Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including the ability to:
     * add/delete/modify request/response headers
     * add/delete/modify request params
     * add/delete/modify request cookies
     * alter the request hostname
     * manipulate request/response bodies (as strings, won't work on binary data)
-    * change request url
-    * change request method
-    * change response status code
+    * alter the request url
+    * alter the request method
+    * alter the response status code
     * introduce latency to request/response
     * throttle request/response body transfer speed
-    * beautify HTML/CSS/JS code (makes it easier to debug)
+    * beautify HTML/CSS/JS code (can make it easier to debug)
     * perform internal and external redirects
     * run other plugins
-* Extensible via a plugin API
-* Comes with several out-of-the-box plugins (see usage examples of each file under the `plugins` dir)
+* Hoxy is extensible via a plugin API
+* Hoxy comes with a few out-of-the-box plugins
 
 Getting Started
 ---------------
