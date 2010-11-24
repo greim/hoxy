@@ -9,7 +9,7 @@ Actions will be executed in the given phase, if the given conditions are met. If
 
     condition1 and condition2 or condition3 and condition4
 
-Evaluation is left-to-right, with implied grouping like this:
+...then evaluation is left-to-right, with implied grouping like this:
 
     ((condition1 and condition2) or condition3) and condition4
 
