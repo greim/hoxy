@@ -5,7 +5,7 @@ http://github.com/greim
 Special thanks to folks at http://jsbeautifier.org/
 */
 
-/*
+/**
 Plugin to beautify minified or otherwise hard-to-debug JS.
 usage: @js-beautify
 */

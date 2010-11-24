@@ -1,3 +1,14 @@
+/*
+Written by Greg Reimer
+Copyright (c) 2010
+http://github.com/greim
+*/
+
+/**
+Adds a banner to the top of an html page showing a message.
+usage: @banner('hey, this is a banner!')
+*/
+
 exports.run = function(api){
 	var ct = api.responseInfo.headers['content-type'];
 	if (ct && ct.indexOf('html')>-1) {

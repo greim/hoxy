@@ -4,7 +4,7 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
-/*
+/**
 Throttles the writing of request and response bodies by separating them into
 chunks of a given size, and imposing a delay between writing of those chunks.
 

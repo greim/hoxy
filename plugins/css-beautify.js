@@ -4,7 +4,7 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
-/*
+/**
 Plugin to beautify minified or otherwise hard-to-debug CSS.
 usage: @css-beautify
 */

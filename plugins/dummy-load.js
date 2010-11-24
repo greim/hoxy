@@ -4,7 +4,7 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
-/*
+/**
 Plugin to return a ((very) pseudo)-randomly-generated text/html response.
 usage: @dummy-load(sizeOfResponseBodyInKilobytes)
 */

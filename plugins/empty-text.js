@@ -4,7 +4,7 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
-/*
+/**
 Plugin to return an empty text/plain response.
 usage: @empty-text
 */

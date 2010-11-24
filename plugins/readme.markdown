@@ -13,6 +13,7 @@ Plugin Authoring Guide
 A plugin file has the form:
 
 	/**
+	This plugin increases the temperature of the response by one kelvin.
 	usage: @foo()
 	*/
 

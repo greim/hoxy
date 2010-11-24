@@ -4,7 +4,7 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
-/*
+/**
 Plugin to output an informative log of a request [and response].
 TODO: json isn't nicely readable, implement.
 
