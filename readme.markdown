@@ -22,6 +22,13 @@ Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used tha
 Features
 --------
 
+* Manipulate aspects of HTTP conversation, during either request or response phases, including:
+    * add/delete/modify request/response headers
+    * arbitrarily manipulate request/response bodies (as strings, won't work on binary data)
+    * changing request url and method
+    * changing response status code
+    * introducing latency to request/response
+    * throttling request/response body transfer speed
 * Rule-driven operation, see resources/rules-db.txt
 * Rules have simple, human-readable syntax
 * Extensible via a plugin API
