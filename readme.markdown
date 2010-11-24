@@ -8,9 +8,9 @@ Getting Started
 
 Clone this project. Then, stand in the project dir and type:
 
-    node hoxy.js
+    node hoxy.js <port>
 
-This will start the proxy server and will print an informative message. Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
+This will start the proxy server and print an informative message. Port is optional and defaults to 8080. Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
 
 Meanwhile, in your text editor, open `resources/rules-db.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
