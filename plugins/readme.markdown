@@ -3,27 +3,30 @@ Plugins
 
 Plugins are a way of arbitrarily extending hoxy's capabilities.
 
-Plugins are invoked from the rules file. See `readme.markdown` in rules dir.
+Plugins are invoked from the rules file. See `readme.markdown` in the rules dir. If a plugin is invoked in the rules as `@foo()`, that corresponds to a file in this dir called `foo.js`.
 
-For usage info for a given plugin, peruse the files in this dir and look at the usage info in the comments.
+For usage info for a given plugin, peruse the JS files in this dir and look at the usage info in the comments.
 
 Plugin Authoring Guide
 ======================
 
 A plugin file has the form:
 
+	/**
+	usage: @foo()
+	*/
+
     // this is a plugin file
     exports.run = function(api) {
     	...use the api...
     	...and/or do anything node.js allows you to do...
+    	api.notify(); // and done
     };
 
-WARNING: after it has done what it needs to do, a plugin *must* call `api.notify()`, otherwise it will cause hoxy to hang indefinitely. This allows plugins to behave asynchronously and still be executed in order.
+WARNING: after it has done whatever it needs to do, a plugin *must* call `api.notify()`, otherwise it will cause hoxy to hang indefinitely. This scheme allows plugins to use asynchronous logic and still be executed in order.
 
-Once you've saved a plugin in the plugins dir, for example `foo.js`, you can invoke it by saying `@foo()` in a rule.
-
-API Documentation
------------------
+Plugin API Documentation
+------------------------
 
 ### api.arg(index)
 
