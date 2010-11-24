@@ -65,13 +65,14 @@ HTTP.createServer(function(request, response) {
 				respPhaseQ.on('done', function(){
 					respInfo.headers['x-manipulated-by'] = projectName;
 					response.writeHead(respInfo.status, respInfo.headers);
+					var throt = respInfo.throttle || 0;
 					var respQ = new Q.AsynchQueue();
 					respInfo.body.forEach(function(chunk){
 						respQ.push(function(notifier){
 							response.write(chunk);
 							setTimeout(function(){
 								notifier.notify();
-							}, respInfo.throttle);
+							}, throt);
 						});
 					});
 					respQ.on('done', function(){
@@ -99,13 +100,14 @@ HTTP.createServer(function(request, response) {
 				proxyReq.socket.on("error",function(err){
 					logError(err,'PROXY REQUEST', request.url);
 				});
+				var throt = respInfo.throttle || 0;
 				var reqQ = new Q.AsynchQueue();
 				reqInfo.body.forEach(function(chunk){
 					reqQ.push(function(notifier){
 						proxyReq.write(chunk);
 						setTimeout(function(){
 							notifier.notify();
-						}, reqInfo.throttle);
+						}, throt);
 					});
 				});
 				reqQ.on('done', function(){

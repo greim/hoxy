@@ -32,7 +32,7 @@ Getting Started
 
 To start hoxy, stand in the project dir and type:
 
-    % node hoxy.js
+    node hoxy.js
 
 Make a note of the port that hoxy is running on, and use this information to configure your browser's proxy settings.
 
