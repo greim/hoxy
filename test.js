@@ -12,7 +12,7 @@ Stand in this dir and run the command:
 
 */
 
-require('./main.js');
+require('./hoxy.js');
 var HTTP = require('http');
 var Rule = require('./lib/rules.js').Rule;
 var RDB = require('./lib/rules-db.js');

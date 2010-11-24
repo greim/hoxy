@@ -14,10 +14,10 @@ Likewise, after the server has returned the response to the proxy, but before th
 
 This may come in useful in all sorts of scenarios, especially for complex production environments that are hard to debug and test against.
 
-Browser Requirements
+System Requirements
 --------------------
 
-Hoxy works in any browser that can be configured to use a proxy.
+Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used that can be configured to use a proxy, and that can see hoxy over the network. Since it's a typical client/server relationship, there's no need for the browser to be running on the same machine as the server.
 
 Features
 --------
@@ -26,3 +26,14 @@ Features
 * Rules have simple, human-readable syntax
 * Extensible via a plugin API
 * Comes with several out-of-the-box plugins
+
+Getting Started
+---------------
+
+To start hoxy, stand in the project dir and type:
+
+    % node hoxy.js
+
+Make a note of the port that hoxy is running on, and use this information to configure your browser's proxy settings.
+
+Meanwhile, in your text editor, open resources/rules-db.txt and edit rules as needed. There's no need to restart hoxy each time you save the rules file.
