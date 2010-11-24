@@ -27,7 +27,13 @@ API Documentation
 
 ### `api.arg(index)`
 
-gets any args passed to the plugin, for example if the plugin is invoked as `@foo('bar',2000)` then `api.arg(0)` will return `"bar"` and `api.arg(1)` will return `2000`.
+gets any args passed to the plugin, for example if the plugin is invoked as `@foo('bar',2000)` then:
+
+    var firstArg = api.arg(0);
+    // firstArg === "bar"
+
+    var secondArg = api.arg(1)
+    // secondArg === 2000
 
 ### `api.setResponseBody(string)`
 
@@ -45,21 +51,34 @@ Gets the entire response body as a string.
 
 Gets the entire request body as a string.
 
+### `api.getRequestInfo()`
+
+Gets a dictionary object containing all the information hoxy needs to make the request to the server. If the plugin is executing in the response phase, this information is purely historical.
+
+* `requestInfo.method` - HTTP method to be used.
+* `requestInfo.headers` - Header dictionary.
+* `requestInfo.url` - URL to be used. (must be root-relative)
+* `requestInfo.hostname` - Host to make the request to.
+* `requestInfo.port` - Port to make the request on.
+* `requestInfo.body` - An array of buffer objects containing binary data. For string manipulation against the body, it's recommended to use `api.getRequestBody()` and `api.setRequestBody(string)`.
+* `requestInfo.throttle` - Integer number of milliseconds to wait between writing each binary buffer in the body array out to the server.
+
+### `api.getResponseInfo()`
+
+Gets a dictionary object containing all the information hoxy needs to return the response to the client. If the plugin is executing in the request phase, this method will return `undefined`.
+
+* `responseInfo.headers` - header dictionary.
+* `responseInfo.status` - status code integer.
+* `responseInfo.body` - An array of buffer objects containing binary data. For string manipulation against the body, it's recommended to use `api.getResponseBody()` and `api.setResponseBody(string)`.
+* `responseInfo.throttle` - Integer number of milliseconds to wait between writing each binary buffer in the body array back to the client.
+
 ### `api.setRequestInfo(newInfo)`
 
-TODO: document
+Accepts a dictionary object. These values correspond to the ones listed in the section above for `api.getRequestInfo()`. If the plugin is executing in the request phase, these values will be used to make the request to the server.
 
 ### `api.setResponseInfo(newInfo)`
 
-TODO: document
-
-### `api.requestInfo`
-
-TODO: document
-
-### `api.responseInfo`
-
-TODO: document
+Accepts a dictionary object. These values correspond to the ones listed in the section above for `api.getResponseInfo()`. If called during the request phase, hoxy will not make a request to a server, and will instead use the info passed here.
 
 ### `api.notify()`
 
