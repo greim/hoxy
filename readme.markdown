@@ -29,7 +29,7 @@ Hoxy lets you to manipulate the HTTP conversation between your browser and the s
 Features
 --------
 
-* Hoxy's operation is rule-driven, see comments and examples in `rules/rules-db.txt`
+* Hoxy's operation is rule-driven, see comments and examples in `rules/rules-db.txt` and `rules/readme.markdown`
 * Rules have simple, human-readable syntax
 * Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including the ability to:
     * add/delete/modify request/response headers
