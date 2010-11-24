@@ -24,21 +24,6 @@ How it Works
 
 Hoxy lets you to manipulate the HTTP conversation between your browser and the server. You can either manipulate the request as it's going out, or the response as it's coming in.
 
-The Idea Behind Hoxy
---------------------
-
-If you've ever been caught between *we won't know what will break until we put it into production* and *we can't put it into production until we know it won't break*, then you may like what hoxy has to offer.
-
-If you've ever asked the age-old question *Why do all the store pages have this extra CSS file? Did a vendor put it there? Will anything break if it goes away?* then hoxy may be for you.
-
-If a small part of your soul dies every time you try to set a breakpoint on a YUI-compressed JS file in Firebug, then you should check out hoxy.
-
----------------
-
-Hoxy exploits the fact that an HTTP proxy is transparent. Cookies, url-resolution and things like AJAX same-domain restrictions behave exactly the same whether you're going through a proxy or not, so when you load a production page through hoxy, your browser *thinks* it's looking at the production environment.
-
-But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the HTML of a page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
-
 Features
 --------
 
@@ -60,3 +45,18 @@ Features
     * run other plugins
 * Hoxy is extensible via a plugin API
 * Hoxy comes with a few out-of-the-box plugins
+
+The Idea Behind Hoxy
+====================
+
+If you've ever been caught between *we won't know what will break until we put it into production* and *we can't put it into production until we know it won't break*, then you may like what hoxy has to offer.
+
+If you've ever asked the age-old question *Why do all the store pages have this extra CSS file and will anything break if it goes away?* then hoxy may be for you.
+
+If a small part of your soul dies every time you try to set a breakpoint on a YUI-compressed JS file in Firebug, then you should check out hoxy.
+
+If you're crying after reading the above three paragraphs, then welcome friend, you've found hoxy.
+
+Hoxy exploits the fact that an HTTP proxy is transparent. Cookies, url-resolution and things like AJAX same-domain restrictions behave exactly the same whether you're going through a proxy or not, so when you load a production page through hoxy, your browser *thinks* it's looking at the production environment.
+
+But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the HTML of a page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
