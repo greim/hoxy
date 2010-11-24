@@ -107,7 +107,7 @@ HTTP.createServer(function(request, response) {
 				proxyReq.socket.on("error",function(err){
 					logError(err,'PROXY REQUEST', request.url);
 				});
-				var throt = respInfo.throttle || 0;
+				var throt = reqInfo.throttle || 0;
 				var reqQ = new Q.AsynchQueue();
 				reqInfo.body.forEach(function(chunk){
 					reqQ.push(function(notifier){
