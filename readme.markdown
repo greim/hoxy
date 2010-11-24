@@ -3,6 +3,22 @@ Overview
 
 Hoxy is a web hacking proxy for node.js, intended for use by web developers.
 
+Getting Started
+---------------
+
+To start hoxy, stand in the project dir and type:
+
+    node hoxy.js
+
+Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
+
+Meanwhile, in your text editor, open `resources/rules-db.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
+
+System Requirements
+--------------------
+
+Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
+
 How it Works
 ------------
 
@@ -22,11 +38,6 @@ If a small part of your soul dies every time you try to set a breakpoint on a YU
 Hoxy exploits the fact that an HTTP proxy is transparent. Cookies, url-resolution and things like AJAX same-domain restrictions behave exactly the same whether you're going through a proxy or not, so when you load a production page through hoxy, your browser *thinks* it's looking at the production environment.
 
 But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the HTML of a page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
-
-System Requirements
---------------------
-
-Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
 
 Features
 --------
@@ -49,14 +60,3 @@ Features
     * run other plugins
 * Hoxy is extensible via a plugin API
 * Hoxy comes with a few out-of-the-box plugins
-
-Getting Started
----------------
-
-To start hoxy, stand in the project dir and type:
-
-    node hoxy.js
-
-Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
-
-Meanwhile, in your text editor, open `resources/rules-db.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
