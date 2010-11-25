@@ -5,7 +5,21 @@ Plugins are a way of arbitrarily extending hoxy's capabilities.
 
 Plugins are invoked from the rules file. See `readme.markdown` in the rules dir. If a plugin is invoked in the rules as `@foo()`, that corresponds to a file in this dir called `foo.js`.
 
-For usage info for a given plugin, peruse the JS files in this dir and look at the usage info in the comments.
+List of Included Plugins
+========================
+
+* `@banner(textToShow)` - display a banner on html pages
+* `@css-beautify()`
+* `@empty-text()` - send an empty text response
+* `@external-redirect(url)` - send an http redirect
+* `@html-beautify()`
+* `@internal-redirect(url)` - silent redirect
+* `@js-beautify()`
+* `@throttle(ms, chunkSize)` - throttle back the transfer speed
+* `@unconditional()` - suppress http conditional get headers
+* `@wait(ms)` - introduce latency
+
+For more detailed usage info for a given plugin, peruse the JS files in this dir and look at the usage info in the comments.
 
 Plugin Authoring Guide
 ======================
