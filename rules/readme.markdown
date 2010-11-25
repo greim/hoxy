@@ -94,3 +94,14 @@ Obviously, an HTTP request can't go through after you call `$hostname.clear()`, 
 Plugins take the form: `@something()` where "something" is the name of a file in the plugins dir, minus the `.js` extension.
 
 The actions section of a rule comes last and may consist of an arbitrarily long list of space-separated actions.
+
+A Note About Cumulative Effects
+-------------------------------
+
+Supposing you had these two rules:
+
+    request: $origin.clear()
+    response: if $origin not empty, $response-headers['access-control-allow-origin'].set-to('*')
+
+...then the second rule's conditions will never be met, since the first rule makes `$origin` always return empty.
+
