@@ -5,7 +5,7 @@ http://github.com/greim
 */
 
 /**
-Plugin to return a ((very) pseudo)-randomly-generated text/html response.
+Plugin to return a ((very) pseudo)-randomly-generated text/plain response.
 usage: @dummy-load(sizeOfResponseBodyInKilobytes)
 */
 

@@ -4,7 +4,7 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
-/*
+/**
 Plugin to silently redirect the http request on the back end.
 (user will NOT see the url change in their location field /
 client will NOT receive a 302 response/location: header)
