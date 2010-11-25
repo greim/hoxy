@@ -1,9 +1,16 @@
 Rule Syntax Overview
 ====================
 
+Hoxy reads the rules file upon startup. For each request, hoxy executes all rules found in it. You may edit and resave the rules file at any time without needing to restart hoxy, however saving a malformed rule will cause hoxy to exit with an error.
+
 Rules must be on a single line and follow the form:
 
     <phase>: [<conditions>,] <actions>
+
+Examples:
+
+    request: if $file eq 'foo.min.js' or $file eq 'bar.min.js', @js-beautify()
+    response: if $content-type eq 'application/xhtml+xml', $content-type.set-to('text/html') @banner('converted to text/html')
 
 Actions will be executed in the given phase, if the given conditions are met. If no conditions are given, the actions will always be executed. When multiple conditions are chained using `and` or `or`, for example:
 
@@ -19,7 +26,11 @@ Rule Syntax Details
 Phase
 -----
 
-All rules must be preceded by a phase, which can be either `request` or `response`. Request-phase rules are processed after the client has sent the request to the proxy, but before the proxy has sent the request to the server. Response-phase rules are processed after the response has been received from the server, but before the proxy has sent the response to the client.
+All rules must be preceded by a phase, which can be either `request` or `response`.
+
+Request-phase rules are processed after the client has sent the request to the proxy, but before the proxy has sent the request to the server.
+
+Response-phase rules are processed after the response has been received from the server, but before the proxy has sent the response to the client.
 
 Things
 ------
@@ -28,7 +39,6 @@ Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a
 
 * `$hostname` (will not contain port)
 * `$port`
-* `$protocol` (will contain colon, such as 'http:')
 * `$url` (root-relative url, plus query string if present)
 * `$file` (file name from the url, such as 'foo.css')
 * `$request-headers[key]` (key is all-lowercase, such as 'user-agent')
@@ -39,12 +49,12 @@ Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a
 * `$request-body`
 * `$origin` (alias for `$request-headers['origin']`)
 * `$response-headers[key]` (key is all-lowercase, such as 'content-type')
-* `$content-type` (e.g. just the 'text/html' part of 'text/html; charset=utf-8' from content-type header)
-* `$charset` (e.g. just the 'utf-8' part of 'text/html; charset=utf-8' from content-type header)
+* `$content-type` (e.g. just the `text/html` part of `text/html; charset=utf-8` from content-type header)
+* `$charset` (e.g. just the `utf-8` part of `text/html; charset=utf-8` from content-type header)
 * `$status` (returns an integer)
 * `$response-body`
 
-Obviously, trying to invoke `$status` or `$response-headers` during the request phase will cause an error. However, request information is available during the response phase.
+Obviously, trying to invoke response info such as `$status` or `$response-headers` during the request phase will cause an error. On the other hand, request information is available during the response phase.
 
 Conditions / Tests
 ----------
