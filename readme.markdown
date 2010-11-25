@@ -14,12 +14,10 @@ Clone this project. Then, stand in the project dir and type:
 
 Meanwhile, in your text editor, open `rules/rules.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
-As you're using hoxy, you may find it convenient to find a way to switch on and off your proxy settings at the click of a button, such as a browser add-on, however it's not required.
-
 System Requirements
 --------------------
 
-Hoxy requires node.js to run, version 0.3 or higher. Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
+Hoxy requires node.js to run, version 0.3 or higher. (Anecdotal evidence suggests it *may* work on earlier versions, YMMV.) Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
 
 How it Works
 ------------
