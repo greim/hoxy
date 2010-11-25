@@ -9,12 +9,12 @@ List of Included Plugins
 ========================
 
 * `@banner(textToShow)` - display a banner on html pages
-* `@css-beautify()`
+* `@css-beautify()` - reformat css code
 * `@empty-text()` - send an empty text response
 * `@external-redirect(url)` - send an http redirect
-* `@html-beautify()`
+* `@html-beautify()` - reformat html code. credit: http://github.com/einars/js-beautify
 * `@internal-redirect(url)` - silent redirect
-* `@js-beautify()`
+* `@js-beautify()` - reformat javascrit code. credit: http://github.com/einars/js-beautify
 * `@throttle(ms, chunkSize)` - throttle back the transfer speed
 * `@unconditional()` - suppress http conditional get headers
 * `@wait(ms)` - introduce latency
@@ -80,7 +80,7 @@ Gets a dictionary object containing all the information hoxy needs to make the r
 * `requestInfo.url` - URL to be used. (must be root-relative)
 * `requestInfo.hostname` - Host to make the request to.
 * `requestInfo.port` - Port to make the request on.
-* `requestInfo.body` - An array of node's `Buffer` objects containing binary data. For string manipulation against the body, it's recommended to use `api.getRequestBody()` and `api.setRequestBody(string)`.
+* `requestInfo.body` - An array of buffers containing binary data. For string manipulation against the body, it's recommended to use `api.getRequestBody()` and `api.setRequestBody(string)`.
 * `requestInfo.throttle` - Integer number of milliseconds to wait between writing each binary buffer in the body array out to the server.
 
 ### api.getResponseInfo()
@@ -89,16 +89,16 @@ Gets a dictionary object containing all the information hoxy needs to return the
 
 * `responseInfo.headers` - header dictionary.
 * `responseInfo.status` - status code integer.
-* `responseInfo.body` - An array of node's `Buffer` objects containing binary data. For string manipulation against the body, it's recommended to use `api.getResponseBody()` and `api.setResponseBody(string)`.
+* `responseInfo.body` - An array of buffers objects containing binary data. For string manipulation against the body, it's recommended to use `api.getResponseBody()` and `api.setResponseBody(string)`.
 * `responseInfo.throttle` - Integer number of milliseconds to wait between writing each binary buffer in the body array back to the client.
 
 ### api.setRequestInfo(newInfo)
 
-If the plugin is executing in the response phase, calling this method has no effect. (There are exceptions, see note about cumulative effects below.) Otherwise, it deletes the existing info hoxy will use to make the request to the server, and replaces it by the given dictionary object. The values *must* correspond to the ones listed in the section above for `api.getRequestInfo()`.
+If the plugin is executing in the response phase, calling this method has no effect. (There are exceptions, see note about cumulative effects below.) Otherwise, it deletes the existing info hoxy will use to make the request to the server, and replaces it by the given dictionary object. These properties *must* correspond to the ones listed in the section above for `api.getRequestInfo()`.
 
 ### api.setResponseInfo(newInfo)
 
-If the plugin is executing in the request phase, calling this method will prevent hoxy from making a request to the server. Otherwise, it will delete the response info received from the server. In either case, the given dictionary object's values *must* correspond to the ones listed in the section above for `api.getResponseInfo()`, and will be used to return a response to the client.
+If the plugin is executing in the request phase, calling this method will prevent hoxy from making a request to the server. Otherwise, it will delete the response info received from the server. In either case, this info and will be used to return a response to the client. These properties *must* correspond to the ones listed in the section above for `api.getResponseInfo()`.
 
 ### api.notify()
 
@@ -107,5 +107,10 @@ Must be called after the plugin is done executing or hoxy will hang indefinitely
 A Note About Cumulative Effects
 -------------------------------
 
-The effects of native actions and plugins are cumulative. If one rule sets a request header, then that change will affect conditions, actions and plugins of subsequent rules.
+The effects of native actions and plugins are cumulative. If one rule sets a request header, then that change will be visible to conditions, actions and plugins of subsequent rules. For example, altering request info during the response phase may seem pointless and inconsequential, but actually may affect subsequent response-phase rules whose conditionals involve request info.
+
+For instance, the second rule below will never execute:
+
+    request: $origin.clear()
+    response: if $origin not empty, $response-headers['access-control-allow-origin'].set-to('*')
 
