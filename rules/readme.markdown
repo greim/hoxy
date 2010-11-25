@@ -1,7 +1,10 @@
+Rules
+=====
+
+Hoxy reads the rules file upon startup. For each request, hoxy executes all rules found in it. You may edit and resave the rules file at any time without needing to restart hoxy, however saving a malformed rule will cause hoxy to print an error to the console and ignore that rule.
+
 Rule Syntax Overview
 ====================
-
-Hoxy reads the rules file upon startup. For each request, hoxy executes all rules found in it. You may edit and resave the rules file at any time without needing to restart hoxy, however saving a malformed rule will cause hoxy to exit with an error.
 
 Rules must be on a single line and follow the form:
 
