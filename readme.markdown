@@ -12,7 +12,7 @@ Clone this project. Then, stand in the project dir and type:
 
 ...where `<port>` is the port hoxy will listen on (optional, defaults to 8080). This will start the proxy server and print an informative message. Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
 
-Meanwhile, in your text editor, open `rules/rules-db.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
+Meanwhile, in your text editor, open `rules/rules.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
 As you're using hoxy, you may find it convenient to find a way to switch on and off your proxy settings at the click of a button, such as a browser add-on, however it's not required.
 
@@ -29,7 +29,7 @@ Hoxy lets you to manipulate the HTTP conversation between your browser and the s
 Features
 --------
 
-* Hoxy's operation is rule-driven, see comments and examples in `rules/rules-db.txt` and `rules/readme.markdown`
+* Hoxy's operation is rule-driven, see comments and examples in `rules/rules.txt` and `rules/readme.markdown`
 * Rules have simple, human-readable syntax
 * Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including the ability to:
     * add/delete/modify request/response headers
