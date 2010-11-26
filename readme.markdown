@@ -1,7 +1,7 @@
 Overview
 ========
 
-Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. One way to think of it is as a [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/748/) for HTTP, however hoxy operates as a standalone proxy server, not as an add-on for any specific browser.
+Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Think of it is as a [Firebug](http://getfirebug.com/), or perhaps a [Greasemonkey](http://www.greasespot.net/), for the HTTP transport layer. Hoxy however operates as a standalone proxy server, not as an add-on for any specific browser.
 
 Getting Started
 ---------------
@@ -59,7 +59,7 @@ Hoxy differs from a normal HTTP proxy by adding two additional processing steps,
 
 Hoxy provides a simple, human-readable rule syntax allowing you to manipulate the state of the HTTP transaction during the request phase (step 2) or response phase (step 4). (See the readme file in the rules folder for more info on how to write rules.) A plugin API is also provided, allowing you to arbitrarily extend hoxy's capabilities. Plugins are invoked from within the above-mentioned rule syntax. (See the readme file in the plugins folder for more info on how to write plugins.)
 
-As far as the client and server are concerned, however, hoxy still looks like nothing more than a slight complication in the transport layer, with perhaps a bit more latency. For example if you use hoxy to beautify obfuscated JavaScript, the client will behave exactly as if that's the way the server served it. This opens the door for all kinds of testing, debugging and prototyping (and maybe some mischief) that might not otherwise be possible. Please use hoxy responsibly.
+As far as the client and server are concerned, however, hoxy still looks like nothing more than plain old proxy server. For example if you use hoxy to beautify obfuscated JavaScript, the client will behave exactly as if that's the way the server served it. If you switch the host from production to staging, the browser still *thinks* the file comes from production. This opens the door for all kinds of testing, debugging and prototyping (and maybe some mischief) that might not otherwise be possible. Please use hoxy responsibly.
 
 Features
 --------
