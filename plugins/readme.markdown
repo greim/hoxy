@@ -13,9 +13,9 @@ List of Included Plugins
 * `@css-beautify()` - reformat css code
 * `@empty-text()` - send an empty text response
 * `@external-redirect(url)` - send an http redirect
-* `@html-beautify()` - reformat html code. credit: http://github.com/einars/js-beautify
+* `@html-beautify()` - reformat html code. [credit](http://github.com/einars/js-beautify)
 * `@internal-redirect(url)` - silent redirect
-* `@js-beautify()` - reformat javascrit code. credit: http://github.com/einars/js-beautify
+* `@js-beautify()` - reformat javascrit code. [credit](http://github.com/einars/js-beautify)
 * `@send-404()` - sends a 404 response
 * `@throttle(ms, chunkSize)` - throttle back the transfer speed
 * `@unconditional()` - suppress http conditional get headers
