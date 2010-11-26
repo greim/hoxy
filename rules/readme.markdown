@@ -40,22 +40,24 @@ Things
 
 Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a key if it's a dictionary variable. They include:
 
-* `$hostname` (will not contain port)
-* `$port`
-* `$url` (root-relative url, plus query string if present)
-* `$file` (file name from the url, such as 'foo.css')
-* `$request-headers[key]` (key is all-lowercase, such as 'user-agent')
-* `$cookies[key]`
-* `$get-params[key]` (taken from url query string)
-* `$post-params[key]` (taken from request body)
-* `$method` (uppercase, as in 'GET')
-* `$request-body`
-* `$origin` (alias for `$request-headers['origin']`)
-* `$response-headers[key]` (key is all-lowercase, such as 'content-type')
-* `$content-type` (e.g. just the `text/html` part of `text/html; charset=utf-8` from content-type header)
-* `$charset` (e.g. just the `utf-8` part of `text/html; charset=utf-8` from content-type header)
-* `$status` (returns an integer)
-* `$response-body`
+* `hostname` - Hostname of destination server to which request is being made. Should be identical to the value of the "host" request header.
+* `port` - Port on destination server on which to connect.
+* `url` - Root-relative URL of the resource being requested.
+* `filename` - By convention, all non-slash characters at the end of the request URL's path component.
+* `request-headers[key]` - A dictionary object containing request header names and their values.
+* `referer` - Alias for $request-headers["referer"].
+* `user-agent` - Alias for $request-headers["user-agent"].
+* `origin` - Alias for $request-headers["origin"].
+* `cookies[key]` - A dictionary object containing cookie names and their values. Names and values are URL-decoded.
+* `url-params[key]` - A dictionary object containing URL param names and their values. Names and values are URL-decoded.
+* `body-params[key]` - A dictionary object containing request body names and their values. Typical with POSTs. Names and values are URL-decoded.
+* `method` - Method of the request being made to the destination server. Uppercase by convention, as in GET.
+* `request-body` - Request body in its entirety, represented as a string. Beware binary data.
+* `response-headers[key]` - A dictionary object containing response header names and their values.
+* `content-type` - Just the mime type portion of the "content-type" response-header.
+* `charset` - Just the charset portion of the "content-type" response-header.
+* `status` - Status code of the server response.
+* `response-body` - Response body in its entirety, represented as a string. Beware binary data.
 
 Obviously, trying to invoke response info such as `$status` or `$response-headers` during the request phase will cause an error. On the other hand, request information is available during the response phase.
 
@@ -96,13 +98,11 @@ There are two kinds of actions: native actions and plugins. Native actions are s
 
 Native actions include:
 
-* `clear()`
-* `set-to(string)`
-* `replace(string, string)`
-* `prepend(string)`
-* `append(string)`
-
-Obviously, an HTTP request can't go through after you call `$hostname.clear()`, so that would throw an error, whereas `$origin.clear()` wouldn't prevent the request from working. Use context and common sense to know what is possible or not.
+* `clear()` - Context determines if the thing being cleared is deleted, set to an empty string, or if an error is thrown. Use common sense.
+* `set-to(string)` - Assigns a new value to something, overwriting the old value.
+* `replace(stringOrRegex, string)` - Replaces all instances of the first arg by the second arg. If the first arg is a regex, match refs in the second arg will be expanded.
+* `prepend(string)` - Prepends the given string to the existing value.
+* `append(string)` - Appends the given string to the existing value.
 
 Plugins take the form: `@something()` where "something" is the name of a file in the plugins dir, minus the `.js` extension.
 
