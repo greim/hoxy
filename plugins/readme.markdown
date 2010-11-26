@@ -5,7 +5,7 @@ Plugins are a way of arbitrarily extending hoxy's capabilities.
 
 Plugins are invoked from the rules file. See `readme.markdown` in the rules dir. If a plugin is invoked in the rules as `@foo()`, that corresponds to a file in this dir called `foo.js`.
 
-List of Included Plugins
+List of OOTB Plugins
 ========================
 
 * `@allow-origin()` - allows cross-origin resource sharing
