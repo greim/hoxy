@@ -114,5 +114,5 @@ The effects of native actions and plugins are cumulative. If one rule sets a req
 For instance, the second rule below will never execute:
 
     request: $origin.clear()
-    response: if $origin not empty, $response-headers['access-control-allow-origin'].set-to('*')
+    response: if $origin not empty, @allow-origin()
 
