@@ -1,12 +1,12 @@
 Overview
 ========
 
-Hoxy is a web hacking proxy for node.js, intended for use by web developers.
+Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Think of it is as a [Firebug](http://getfirebug.com/), or perhaps a [Greasemonkey](http://www.greasespot.net/), for the HTTP transport layer. Hoxy however operates as a standalone proxy server, not as an add-on for any specific browser.
 
 Getting Started
 ---------------
 
-Clone this project. Then, stand in the project dir and type:
+Make sure node is installed on your system. Clone this project. Then, stand in the project dir and type:
 
     node hoxy.js <port>
 
@@ -19,16 +19,51 @@ System Requirements
 
 Hoxy requires node.js to run, version 0.3 or higher. (Anecdotal evidence suggests it *may* work on earlier versions, YMMV.) Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
 
-How it Works
-------------
+Architectural Overview
+----------------------
 
-Hoxy lets you to manipulate the HTTP conversation between your browser and the server. You can either manipulate the request as it's going out, or the response as it's coming in.
+A normal HTTP transaction could be illustrated like this. Time flows left-to-right. Diagonal slashes represent communication hops between client and server. Numbers represent processing steps:
+
+    HTTP TRANSACTION
+    -----------------------
+    server:      2
+    ------------/-\--------
+    client:    1   3
+    -----------------------
+
+1. Client prepares to make a request.
+2. Server processes the request and prepares a response.
+3. Client processes the response.
+
+Although they're often capable of filtering and logging, for our purposes we can say that a normal HTTP proxy represents no additional processing steps. It just passes through the data transparently. Processing steps 1-3 are thus identical to above. A proxy just introduces a slight complication to the transport layer:
+
+    USING A PROXY SERVER
+    -----------------------
+    server:       2
+    -------------/-\-------
+    proxy:      /   \
+    -----------/-----\-----
+    client:   1       3
+    -----------------------
+
+Hoxy differs from a normal HTTP proxy by adding two additional processing steps, one during the request phase, another during the response phase:
+
+    USING HOXY
+    -----------------------
+    server:       3
+    -------------/-\-------
+    hoxy:       2   4
+    -----------/-----\-----
+    client:   1       5
+    -----------------------
+
+Hoxy provides a simple, human-readable rule syntax allowing you to manipulate the state of the HTTP transaction during the request phase (step 2) or response phase (step 4). (See the readme file in the rules folder for more info on how to write rules.) A plugin API is also provided, allowing you to arbitrarily extend hoxy's capabilities. Plugins are invoked from within the above-mentioned rule syntax. (See the readme file in the plugins folder for more info on how to write plugins.)
+
+As far as the client and server are concerned, however, hoxy still looks like nothing more than plain old proxy server. For example if you use hoxy to beautify obfuscated JavaScript, the client will behave exactly as if that's the way the server served it. If you switch the host from production to staging, the browser still *thinks* the file comes from production. This opens the door for all kinds of testing, debugging and prototyping (and maybe some mischief) that might not otherwise be possible. Please use hoxy responsibly.
 
 Features
 --------
 
-* Hoxy's operation is rule-driven, see comments and examples in `rules/rules.txt` and `rules/readme.markdown`
-* Rules have simple, human-readable syntax
 * Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including the ability to:
     * add/delete/modify request/response headers
     * add/delete/modify request params
@@ -44,17 +79,4 @@ Features
     * perform internal and external redirects
     * run other plugins
 * Hoxy is extensible via a plugin API
-* Hoxy comes with a few out-of-the-box plugins
-
-The Idea Behind Hoxy
-====================
-
-If you've ever been caught between *we won't know what will break until we put it into production* and *we can't put it into production until we know it won't break*, then you may like what hoxy has to offer.
-
-If you've ever asked the age-old question *Why do all the store pages have this extra CSS file and will anything break if it goes away?* then hoxy may be for you.
-
-If a small part of your soul dies every time you try to set a breakpoint on a YUI-compressed JS file in Firebug, then you should check out hoxy.
-
-Hoxy exploits the fact that an HTTP proxy is transparent. Cookies, url-resolution and things like AJAX same-domain restrictions behave exactly the same whether you're going through a proxy or not, so when you load a production page through hoxy, your browser *thinks* it's looking at the production environment.
-
-But meanwhile you may be doing anything from redirecting to the latest version of jquery, to completely re-writing the markup of an HTML page before it's sent to the browser. Or anything. Hoxy lets you test changes and debug directly against production, without the risk of actually pushing anything to production.
+* Hoxy comes with several out-of-the-box plugins
