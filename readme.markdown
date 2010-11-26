@@ -6,7 +6,7 @@ Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use 
 Getting Started
 ---------------
 
-Clone this project. Then, stand in the project dir and type:
+Make sure node is installed on your system. Clone this project. Then, stand in the project dir and type:
 
     node hoxy.js <port>
 
