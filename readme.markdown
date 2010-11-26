@@ -1,7 +1,7 @@
 Overview
 ========
 
-Hoxy is a web hacking proxy for node.js, intended for use by web developers. One way to think about it is as a [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/748/) for HTTP.
+Hoxy is a web hacking proxy for node.js, intended for use by web developers. One way to think of it is as a [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/748/) for HTTP, however hoxy operates as a standalone proxy server, not as an add-on for any specific browser.
 
 Getting Started
 ---------------
