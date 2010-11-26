@@ -64,8 +64,6 @@ As far as the client and server are concerned, however, hoxy still looks like no
 Features
 --------
 
-* Hoxy's operation is rule-driven, see comments and examples in `rules/rules.txt` and `rules/readme.markdown`
-* Rules have simple, human-readable syntax
 * Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including the ability to:
     * add/delete/modify request/response headers
     * add/delete/modify request params
