@@ -12,7 +12,7 @@ usage: @send-404()
 
 exports.run = function(api){
 	api.setResponseInfo({
-		headers: { content-type: 'text/plain; charset=ascii' },
+		headers: { 'content-type': 'text/plain; charset=ascii' },
 		status: 404,
 		body: [],
 		throttle: 0,
