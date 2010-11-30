@@ -13,6 +13,7 @@ List of OOTB Plugins
 * `@css-beautify()` - reformat css code
 * `@empty-text()` - send an empty text response
 * `@external-redirect(url)` - send an http redirect
+* `@expiry(days, hours, mins, secs)` - send expiry headers
 * `@html-beautify()` - reformat html code. [credit](http://github.com/einars/js-beautify)
 * `@internal-redirect(url)` - silent redirect
 * `@js-beautify()` - reformat javascrit code. [credit](http://github.com/einars/js-beautify)

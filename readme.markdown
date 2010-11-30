@@ -6,7 +6,7 @@ Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use 
 Starting Hoxy
 ---------------
 
-Make sure node is installed on your system. Clone this project. Then, stand in the project dir and type:
+Make sure [node.js](http://nodejs.org/) is installed on your system. Clone this project. Then, stand in the project dir and type:
 
     node hoxy.js <port>
 
@@ -24,7 +24,7 @@ If you're comfortable writing JavaScript for node.js, you can also write plugins
 System Requirements
 --------------------
 
-Hoxy requires node.js to run, version 0.3 or higher. (Anecdotal evidence suggests it *may* work on earlier versions, YMMV.) Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
+Hoxy requires [node.js](http://nodejs.org/) to run, version 0.3 or higher. (Anecdotal evidence suggests it *may* work on earlier versions, YMMV.) Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
 
 Architectural Overview
 ======================
@@ -90,23 +90,3 @@ Furthermore, a rule will fire only when certain conditions are met. For example,
 Finally, while hoxy has a broad set of out-of-the-box capabilities, it also has a plugin API allowing developers to extend it in arbitrary ways. Plugins are written in JavaScript and invoked using the same conditional logic described above.
 
 This opens the door for all kinds of testing, debugging and prototyping (and maybe some mischief) that might not otherwise be possible. Please use hoxy responsibly.
-
-Features
---------
-
-* Rules allow you to conditionally manipulate any aspect of the HTTP conversation, including the ability to:
-    * add/delete/modify request/response headers
-    * add/delete/modify request params
-    * add/delete/modify request cookies
-    * alter the request hostname
-    * manipulate request/response bodies (as strings, won't work on binary data)
-    * alter the request url
-    * alter the request method
-    * alter the response status code
-    * introduce latency to request/response
-    * throttle request/response body transfer speed
-    * beautify HTML/CSS/JS code (can make it easier to debug)
-    * perform internal and external redirects
-    * run other plugins
-* Hoxy is extensible via a plugin API
-* Hoxy comes with several out-of-the-box plugins
