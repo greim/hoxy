@@ -1,23 +1,25 @@
 Overview
 ========
 
-Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Hoxy is similar in concept to [Firebug](http://getfirebug.com/), or perhaps [Greasemonkey](http://www.greasespot.net/), but it operates on the HTTP transport layer. Hoxy is also a standalone proxy server, not an add-on for any specific browser.
+Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Hoxy is similar in concept to [Firebug](http://getfirebug.com/), or perhaps [Greasemonkey](http://www.greasespot.net/), but it operates within the HTTP transport layer rather than within the client runtime. As such, hoxy runs as a standalone proxy server, not as an add-on for any specific browser.
 
 Starting Hoxy
 ---------------
 
-Make sure [node.js](http://nodejs.org/) is installed on your system. Clone this project. Then, stand in the project dir and type:
+Stand in the hoxy project dir and type:
 
     node hoxy.js <port>
 
-...where `<port>` is the port hoxy will listen on (optional, defaults to 8080). This will start the proxy server and print an informative message. Make a note of the port hoxy is running on, and use this information to configure your browser's proxy settings.
+...where *<port>* is the port hoxy will listen on (optional, defaults to 8080).
 
-Meanwhile, in your text editor, open `rules/rules.txt` and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
+Next, configure your browser's proxy settings to point to hoxy.
+
+If it doesn't already exist, upon startup hoxy will create a file in the `rules` dir called `rules.txt`. Open this file in your text editor and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
 How to Use Hoxy
 ---------------
 
-If you have a good grasp of HTTP basics, hoxy itself isn't wildly complicated, and reading the architectural overview below should give you an idea of how it works. From there, the readme file in the `rules` dir should give you enough info to get on your way.
+If you have a good grasp of HTTP basics, hoxy itself isn't wildly complicated, and reading the architectural overview below should give you a basic idea of how it works. From there, the readme file in the `rules` dir should give you enough info to get on your way for writing rules.
 
 If you're comfortable writing JavaScript for node.js, you can also write plugins for hoxy. See the readme file in the `plugins` dir for more info.
 
