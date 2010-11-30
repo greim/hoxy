@@ -53,13 +53,15 @@ function rechunkify(oldChunks, amt){
 exports.run = function(api){
 	var delayMS = api.arg(0);
 	var chunkSizeBytes = api.arg(1) || 1024;
+	var reqInf = api.getRequestInfo();
+	var respInf = api.getResponseInfo();
 
-	api.requestInfo.throttle = delayMS;
-	api.requestInfo.body = rechunkify(api.requestInfo.body, chunkSizeBytes);
+	reqInf.throttle = delayMS;
+	reqInf.body = rechunkify(reqInf.body, chunkSizeBytes);
 
-	if (api.responseInfo) {
-		api.responseInfo.throttle = delayMS;
-		api.responseInfo.body = rechunkify(api.responseInfo.body, chunkSizeBytes);
+	if (respInf) {
+		respInf.throttle = delayMS;
+		respInf.body = rechunkify(respInf.body, chunkSizeBytes);
 	}
 	api.notify();
 };

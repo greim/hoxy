@@ -1,6 +1,5 @@
-# THIS FILE CONTAINS RULES THAT ARE EXECUTED FOR THE WEB HACKING PROXY
-# BELOW ARE SOME EXAMPLE RULES. UNCOMMENT TO ACTIVATE
-# SEE readme.markdown IN THIS DIR FOR SYNTAX HELP
+# THIS IS AN EXAMPLE FILE THAT CONTAINS EXAMPLE RULES FOR THE WEB HACKING PROXY.
+# UNCOMMENT TO ACTIVATE. SEE readme.markdown IN THIS DIR FOR SYNTAX HELP.
 
 # add a visible banner alerting user of proxy
 #response: if $content-type contains 'html', @banner("currently browsing through a web hacking proxy")
