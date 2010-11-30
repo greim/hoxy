@@ -8,9 +8,9 @@ Starting Hoxy
 
 Stand in the hoxy project dir and type:
 
-    node hoxy.js <port>
+    node hoxy.js port
 
-...where *<port>* is the port hoxy will listen on (optional, defaults to 8080).
+...where *port* is the port hoxy will listen on (optional, defaults to 8080).
 
 Next, configure your browser's proxy settings to point to hoxy.
 
