@@ -85,7 +85,7 @@ Hoxy differs from a normal HTTP proxy by adding two additional processing steps,
 
 Request-phase rules (2) and response-phase rules (4) are written by you, and can change any aspect of a request or response, in a way that's undetectable by either client or server. This includes (but isn't limited to) method, url, hostname, port, status, headers, cookies, params, and even the content body.
 
-Furthermore, a rule will fire only when certain conditions are met. For example,  *if* the url ends with ".min.js", *then* beautify the content of the response body. Or, *if* the hostname equals "www.example.com", *then* change it to "www-stage.example.com". Just as any aspect of a request or response can be altered, any aspect of a request or response can be used in a conditional.
+Furthermore, a rule will fire only when certain conditions are met. For example,  *if* the url ends with ".min.js", *then* run js-beautify against the content of the response body. Or, *if* the hostname equals "www.example.com", *then* change it to "www-stage.example.com". Just as any aspect of a request or response can be altered, any aspect of a request or response can be used in a conditional.
 
 Finally, while hoxy has a broad set of out-of-the-box capabilities, it also has a plugin API allowing developers to extend it in arbitrary ways. Plugins are written in JavaScript and invoked using the same conditional logic described above.
 

@@ -7,7 +7,7 @@ http://github.com/greim
 /**
 Plugin to return expiry/cache-control headers.
 usage: @expiry(days, hours, minutes, seconds)
-example: @expires(4,3,2,1) will send expiry headers causing the response to
+example: @expiry(4,3,2,1) will send expiry headers causing the response to
 expire 4 days, 3 hours, two minutes, and one second from the time of the
 request.
 */
