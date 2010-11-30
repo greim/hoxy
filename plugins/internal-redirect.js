@@ -18,7 +18,7 @@ var HTS = require('../lib/http-transaction-state.js');
 
 exports.run = function(api) {
 	var url = api.arg(0);
-	var reqUrl = api.requestInfo.url;
+	var reqUrl = api.getRequestInfo().url;
 	url = URL.resolve(reqUrl, url);
 	var pUrl = URL.parse(url);
 	var port = parseInt(pUrl.port) || 80;

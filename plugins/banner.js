@@ -10,7 +10,8 @@ usage: @banner('hey, this is a banner!')
 */
 
 exports.run = function(api){
-	var ct = api.responseInfo.headers['content-type'];
+	var respInf = api.getResponseInfo();
+	var ct = respInf.headers['content-type'];
 	if (ct && ct.indexOf('html')>-1) {
 		var html = api.getResponseBody();
 		var contents = api.arg(0);

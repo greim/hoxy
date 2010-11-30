@@ -44,7 +44,7 @@ Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a
 * `$port` - Port on destination server on which to connect.
 * `$url` - Root-relative URL of the resource being requested.
 * `$filename` - By convention, any non-slash characters at the end of the URL path.
-* `$ext` - The filename extension matching the convention `file.ext`.
+* `$ext` - The filename extension matching the convention `file.ext`
 * `$request-headers[key]` - A dictionary object containing request header names and their values.
 * `$referer` - Alias for $request-headers["referer"].
 * `$user-agent` - Alias for $request-headers["user-agent"].
@@ -104,6 +104,7 @@ Native actions include:
 * `replace(stringOrRegex, string)` - Replaces all instances of the first arg by the second arg. If the first arg is a regex, match refs in the second arg will be expanded.
 * `prepend(string)` - Prepends the given string to the existing value.
 * `append(string)` - Appends the given string to the existing value.
+* `log()` - Appends the given string to the existing value.
 
 Plugins take the form: `@something()` where "something" is the name of a file in the plugins dir, minus the `.js` extension.
 

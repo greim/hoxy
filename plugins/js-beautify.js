@@ -11,7 +11,7 @@ usage: @js-beautify
 */
 
 exports.run = function(api) {
-	var ct = api.responseInfo.headers['content-type'];
+	var ct = api.getResponseInfo().headers['content-type'];
 	if (ct && ct.indexOf('javascript')>-1) {
 		var js = api.getResponseBody();
 		try {

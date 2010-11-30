@@ -80,6 +80,14 @@ RDB.setRules([
 	new Rule('request:if $referer eq "foo", @test("referer")'),
 	new Rule('request:if $user-agent eq "bar", @test("userAgent")'),
 	new Rule('request:if $ext eq "html", @test("ext")'),
+	new Rule('response: $ext.set-to("htm")'),
+	new Rule('response: if $ext eq "htm", @test("extChange")'),
+	new Rule('response: $ext.clear()'),
+	new Rule('response: if $filename eq "foo", @test("extClear")'),
+	new Rule('response: if $ext empty, @test("extEmpty")'),
+	new Rule('response: $filename.clear()'),
+	new Rule('response: if $filename empty, @test("filenameEmpty")'),
+	new Rule('response: @test-api()'),
 ]);
 
 var url = 'http://localhost:9596/foo.html?bar=baz&bar%202=baz%202';
@@ -98,13 +106,15 @@ var passes = {
 	port:false,referer:false,userAgent:false,url:false,filename:false,requestHeaders:false,cookies:false,
 	urlParams:false,bodyParams:false,method:false,requestBody:false,origin:false,
 	responseHeaders:false,contentType:false,charset:false,status:false,responseBody:false,
-	ext:false,
+	ext:false,extChange:false,extClear:false,extEmpty:false,filenameEmpty:false,
 };
 
 exports.run = function(api) {
+	var reqInf = api.getRequestInfo();
+	var respInf = api.getResponseInfo();
 	var testItem = api.arg(0);
-	if (testItem === 'request' && !api.responseInfo) { passes['request'] = true; }
-	else if (testItem === 'response' && api.responseInfo) { passes['response'] = true; }
+	if (testItem === 'request' && !respInf) { passes['request'] = true; }
+	else if (testItem === 'response' && respInf) { passes['response'] = true; }
 	else if (testItem === 'start') {
 		var cl = HTTP.createClient(8080, 'localhost');
 		var getReq = cl.request('get', url, {'cookie':cookie,'origin':origin,'host':'localhost','referer':'foo','user-agent':'bar'});

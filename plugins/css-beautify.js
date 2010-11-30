@@ -10,7 +10,7 @@ usage: @css-beautify
 */
 
 exports.run = function(api) {
-	var ct = api.responseInfo.headers['content-type'];
+	var ct = api.getResponseInfo().headers['content-type'];
 	if (ct && ct.indexOf('text/css')===0) {
 		var css = api.getResponseBody();
 		try {
