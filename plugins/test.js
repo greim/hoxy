@@ -79,8 +79,12 @@ RDB.setRules([
 	new Rule('request:if $request-body eq "a1=a2&a3=a4&a%205=a%206", @test("requestBody")'),
 	new Rule('request:if $referer eq "foo", @test("referer")'),
 	new Rule('request:if $user-agent eq "bar", @test("userAgent")'),
+	new Rule('request:if $hostname contains-among ["oca","asd","rr"], @test("containsAmong")'),
+	new Rule('request:if $hostname not contains-among ["oa","asd","rr"], @test("notContainsAmong")'),
 	new Rule('request:if $ext eq "html", @test("ext")'),
 	new Rule('response: $ext.set-to("htm")'),
+	new Rule('response: if $ext matches-among [/foo/,/[hij]t[LMN]$/i], @test("matchesAmong")'),
+	new Rule('response: if $ext not matches-among [/foo/,/[hij]t[LN]$/i, /bar/], @test("notMatchesAmong")'),
 	new Rule('response: if $ext eq "htm", @test("extChange")'),
 	new Rule('response: $ext.clear()'),
 	new Rule('response: if $filename eq "foo", @test("extClear")'),
@@ -106,7 +110,8 @@ var passes = {
 	port:false,referer:false,userAgent:false,url:false,filename:false,requestHeaders:false,cookies:false,
 	urlParams:false,bodyParams:false,method:false,requestBody:false,origin:false,
 	responseHeaders:false,contentType:false,charset:false,status:false,responseBody:false,
-	ext:false,extChange:false,extClear:false,extEmpty:false,filenameEmpty:false,
+	ext:false,extChange:false,extClear:false,extEmpty:false,filenameEmpty:false,matchesAmong:false,
+	notMatchesAmong:false,containsAmong:false,notContainsAmong:false,
 };
 
 exports.run = function(api) {

@@ -82,13 +82,15 @@ Some tests require arguments, others don't. For example:
 
 Tests include:
 
-* `empty`
-* `eq <string> | <number>`
-* `contains <string>`
-* `starts-with <string>`
-* `ends-with <string>`
-* `matches <regexp>`
-* `among <list>`
+* `empty` - tests if the value is falsy
+* `eq <string> | <number>` - tests loose equality (`==`)
+* `contains <string>` - tests if the value contains the given string
+* `starts-with <string>` - tests if the value starts with the given string
+* `ends-with <string>` - tests if the value ends with the given string
+* `matches <regexp>` - tests if the value matches the given regular expression
+* `among <list>` - tests if the value loosely equals (`==`) at least one of a given list of strings or numbers
+* `contains-among <list>` - tests if the value contains at least one of a given list of strings
+* `matches-among <list>` - tests if the value matches at least one of a given list of regular expressions
 
 The conditional section is optional, but if it exists it must start with `if` and end with `,`. In between is a list of conditions separated by `and` or `or`.
 
@@ -104,7 +106,7 @@ Native actions include:
 * `replace(stringOrRegex, string)` - Replaces all instances of the first arg by the second arg. If the first arg is a regex, match refs in the second arg will be expanded.
 * `prepend(string)` - Prepends the given string to the existing value.
 * `append(string)` - Appends the given string to the existing value.
-* `log()` - Appends the given string to the existing value.
+* `log()` - Prints the value to the console.
 
 Plugins take the form: `@something()` where "something" is the name of a file in the plugins dir, minus the `.js` extension.
 
