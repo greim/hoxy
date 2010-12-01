@@ -54,7 +54,7 @@ Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a
 * `$body-params[key]` - A dictionary object containing request body names and their values. Typical with POSTs. Names and values are URL-decoded.
 * `$method` - Method of the request being made to the destination server. Uppercase by convention, as in GET.
 * `$request-body` - Request body in its entirety, represented as a string. Beware binary data.
-* `$response-headers[key]` (alias: `$ph[key]`) - A dictionary object containing response header names and their values.
+* `$response-headers[key]` (alias: `$sh[key]`) - A dictionary object containing response header names and their values.
 * `$content-type` (alias: `$mime-type`) - Just the mime type portion of the "content-type" response-header.
 * `$charset` - Just the charset portion of the "content-type" response-header.
 * `$status-code` (alias: `$status`) - Status code of the server response.
