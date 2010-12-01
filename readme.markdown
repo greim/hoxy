@@ -107,7 +107,8 @@ Plugins running in the request phase have the option to write the response thems
 * Phase 1: Client prepares to make request.
 * Hop: Client transmits to hoxy.
 * Phase 2: Hoxy executes request-phase rules, triggering a plugin that populates the response.
-* Phase 3: Hoxy notices that a response has already been written, skips the server hit and executes response-phase rules.
+* Hoxy notices that the response has already been written and skips the server hit.
+* Phase 3: Hoxy executes response-phase rules.
 * Hop: Hoxy transmits to client.
 * Phase 4: Client processes response.
 
