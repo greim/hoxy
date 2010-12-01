@@ -71,14 +71,14 @@ If `not` is present it inverts the test.
 
 Some tests require arguments, others don't. For example:
 
-    # "empty" DOESN'T REQUIRE ARGUMENT
-    if $origion empty, ...
+    # "empty" doesn't require an argument
+    $origion empty
 
-    # "eq" REQUIRES ONE ARGUMENT
-    if $content-type eq "http://example.com", ...
+    # "eq" requires one argument
+    $content-type eq "text/html"
 
-    # "among" REQUIRES MULTIPLE ARGUMENTS, BRACKETED
-    if $method among ["GET","HEAD"], ...
+    # "among" requires multiple arguments, bracketed
+    $method among ['GET','HEAD']
 
 Tests include:
 
@@ -91,14 +91,19 @@ Tests include:
 * `among <list>` - tests if the value loosely equals (`==`) at least one of a given list of strings or numbers
 * `contains-among <list>` - tests if the value contains at least one of a given list of strings
 * `matches-among <list>` - tests if the value matches at least one of a given list of regular expressions
-* `lt` `lte` `gt` `gte` - less than, less that or equal to, greater than, greater than or equal to
+* `lt <string> | <number>` - less than
+* `lte <string> | <number>` - less that or equal to
+* `gt <string> | <number>` - greater than
+* `gte <string> | <number>` - greater than or equal to
 
-The conditional section is optional, but if it exists it must start with `if` and end with `,`. In between is a list of conditions separated by `and` or `or`.
+Note about data types: Internally, hoxy treats `$port` and `$status` as numbers, not strings. For string-centric tests, such as `starts-with`, hoxy preemptively coerces the operands to strings. For others, such as `eq` and `lt`, hoxy uses JavaScript's `==` and `<` operators respectively, using operands as-is and letting JavaScript decide how to deal with coercion. For regex-centric tests, such as `matches`, hoxy will throw an error unless a regexp is provided.
+
+The whole conditional section takes the form: `if <condition> [and|or <condition>]*,`
 
 Actions
 -------
 
-There are two kinds of actions: native actions and plugins. Native actions are simple and operate on a single thing, such as `$origin.clear()`. Plugins are potentially complex and may or may not completely alter the state of the HTTP conversation.
+Actions are the verbs of hoxy's rule syntax. There are two kinds of actions: native actions and plugins. Native actions are simple and operate on a single thing, such as `$origin.clear()`. Plugins are potentially complex and are preceded by a `@`, such as `@js-beautify()`. Empty parens are optional so `@js-beautify` works just as well.
 
 Native actions include:
 
