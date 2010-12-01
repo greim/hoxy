@@ -46,9 +46,9 @@ Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a
 * `$filename` (alias: `$file`) - By convention, any non-slash characters at the end of the URL path.
 * `$extension` (alias: `$ext`) - The filename extension matching the convention `file.ext`
 * `$request-headers[key]` (alias: `$qh[key]`) - A dictionary object containing request header names and their values.
-* `$referer` (alias: `$referrer`) - Alias for $request-headers["referer"].
-* `$user-agent` (alias: `$ua`) - Alias for $request-headers["user-agent"].
-* `$origin` - Alias for $request-headers["origin"].
+* `$referer` (alias: `$referrer`) - Shortcut for `$request-headers["referer"]`.
+* `$user-agent` (alias: `$ua`) - Shortcut for `$request-headers["user-agent"]`.
+* `$origin` - Shortcut for `$request-headers["origin"]`.
 * `$cookies[key]` - A dictionary object containing cookie names and their values. Names and values are URL-decoded.
 * `$url-params[key]` - A dictionary object containing URL param names and their values. Names and values are URL-decoded.
 * `$body-params[key]` - A dictionary object containing request body names and their values. Typical with POSTs. Names and values are URL-decoded.
