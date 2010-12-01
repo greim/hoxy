@@ -44,7 +44,8 @@ function turl(url){
 }
 
 function logError(err, errType, url) {
-	console.log(errType+' error: '+turl(url)+': '+err.message);
+	// TODO: add cmd line option to log
+	//console.log(errType+' error: '+turl(url)+': '+err.message);
 }
 
 HTTP.createServer(function(request, response) {
