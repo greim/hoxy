@@ -91,6 +91,16 @@ RDB.setRules([
 	new Rule('response: if $ext empty, @test("extEmpty")'),
 	new Rule('response: $filename.clear()'),
 	new Rule('response: if $filename empty, @test("filenameEmpty")'),
+	new Rule('response: if $port lt 9597, @test("lt")'),
+	new Rule('response: if $port lte 9597, @test("lte")'),
+	new Rule('response: if $port lte 9596, @test("lte2")'),
+	new Rule('response: if $port gt 9595, @test("gt")'),
+	new Rule('response: if $port gte 9595, @test("gte")'),
+	new Rule('response: if $port gte 9596, @test("gte2")'),
+	new Rule('response: if $port not lt 9595, @test("notLt")'),
+	new Rule('response: if $port not lte 9595, @test("notLte")'),
+	new Rule('response: if $port not gt 9597, @test("notGt")'),
+	new Rule('response: if $port not gte 9597, @test("notGte")'),
 	new Rule('response: @test-api()'),
 ]);
 
@@ -112,6 +122,8 @@ var passes = {
 	responseHeaders:false,contentType:false,charset:false,status:false,responseBody:false,
 	ext:false,extChange:false,extClear:false,extEmpty:false,filenameEmpty:false,matchesAmong:false,
 	notMatchesAmong:false,containsAmong:false,notContainsAmong:false,
+	lt:false,lte:false,gt:false,gte:false,lte2:false,gte2:false,
+	notLt:false,notLte:false,notGt:false,notGte:false,
 };
 
 exports.run = function(api) {

@@ -91,6 +91,7 @@ Tests include:
 * `among <list>` - tests if the value loosely equals (`==`) at least one of a given list of strings or numbers
 * `contains-among <list>` - tests if the value contains at least one of a given list of strings
 * `matches-among <list>` - tests if the value matches at least one of a given list of regular expressions
+* `lt` `lte` `gt` `gte` - less than, less that or equal to, greater than, greater than or equal to
 
 The conditional section is optional, but if it exists it must start with `if` and end with `,`. In between is a list of conditions separated by `and` or `or`.
 
