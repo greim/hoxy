@@ -97,9 +97,11 @@ Tests include:
 * `gt <string> | <number>` - greater than
 * `gte <string> | <number>` - greater than or equal to
 
+The whole conditional section takes the form: `if <condition> [and|or <condition>]*,`
+
 Note about data types: Internally, hoxy treats `$port` and `$status` as numbers, not strings. For string-centric tests, such as `starts-with`, hoxy preemptively coerces the operands to strings. For others, such as `eq` and `lt`, hoxy uses JavaScript's `==` and `<` operators respectively, using operands as-is and letting JavaScript decide how to deal with coercion. For regex-centric tests, such as `matches`, hoxy will throw an error unless a regexp is provided.
 
-The whole conditional section takes the form: `if <condition> [and|or <condition>]*,`
+Hoxy typically checks that a value exists before running a test against it that presumes existence. For example if the param "foo" doesn't exist, then `$url-params['foo'] starts-with 'abc'` would evaluate false, rather than throwing an error.
 
 Actions
 -------
@@ -117,7 +119,9 @@ Native actions include:
 
 Plugins take the form: `@something()` where "something" is the name of a file in the plugins dir, minus the `.js` extension.
 
-The actions section of a rule comes last and may consist of an arbitrarily long list of space-separated actions.
+The actions section of a rule comes last and may consist of an arbitrarily long list of space-separated actions:
+
+    request: if $port not eq 80, $hostname.log @expiry(1) $url-params['foo'].set-to('bar')
 
 A Note About Cumulative Effects
 -------------------------------
