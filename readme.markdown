@@ -19,7 +19,7 @@ If it doesn't already exist, upon startup hoxy will create a file in the `rules`
 How to Use Hoxy
 ---------------
 
-If you have a good grasp of HTTP basics, hoxy itself isn't wildly complicated, and reading the architectural overview below should give you a basic idea of how it works. From there, the readme file in the `rules` dir should give you enough info to get on your way for writing rules.
+If you have a good grasp of HTTP basics, hoxy itself isn't wildly complicated, and reading the architectural overview below should give you a basic idea of how it works. From there, the readme file in the `rules` dir should give you enough info to get on your way writing rules.
 
 If you're comfortable writing JavaScript for node.js, you can also write plugins for hoxy. See the readme file in the `plugins` dir for more info.
 
@@ -89,6 +89,29 @@ Request-phase rules (2) and response-phase rules (4) are written by you, and can
 
 Furthermore, a rule will fire only when certain conditions are met. For example,  *if* the url ends with ".min.js", *then* run js-beautify against the content of the response body. Or, *if* the hostname equals "www.example.com", *then* change it to "www-stage.example.com". Just as any aspect of a request or response can be altered, any aspect of a request or response can be used in a conditional.
 
-Finally, while hoxy has a broad set of out-of-the-box capabilities, it also has a plugin API allowing developers to extend it in arbitrary ways. Plugins are written in JavaScript and invoked using the same conditional logic described above.
+Finally, while hoxy has a broad set of out-of-the-box capabilities, its plugin API allows developers to extend it in arbitrary ways. Plugins are written in JavaScript and invoked using the same conditional logic described above.
 
-This opens the door for all kinds of testing, debugging and prototyping (and maybe some mischief) that might not otherwise be possible. Please use hoxy responsibly.
+A Twist in the Plot
+-------------------
+
+Plugins running in the request phase have the option to write the response themselves, which effectively preempts the hit to the server. In such cases, hoxy's behavior would look like this:
+
+    ------------------------------
+    server:  *blissful ignorance*
+    ------------------------------
+    hoxy:          2———3
+    --------------/-----\---------
+    client:      1       4
+    ------------------------------
+
+* Phase 1: Client prepares to make request.
+* Hop: Client transmits to hoxy.
+* Phase 2: Hoxy executes request-phase rules, triggering a plugin that populates the response.
+* Phase 3: Hoxy notices that a response has already been written, skips the server hit and executes response-phase rules.
+* Hop: Hoxy transmits to client.
+* Phase 4: Client processes response.
+
+Fin
+---
+
+Hoxy opens the door for all kinds of testing, debugging and prototyping (and maybe some mischief) that might not otherwise be possible. Please use hoxy responsibly.
