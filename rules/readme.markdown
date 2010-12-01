@@ -40,25 +40,25 @@ Things
 
 Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a key if it's a dictionary variable. They include:
 
-* `$hostname` - Hostname of destination server to which request is being made. Should be identical to the value of the "host" request header.
+* `$hostname` (alias: `$host`) - Hostname of destination server to which request is being made. Should be identical to the value of the "host" request header.
 * `$port` - Port on destination server on which to connect.
 * `$url` - Root-relative URL of the resource being requested.
-* `$filename` - By convention, any non-slash characters at the end of the URL path.
-* `$ext` - The filename extension matching the convention `file.ext`
-* `$request-headers[key]` - A dictionary object containing request header names and their values.
-* `$referer` - Alias for $request-headers["referer"].
-* `$user-agent` - Alias for $request-headers["user-agent"].
+* `$filename` (alias: `$file`) - By convention, any non-slash characters at the end of the URL path.
+* `$extension` (alias: `$ext`) - The filename extension matching the convention `file.ext`
+* `$request-headers[key]` (alias: `$qh[key]`) - A dictionary object containing request header names and their values.
+* `$referer` (alias: `$referrer`) - Alias for $request-headers["referer"].
+* `$user-agent` (alias: `$ua`) - Alias for $request-headers["user-agent"].
 * `$origin` - Alias for $request-headers["origin"].
 * `$cookies[key]` - A dictionary object containing cookie names and their values. Names and values are URL-decoded.
 * `$url-params[key]` - A dictionary object containing URL param names and their values. Names and values are URL-decoded.
 * `$body-params[key]` - A dictionary object containing request body names and their values. Typical with POSTs. Names and values are URL-decoded.
 * `$method` - Method of the request being made to the destination server. Uppercase by convention, as in GET.
 * `$request-body` - Request body in its entirety, represented as a string. Beware binary data.
-* `$response-headers[key]` - A dictionary object containing response header names and their values.
-* `$content-type` - Just the mime type portion of the "content-type" response-header.
+* `$response-headers[key]` (alias: `$ph[key]`) - A dictionary object containing response header names and their values.
+* `$content-type` (alias: `$mime-type`) - Just the mime type portion of the "content-type" response-header.
 * `$charset` - Just the charset portion of the "content-type" response-header.
-* `$status` - Status code of the server response.
-* `$response-body` - Response body in its entirety, represented as a string. Beware binary data.
+* `$status-code` (alias: `$status`) - Status code of the server response.
+* `$response-body` (alias: `$body`) - Response body in its entirety, represented as a string. Beware binary data.
 
 Obviously, trying to invoke response info such as `$status` or `$response-headers` during the request phase will cause an error. On the other hand, request information is available during the response phase.
 
