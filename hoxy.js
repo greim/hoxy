@@ -134,6 +134,11 @@ HTTP.createServer(function(request, response) {
 	});
 }).listen(proxyPort);
 
+// helps to ensure the proxy stays up and running
+process.on('uncaughtException',function(err){
+	console.log('uncaucht exception: '+err.message);
+});
+
 console.log(projectName+' proxy running at http://'+proxyHost+':'+proxyPort);
 
 
