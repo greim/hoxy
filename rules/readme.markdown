@@ -79,6 +79,7 @@ Some tests require arguments, others don't. For example:
 
     # "among" requires multiple arguments, bracketed
     $method among ['GET','HEAD']
+    $port among [80, 8080]
 
 Tests include:
 
