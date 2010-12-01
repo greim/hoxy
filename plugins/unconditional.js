@@ -17,8 +17,10 @@ Calling in response phase is harmless but ineffective.
 */
 
 exports.run = function(api) {
-	delete api.requestInfo.headers['if-modified-since'];
-	delete api.requestInfo.headers['if-none-match'];
+	var reqInf = api.getRequestInfo();
+	var respInf = api.getResponseInfo();
+	delete reqInf.headers['if-modified-since'];
+	delete reqInf.headers['if-none-match'];
 	api.notify();
 };
 
