@@ -83,7 +83,7 @@ HTTP.createServer(function(request, response) {
 						respInfo.body.forEach(function(chunk){
 							len += chunk.length;
 						});
-						respInfo.headers['content-length'] = len;
+						respInfo.headers['content-length'] = len+'';
 					}
 					response.writeHead(respInfo.status, respInfo.headers);
 					var throt = respInfo.throttle || 0;
@@ -116,7 +116,7 @@ HTTP.createServer(function(request, response) {
 					reqInfo.body.forEach(function(chunk){
 						len += chunk.length;
 					});
-					reqInfo.headers['content-length'] = len;
+					reqInfo.headers['content-length'] = len+'';
 				}
 				var proxyReq = proxy.request(
 					reqInfo.method,
