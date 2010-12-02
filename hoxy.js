@@ -97,7 +97,7 @@ HTTP.createServer(function(request, response) {
 			}
 		});
 
-		reqPhaseRulesQ.on('done',function(){
+		reqPhaseRulesQ.start(function(){
 
 			// request phase rules are now done processing. try to send the
 			// response directly without hitting up the server for a response.
@@ -139,9 +139,9 @@ HTTP.createServer(function(request, response) {
 						}, reqInfo.throttle);
 					});
 				});
-				reqBodyQ.on('done', function(){
+				reqBodyQ.start(function(){
 					proxyReq.end();
-				}).start();
+				});
 
 				// handle response from server
 				proxyReq.on('response', function(proxyResp){
@@ -164,7 +164,7 @@ HTTP.createServer(function(request, response) {
 					}
 				});
 
-				respPhaseRulesQ.on('done', function(){
+				respPhaseRulesQ.start(function(){
 
 					// response phase rules are now done processing
 					// send response, but first drop this little hint
@@ -193,12 +193,12 @@ HTTP.createServer(function(request, response) {
 							}, respInfo.throttle);
 						});
 					});
-					respBodyQ.on('done', function(){
+					respBodyQ.start(function(){
 						response.end();
-					}).start();
-				}).start();
+					});
+				});
 			}
-		}).start();
+		});
 	});
 }).listen(proxyPort);
 
@@ -206,7 +206,7 @@ HTTP.createServer(function(request, response) {
 // #############################################################################
 // print a nice info message
 
-console.log(projectName+' proxy running at http://localhost:'+proxyPort);
+console.log(projectName+' running at http://localhost:'+proxyPort);
 if (debug) console.log('debug mode is on');
 
 
