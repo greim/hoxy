@@ -5,10 +5,10 @@ http://github.com/greim
 */
 
 /*
-To run tests, make sure tool is not already running.
+To run tests, make sure proxy is not already running.
 Stand in this dir and run the command:
 
-> node tests.js
+> node test.js
 
 */
 
