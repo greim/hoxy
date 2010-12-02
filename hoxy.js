@@ -99,14 +99,12 @@ HTTP.createServer(function(request, response) {
 
 		reqPhaseRulesQ.on('done',function(){
 
-			// request phase rules are now done processing
-			// try to send the response directly
-			// this will fail unless the response was
-			// populated during request phase rule processing
+			// request phase rules are now done processing. try to send the
+			// response directly without hitting up the server for a response.
+			// obviously, this will only work if the response was somehow
+			// already populated, e.g. during request-phase rule processing
 			try {
-				// in this case, request is NOT forwarded to server
 				hts.doResponse(sendResponse);
-
 			} catch (ex) {
 				// in this case, request IS forwarded to server
 				// we now switch from being a server to being a client
@@ -173,7 +171,7 @@ HTTP.createServer(function(request, response) {
 					// to let client know something fishy's going on
 					respInfo.headers['x-manipulated-by'] = projectName;
 
-					// clean up the content-length situation
+					// shore up the content-length situation
 					if (!respInfo.body.length) {
 						respInfo.headers['content-length'] = 0;
 					} else if (respInfo.headers['content-length']) {
