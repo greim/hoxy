@@ -113,7 +113,7 @@ HTTP.createServer(function(request, response) {
 				// make sure content-length jibes
 				if (!reqInfo.body.length) {
 					reqInfo.headers['content-length'] = 0;
-				} else if (reqInfo.headers['content-length']) {
+				} else if (reqInfo.headers['content-length']!==undefined) {
 					var len = 0;
 					reqInfo.body.forEach(function(chunk){
 						len += chunk.length;
@@ -174,7 +174,7 @@ HTTP.createServer(function(request, response) {
 					// shore up the content-length situation
 					if (!respInfo.body.length) {
 						respInfo.headers['content-length'] = 0;
-					} else if (respInfo.headers['content-length']) {
+					} else if (respInfo.headers['content-length']!==undefined) {
 						var len = 0;
 						respInfo.body.forEach(function(chunk){
 							len += chunk.length;
