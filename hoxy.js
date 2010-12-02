@@ -76,6 +76,15 @@ HTTP.createServer(function(request, response) {
 				});
 				respPhaseQ.on('done', function(){
 					respInfo.headers['x-manipulated-by'] = projectName;
+					if (!respInfo.body.length) {
+						respInfo.headers['content-length'] = 0;
+					} else if (respInfo.headers['content-length']) {
+						var len = 0;
+						respInfo.body.forEach(function(chunk){
+							len += chunk.length;
+						});
+						respInfo.headers['content-length'] = len;
+					}
 					response.writeHead(respInfo.status, respInfo.headers);
 					var throt = respInfo.throttle || 0;
 					var respQ = new Q.AsynchQueue();
@@ -100,6 +109,15 @@ HTTP.createServer(function(request, response) {
 			} catch (ex) {
 				// need to get a response via proxy
 				var proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
+				if (!reqInfo.body.length) {
+					reqInfo.headers['content-length'] = 0;
+				} else if (reqInfo.headers['content-length']) {
+					var len = 0;
+					reqInfo.body.forEach(function(chunk){
+						len += chunk.length;
+					});
+					reqInfo.headers['content-length'] = len;
+				}
 				var proxyReq = proxy.request(
 					reqInfo.method,
 					reqInfo.url,
