@@ -15,23 +15,31 @@ var RULES = require('./lib/rules.js');
 var RDB   = require('./lib/rules-db.js');
 
 var projectName = 'hoxy';
-var proxyHost = 'localhost';
 var proxyPort = 8080;
+var debug = false;
 
-// done declaring vars
+// done declaring
 // #############################################################################
-// read command line args
+// read cmd line args
+
+var opts = require('./lib/tav.js').set({
+	debug: {
+		note: 'Print errors to the console.',
+		value: false,
+	},
+}, "Web hacking proxy.");
 
 try{
-	var portArg = parseInt(process.argv[2]);
+	var portArg = parseInt(opts.args[0]);
 	if(portArg && portArg > 0){
 		proxyPort = portArg;
 	}
+	debug = opts.debug;
 }catch(ex){}
 
 // done reading args
 // #############################################################################
-// create proxy server
+// error handling and subs
 
 function turl(url){
 	if (url.length > 64) {
@@ -44,71 +52,67 @@ function turl(url){
 }
 
 function logError(err, errType, url) {
-	// TODO: add cmd line option to log
-	//console.log(errType+' error: '+turl(url)+': '+err.message);
+	if (debug) {
+		console.log(errType+' error: '+turl(url)+': '+err.message);
+	}
 }
 
+// helps to ensure the proxy stays up and running
+process.on('uncaughtException',function(err){
+	if (debug) {
+		console.log('uncaught exception: '+err.message);
+		console.log(err.stack);
+	}
+});
+
+// end err handling
+// #############################################################################
+// create proxy server
+
 HTTP.createServer(function(request, response) {
-	delete request.headers['accept-encoding']; // TODO support gzip
+
+	// TODO support gzip dammit
+	delete request.headers['accept-encoding'];
+
+	// handle these noisy error sources with less verbose errors
 	request.socket.on("error",function(err){
 		logError(err,'REQUEST', request.url);
 	});
 	response.socket.on("error",function(err){
 		logError(err,'RESPONSE', request.url);
 	});
-	var rules = RDB.getRules(); // grab fresh copy of rules for each request
+
+	// grab fresh copy of rules for each request
+	var rules = RDB.getRules();
 
 	var hts = new HTS.HttpTransactionState();
 	hts.setRequest(request, function(reqInfo){
-		var reqPhaseQ = new Q.AsynchQueue();
+
+		// entire request body is now loaded
+		// process request phase rules
+		var reqPhaseRulesQ = new Q.AsynchQueue();
 		rules.forEach(function(rule){
 			if(rule.phase==='request'){
-				reqPhaseQ.push(rule.getExecuter(hts));
+				reqPhaseRulesQ.push(rule.getExecuter(hts));
 			}
 		});
-		reqPhaseQ.on('done',function(){
-			function sendResponse(respInfo) {
-				var respPhaseQ = new Q.AsynchQueue();
-				rules.forEach(function(rule){
-					if(rule.phase==='response'){
-						respPhaseQ.push(rule.getExecuter(hts));
-					}
-				});
-				respPhaseQ.on('done', function(){
-					respInfo.headers['x-manipulated-by'] = projectName;
-					if (!respInfo.body.length) {
-						respInfo.headers['content-length'] = 0;
-					} else if (respInfo.headers['content-length']) {
-						var len = 0;
-						respInfo.body.forEach(function(chunk){
-							len += chunk.length;
-						});
-						respInfo.headers['content-length'] = len;
-					}
-					response.writeHead(respInfo.status, respInfo.headers);
-					var throt = respInfo.throttle || 0;
-					var respQ = new Q.AsynchQueue();
-					respInfo.body.forEach(function(chunk){
-						respQ.push(function(notifier){
-							response.write(chunk);
-							setTimeout(function(){
-								notifier.notify();
-							}, throt);
-						});
-					});
-					respQ.on('done', function(){
-						response.end();
-					});
-					respQ.start();
-				});
-				respPhaseQ.start();
-			}
+
+		reqPhaseRulesQ.on('done',function(){
+
+			// request phase rules are now done processing
+			// try to send the response directly
+			// this will fail unless the response was
+			// populated during request phase rule processing
 			try {
-				// this fails unless something has set the response already
+				// in this case, request is NOT forwarded to server
 				hts.doResponse(sendResponse);
+
 			} catch (ex) {
-				// need to get a response via proxy
+				// in this case, request IS forwarded to server
+				// we now switch from being a server to being a client
 				var proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
+
+				// make sure content-length jibes
 				if (!reqInfo.body.length) {
 					reqInfo.headers['content-length'] = 0;
 				} else if (reqInfo.headers['content-length']) {
@@ -117,7 +121,9 @@ HTTP.createServer(function(request, response) {
 						len += chunk.length;
 					});
 					reqInfo.headers['content-length'] = len;
-				}
+				} else { /* node will send a chunked response */ }
+
+				// create request, queue up body writes, start it up
 				var proxyReq = proxy.request(
 					reqInfo.method,
 					reqInfo.url,
@@ -126,20 +132,20 @@ HTTP.createServer(function(request, response) {
 				proxyReq.socket.on("error",function(err){
 					logError(err,'PROXY REQUEST', request.url);
 				});
-				var throt = reqInfo.throttle || 0;
-				var reqQ = new Q.AsynchQueue();
+				var reqBodyQ = new Q.AsynchQueue();
 				reqInfo.body.forEach(function(chunk){
-					reqQ.push(function(notifier){
+					reqBodyQ.push(function(notifier){
 						proxyReq.write(chunk);
 						setTimeout(function(){
 							notifier.notify();
-						}, throt);
+						}, reqInfo.throttle);
 					});
 				});
-				reqQ.on('done', function(){
+				reqBodyQ.on('done', function(){
 					proxyReq.end();
-				});
-				reqQ.start();
+				}).start();
+
+				// handle response from server
 				proxyReq.on('response', function(proxyResp){
 					proxyResp.socket.on("error",function(err){
 						logError(err,'PROXY RESPONSE', request.url);
@@ -147,18 +153,63 @@ HTTP.createServer(function(request, response) {
 					hts.setResponse(proxyResp, sendResponse);
 				});
 			}
-		});
-		reqPhaseQ.start();
+
+			// same subroutine used in either case
+			function sendResponse(respInfo) {
+
+				// entire response body is now available
+				// do response phase rule processing
+				var respPhaseRulesQ = new Q.AsynchQueue();
+				rules.forEach(function(rule){
+					if(rule.phase==='response'){
+						respPhaseRulesQ.push(rule.getExecuter(hts));
+					}
+				});
+
+				respPhaseRulesQ.on('done', function(){
+
+					// response phase rules are now done processing
+					// send response, but first drop this little hint
+					// to let client know something fishy's going on
+					respInfo.headers['x-manipulated-by'] = projectName;
+
+					// clean up the content-length situation
+					if (!respInfo.body.length) {
+						respInfo.headers['content-length'] = 0;
+					} else if (respInfo.headers['content-length']) {
+						var len = 0;
+						respInfo.body.forEach(function(chunk){
+							len += chunk.length;
+						});
+						respInfo.headers['content-length'] = len;
+					} else { /* node will send a chunked response */ }
+
+					// write headers, queue up body writes, send, end and done
+					response.writeHead(respInfo.status, respInfo.headers);
+					var respBodyQ = new Q.AsynchQueue();
+					respInfo.body.forEach(function(chunk){
+						respBodyQ.push(function(notifier){
+							response.write(chunk);
+							setTimeout(function(){
+								notifier.notify();
+							}, respInfo.throttle);
+						});
+					});
+					respBodyQ.on('done', function(){
+						response.end();
+					}).start();
+				}).start();
+			}
+		}).start();
 	});
 }).listen(proxyPort);
 
-// helps to ensure the proxy stays up and running
-process.on('uncaughtException',function(err){
-	console.log('uncaught exception: '+err.message);
-	console.log(err.stack);
-});
+// done creating proxy
+// #############################################################################
+// print a nice info message
 
-console.log(projectName+' proxy running at http://'+proxyHost+':'+proxyPort);
+console.log(projectName+' proxy running at http://localhost:'+proxyPort);
+if (debug) console.log('debug mode is on');
 
 
 
