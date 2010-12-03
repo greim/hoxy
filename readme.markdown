@@ -1,22 +1,20 @@
 Overview
 ========
 
-Hoxy is a web hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Hoxy is similar in concept to [Firebug](http://getfirebug.com/), or perhaps [Greasemonkey](http://www.greasespot.net/), but it operates within the HTTP transport layer rather than within the client runtime. As such, hoxy runs as a standalone proxy server, not as an add-on for any specific browser.
+Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Hoxy is similar in concept to [Firebug](http://getfirebug.com/), or perhaps [Greasemonkey](http://www.greasespot.net/), but it operates within the HTTP transport layer rather than within the client runtime. As such, hoxy runs as a standalone proxy server, not as an add-on for any specific browser.
 
 Starting Hoxy
 ---------------
 
 Stand in the hoxy project dir and type:
 
-    node hoxy.js port
+    node hoxy.js
 
-...where *port* is the port hoxy will listen on (optional, defaults to 8080).
-
-Next, configure your browser's proxy settings to point to hoxy.
+This will start hoxy on port 8080. (To start hoxy on a different port, use `--port=8081`.) Next, configure your browser's proxy settings to point to hoxy.
 
 If it doesn't already exist, upon startup hoxy will create a file in the `rules` dir called `rules.txt`. Open this file in your text editor and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
-Note: hoxy catches as many errors as possible in an effort to stay running. By default, error messages are suppressed. If you're writing rules or developing plugins (or developing hoxy itself), you should run in debug mode so that you can see syntax or runtime errors as they occur:
+Note: hoxy catches as many errors as possible in an effort to stay running. By default, error messages are suppressed. If you're writing rules or developing plugins (or developing hoxy itself), you should run in debug mode so you can see syntax or runtime errors as they occur:
 
     node hoxy.js --debug
 
