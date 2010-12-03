@@ -5,6 +5,21 @@ http://github.com/greim
 */
 
 // #############################################################################
+// read cmd line args
+
+var opts = require('./lib/tav.js').set({
+	debug: {
+		note: 'Turn on debug mode, will print errors to console.',
+		value: false,
+	},
+	rules: {
+		note: 'Specify a rules file other than the default.',
+		value: './rules/rules.txt',
+	},
+}, "Web hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [port]");
+
+// done reading args
+// #############################################################################
 // declare stuff
 
 var HTTP  = require('http');
@@ -15,33 +30,10 @@ var RULES = require('./lib/rules.js');
 var RDB   = require('./lib/rules-db.js');
 
 var projectName = 'hoxy';
-var proxyPort = 8080;
-var debug = false;
+var proxyPort = parseInt(opts.args[0]) || 8080;
+var debug = opts.debug;
 
 // done declaring
-// #############################################################################
-// read cmd line args
-
-var opts = require('./lib/tav.js').set({
-	debug: {
-		note: 'Print errors to the console.',
-		value: false,
-	},
-	rules: {
-		note: 'Use a different rules file',
-		value: false,
-	},
-}, "Web hacking proxy.");
-
-try{
-	var portArg = parseInt(opts.args[0]);
-	if(portArg && portArg > 0){
-		proxyPort = portArg;
-	}
-	debug = opts.debug;
-}catch(ex){}
-
-// done reading args
 // #############################################################################
 // error handling and subs
 
