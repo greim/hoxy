@@ -7,16 +7,22 @@ http://github.com/greim
 // #############################################################################
 // read cmd line args
 
+var defaultRules = './rules/rules.txt';
+
 var opts = require('./lib/tav.js').set({
 	debug: {
-		note: 'Turn on debug mode, will print errors to console.',
+		note: 'Turn on debug mode, print errors to console.',
 		value: false,
 	},
 	rules: {
-		note: 'Specify a rules file other than the default.',
-		value: './rules/rules.txt',
+		note: 'Specify rules file other than default. (default '+defaultRules+')',
+		value: defaultRules,
 	},
-}, "Web hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [port]");
+	port: {
+		note: 'Specify port to listen on. (default 8080)',
+		value: 8080,
+	},
+}, "Hoxy, the web-hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [--port==port]");
 
 // done reading args
 // #############################################################################
@@ -30,8 +36,13 @@ var RULES = require('./lib/rules.js');
 var RDB   = require('./lib/rules-db.js');
 
 var projectName = 'hoxy';
-var proxyPort = parseInt(opts.args[0]) || 8080;
+var proxyPort = opts.port || 8080;
 var debug = opts.debug;
+
+if (opts.args.length && parseInt(opts.args[0])) {
+	console.log('!!! old: please use --port=something to specify port. thank you. exiting.');
+	process.exit(1);
+}
 
 // done declaring
 // #############################################################################
