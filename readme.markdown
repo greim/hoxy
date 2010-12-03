@@ -10,7 +10,7 @@ Stand in the hoxy project dir and type:
 
     node hoxy.js
 
-This will start hoxy on port 8080. (To start hoxy on a different port, use `--port=8081`.) Next, configure your browser's proxy settings to point to hoxy.
+This will start hoxy on port 8080. (For a different port, use `--port=port`.) Next, configure your browser's proxy settings to point to hoxy.
 
 If it doesn't already exist, upon startup hoxy will create a file in the `rules` dir called `rules.txt`. Open this file in your text editor and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 

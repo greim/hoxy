@@ -76,10 +76,18 @@ process.on('uncaughtException',function(err){
 // #############################################################################
 // create proxy server
 
+var stripRqHdrs = [
+	'accept-encoding', // TODO support gzip
+	'proxy-connection', // causes certain sites to hang
+	'proxy-authorization',
+];
+
 HTTP.createServer(function(request, response) {
 
-	// TODO support gzip dammit
-	delete request.headers['accept-encoding'];
+	// strip out certain request headers
+	stripRqHdrs.forEach(function(name){
+		delete request.headers[name];
+	});
 
 	// handle these noisy error sources with less verbose errors
 	request.socket.on("error",function(err){
