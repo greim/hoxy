@@ -11,7 +11,7 @@ usage: @empty-text
 
 exports.run = function(api) {
 	api.setResponseInfo({
-		status: 200,
+		statusCode: 200,
 		body: [],
 		headers: {
 			'content-type': 'text/plain; charset=ASCII',

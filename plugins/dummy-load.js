@@ -49,7 +49,7 @@ exports.run = function(api) {
 		body.push(getRanKB());
 	}
 	api.setResponseInfo({
-		status: 200,
+		statusCode: 200,
 		body: body,
 		headers: {
 			'content-type': 'text/plain; charset=ASCII',

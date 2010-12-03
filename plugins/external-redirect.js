@@ -13,7 +13,7 @@ usage: @external-redirect(url)
 exports.run = function(api) {
 	var url = api.arg(0);
 	api.setResponseInfo({
-		status: 302,
+		statusCode: 302,
 		body: [],
 		headers: {
 			location: url,

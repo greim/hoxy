@@ -101,9 +101,6 @@ HTTP.createServer(function(request, response) {
 			try {
 				hts.doResponse(sendResponse);
 			} catch (ex) {
-				// in this case, request IS forwarded to server
-				// we now switch from being a server to being a client
-				var proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
 
 				// make sure content-length jibes
 				if (!reqInfo.body.length) {
@@ -114,7 +111,17 @@ HTTP.createServer(function(request, response) {
 						len += chunk.length;
 					});
 					reqInfo.headers['content-length'] = len;
-				} else { /* node will send a chunked response */ }
+				} else { /* node will send a chunked request */ }
+
+				// make sure host header jibes
+				if(reqInfo.headers.host){
+					reqInfo.headers.host = reqInfo.hostname;
+					if (reqInfo.port !== 80) {
+						reqInfo.headers.host += ':'+reqInfo.port;
+					}
+				}
+
+				var proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
 
 				// create request, queue up body writes, execute it
 				var proxyReq = proxy.request(
@@ -178,7 +185,7 @@ HTTP.createServer(function(request, response) {
 					} else { /* node will send a chunked response */ }
 
 					// write headers, queue up body writes, send, end and done
-					response.writeHead(respInfo.status, respInfo.headers);
+					response.writeHead(respInfo.statusCode, respInfo.headers);
 					var respBodyQ = new Q.AsynchQueue();
 					respInfo.body.forEach(function(chunk){
 						respBodyQ.push(function(notifier){

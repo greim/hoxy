@@ -53,12 +53,12 @@ exports.run = function(api) {
 	api.setResponseBody(s);
 	ASSERT.equal(api.getResponseBody(), s, 'expected response bodies to be equal');
 	api.setResponseInfo({
-		status: 202,
+		statusCode: 202,
 		throttle: 0,
 		body: [],
 		headers: { 'content-type': 'text/plain; charset=ascii' }
 	});
-	ASSERT.equal(respInf.status, 202, 'expected status to be 202');
+	ASSERT.equal(respInf.statusCode, 202, 'expected status to be 202');
 	api.notify();
 };
 

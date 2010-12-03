@@ -75,7 +75,7 @@ Gets a dictionary object containing all the information hoxy will be using to ma
 Gets a dictionary object containing all the information hoxy will be using to return the response to the client. If the plugin is executing in the request phase, this method will return `undefined`. (There are exceptions, see note about cumulative effects below.) Otherwise, modifying the properties of this object will affect the response hoxy returns to the browser.
 
 * `responseInfo.headers` - header dictionary.
-* `responseInfo.status` - status code integer.
+* `responseInfo.statusCode` - status code integer.
 * `responseInfo.body` - An array of buffers objects containing binary data. For string manipulation against the body, it's recommended to use `api.getResponseBody()` and `api.setResponseBody(string)`.
 * `responseInfo.throttle` - Integer number of milliseconds to wait between writing each binary buffer in the body array back to the client.
 

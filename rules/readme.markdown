@@ -40,7 +40,7 @@ Things
 
 Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a key if it's a dictionary variable. They include:
 
-* `$hostname` (alias: `$host`) - Hostname of destination server to which request is being made. Should be identical to the value of the "host" request header.
+* `$hostname` (alias: `$host`) - Hostname of destination server to which request is being made.
 * `$port` - Port on destination server on which to connect.
 * `$url` - Root-relative URL of the resource being requested.
 * `$filename` (alias: `$file`) - By convention, any non-slash characters at the end of the URL path.
@@ -99,7 +99,7 @@ Tests include:
 
 The whole conditional section takes the form: `if <condition> [and|or <condition>]*,`
 
-Note about data types: Internally, hoxy treats `$port` and `$status` as numbers, not strings. For string-centric tests, such as `starts-with`, hoxy preemptively coerces the operands to strings. For others, such as `eq` and `lt`, hoxy uses JavaScript's `==` and `<` operators respectively, using operands as-is and letting JavaScript decide how to deal with coercion. For regex-centric tests, such as `matches`, hoxy will throw an error unless a regexp is provided.
+Note about data types: Internally, hoxy treats `$port` and `$statusCode` as numbers, not strings. For string-centric tests, such as `starts-with`, hoxy preemptively coerces the operands to strings. For others, such as `eq` and `lt`, hoxy uses JavaScript's `==` and `<` operators respectively, using operands as-is and letting JavaScript decide how to deal with coercion. For regex-centric tests, such as `matches`, hoxy will throw an error unless a regexp is provided.
 
 Hoxy typically checks that a value exists before running a test against it that presumes existence. For example if the param "foo" doesn't exist, then `$url-params['foo'] starts-with 'abc'` would evaluate false, rather than throwing an error.
 
