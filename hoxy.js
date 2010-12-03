@@ -22,7 +22,7 @@ var opts = require('./lib/tav.js').set({
 		note: 'Specify port to listen on. (default 8080)',
 		value: 8080,
 	},
-}, "Hoxy, the web-hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [--port==port]");
+}, "Hoxy, the web-hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [--port=port]");
 
 // done reading args
 // #############################################################################
