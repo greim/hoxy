@@ -27,6 +27,10 @@ var opts = require('./lib/tav.js').set({
 		note: 'Print errors to the console.',
 		value: false,
 	},
+	rules: {
+		note: 'Use a different rules file',
+		value: false,
+	},
 }, "Web hacking proxy.");
 
 try{
@@ -87,7 +91,6 @@ HTTP.createServer(function(request, response) {
 
 	var hts = new HTS.HttpTransactionState();
 	hts.setRequest(request, function(reqInfo){
-
 		// entire request body is now loaded
 		// process request phase rules
 		var reqPhaseRulesQ = new Q.AsynchQueue();
@@ -97,7 +100,7 @@ HTTP.createServer(function(request, response) {
 			}
 		});
 
-		reqPhaseRulesQ.start(function(){
+		reqPhaseRulesQ.execute(function(){
 
 			// request phase rules are now done processing. try to send the
 			// response directly without hitting up the server for a response.
@@ -121,7 +124,7 @@ HTTP.createServer(function(request, response) {
 					reqInfo.headers['content-length'] = len;
 				} else { /* node will send a chunked response */ }
 
-				// create request, queue up body writes, start it up
+				// create request, queue up body writes, execute it
 				var proxyReq = proxy.request(
 					reqInfo.method,
 					reqInfo.url,
@@ -139,7 +142,7 @@ HTTP.createServer(function(request, response) {
 						}, reqInfo.throttle);
 					});
 				});
-				reqBodyQ.start(function(){
+				reqBodyQ.execute(function(){
 					proxyReq.end();
 				});
 
@@ -164,7 +167,7 @@ HTTP.createServer(function(request, response) {
 					}
 				});
 
-				respPhaseRulesQ.start(function(){
+				respPhaseRulesQ.execute(function(){
 
 					// response phase rules are now done processing
 					// send response, but first drop this little hint
@@ -193,7 +196,7 @@ HTTP.createServer(function(request, response) {
 							}, respInfo.throttle);
 						});
 					});
-					respBodyQ.start(function(){
+					respBodyQ.execute(function(){
 						response.end();
 					});
 				});

@@ -8,7 +8,7 @@ Starting Hoxy
 
 Stand in the hoxy project dir and type:
 
-    node hoxy.js [port]
+    node hoxy.js port
 
 ...where *port* is the port hoxy will listen on (optional, defaults to 8080).
 
@@ -16,7 +16,7 @@ Next, configure your browser's proxy settings to point to hoxy.
 
 If it doesn't already exist, upon startup hoxy will create a file in the `rules` dir called `rules.txt`. Open this file in your text editor and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
-Note: hoxy catches as many errors as possible in an effort to stay running. By default, error messages are suppressed. This means that if you're writing rules or developing plugins (or developing hoxy itself), you should run in debug mode so that you can see errors as they occur:
+Note: hoxy catches as many errors as possible in an effort to stay running. By default, error messages are suppressed. If you're writing rules or developing plugins (or developing hoxy itself), you should run in debug mode so that you can see syntax or runtime errors as they occur:
 
     node hoxy.js --debug
 
