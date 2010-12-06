@@ -1,12 +1,14 @@
 Rules
 =====
 
-Hoxy reads `rules.txt` upon startup. For each request, hoxy executes all rules found in it. You may edit and resave the rules file at any time without needing to restart hoxy, however saving a malformed rule will cause hoxy to print an error to the console and ignore that rule.
+NOTE: A future goal of this project is to provide a GUI through which rules can be created, deleted and modified. But for now, hoxy rules live in a configuration file called `rules.txt`, which is read upon startup and continually monitored for updates.
+
+For each request, hoxy executes all rules found in the rules file. You can edit and resave the rules file at any time without needing to restart hoxy. Saving a malformed rule will merely cause hoxy to print an error to the console and ignore that rule.
 
 Rule Syntax Overview
 ====================
 
-Rules must be on a single line and follow the form:
+Rules live on a single line and follow the form:
 
     <phase>: [<conditions>,] <actions>
 
@@ -29,7 +31,7 @@ Rule Syntax Details
 Phase
 -----
 
-All rules must be preceded by a phase, which can be either `request` or `response`.
+All rules must be preceded by a phase, which can be either `request:` or `response:`.
 
 Request-phase rules are processed after the client has sent the request to the proxy, but before the proxy has sent the request to the server.
 
