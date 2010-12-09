@@ -67,11 +67,11 @@ exports.run = function(api){
 								statusCode:304,
 								throttle:0,
 								headers:{
-									server:'hoxy-ghost-server',
-									date:(new Date()).toUTCString(),
+									'server':'hoxy-ghost-server',
+									'date':(new Date()).toUTCString(),
 									'content-length':0,
 									'last-modified':stats.mtime.toUTCString(),
-									etag:etag,
+									'etag':etag,
 								},
 								body:[],
 							});
@@ -86,11 +86,14 @@ exports.run = function(api){
 											statusCode:200,
 											throttle:0,
 											headers:{
-												server:'hoxy-ghost-server',
-												date:(new Date()).toUTCString(),
+												'server':'hoxy-ghost-server',
+												'date':(new Date()).toUTCString(),
 												'last-modified':stats.mtime.toUTCString(),
-												etag:etag,
-												'content-type':getContentType(fullPath),
+												'etag':etag,
+												'content-type':getContentType(
+													fullPath,
+													qi.headers.accept
+												),
 												'content-length':data.length,
 											},
 											body:[data],
@@ -109,18 +112,27 @@ exports.run = function(api){
 
 // todo: use an actual mime types lib
 var ctypes = {
-	'.html':'text/html; charset=utf-8',
-	'.htm':'text/html; charset=utf-8',
-	'.css':'text/css; charset=utf-8',
-	'.js':'text/javascript; charset=utf-8',
+	'.html':'text/html',
+	'.shtml':'text/html',
+	'.htm':'text/html',
+	'.css':'text/css',
+	'.js':'text/javascript',
 	'.gif':'image/gif',
 	'.png':'image/png',
 	'.jpg':'image/jpeg',
 	'.jpeg':'image/jpeg',
-	'.txt':'text/plain; charset=utf-8',
 	'.xml':'application/xml',
 	'.xsl':'application/xml',
 };
-function getContentType(path){
-	return ctypes[PATH.extname(path).toLowerCase()] || ctypes['.txt'];
+function isText(ctype) {
+	return ctype.indexOf('text') > -1
+		|| ctype.indexOf('xml') > -1;
+}
+function getContentType(path, accept){
+	accept = accept || 'text/plain';
+	accept = accept.split(',')[0];
+	var ext = PATH.extname(path).toLowerCase() || accept;
+	var ctype = ctypes[ext];
+	if(isText(ctype)){ ctype += '; charset=utf-8'; }
+	return ctype;
 }
