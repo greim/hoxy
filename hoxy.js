@@ -64,14 +64,6 @@ function logError(err, errType, url) {
 	}
 }
 
-// helps to ensure the proxy stays up and running
-process.on('uncaughtException',function(err){
-	if (debug) {
-		console.log('uncaught exception: '+err.message);
-		console.log(err.stack);
-	}
-});
-
 // end err handling
 // #############################################################################
 // create proxy server
@@ -230,8 +222,14 @@ HTTP.createServer(function(request, response) {
 console.log(projectName+' running at http://localhost:'+proxyPort);
 if (debug) console.log('debug mode is on');
 
+// done with message
+// #############################################################################
+// start catching errors
 
-
-
-
-
+// helps to ensure the proxy stays up and running
+process.on('uncaughtException',function(err){
+	if (debug) {
+		console.log('uncaught exception: '+err.message);
+		console.log(err.stack);
+	}
+});
