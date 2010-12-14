@@ -25,19 +25,14 @@ exports.run = function(api) {
 	secs += hours   * 60 * 60;
 	secs += minutes * 60;
 	secs += seconds;
+	secs = secs<0 ? 0 : secs;
 
 	var expires = new Date();
 	expires.setTime(expires.getTime() + secs * 1000);
 
 	var ri = api.getResponseInfo();
-
-	if (secs > 0) {
-		ri.headers.expires = expires.toUTCString();
-		ri.headers['cache-control'] = 'max-age='+secs;
-	} else {
-		delete ri.headers.expires;
-		delete ri.headers['cache-control'];
-	}
+	ri.headers.expires = expires.toUTCString();
+	ri.headers['cache-control'] = 'max-age='+secs;
 
 	api.notify();
 };

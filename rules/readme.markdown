@@ -14,8 +14,8 @@ Rules live on a single line and follow the form:
 
 Examples:
 
+    response: if $content-type eq 'application/xhtml+xml', $content-type.set-to('text/html')
     request: if $filename eq 'foo.min.js' or $filename eq 'bar.min.js', @js-beautify()
-    response: if $content-type eq 'application/xhtml+xml', $content-type.set-to('text/html') @banner('converted to text/html')
 
 Actions will be executed in the given phase, if the given conditions are met. If no conditions are given, the actions will always be executed. When multiple conditions are chained using `and` or `or`, for example:
 

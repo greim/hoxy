@@ -5,9 +5,9 @@ http://github.com/greim
 */
 
 /*
-Replace response from remote server by static file service out of a local (to
-hoxy) folder, but only when a match is found. Otherwise serve response from
-remote server as normal.
+Replace response from remote server by static file service out of a dir local to
+hoxy, but only when a match is found. Otherwise serve response from remote
+server as normal.
 
 usage: @ghost-server(htdocs)
 
@@ -16,6 +16,10 @@ of one on remote server. If not found, serves file on the remote server as
 normal. If plugin is running in request phase, a match will pre-empt request to
 server. If in response phase, a match merely replaces response body, but will
 use remote server's response headers if status == 200.
+
+This plugin is hostname-agnostic. Unless the calling rule is scoped to a
+specific host, /path/to/htdocs/foo.html will be served for both
+domain1.com/foo.html and domain2.com/foo.html
 */
 
 var PATH = require('path');

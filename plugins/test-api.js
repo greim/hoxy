@@ -5,6 +5,7 @@ http://github.com/greim
 */
 
 /*
+For internal project use.
 Plugin to test the plugin api.
 usage: @test-api()
 */

@@ -4,6 +4,9 @@ Copyright (c) 2010
 http://github.com/greim
 */
 
+/*
+For internal project use.
+*/
 console.log('starting tests');
 
 var proxyPort = 8080;
