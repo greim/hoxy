@@ -3,6 +3,8 @@ Overview
 
 Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Hoxy is similar in concept to [Firebug](http://getfirebug.com/), or perhaps [Greasemonkey](http://www.greasespot.net/), but it operates within the HTTP transport layer rather than within the client runtime. As such, hoxy runs as a standalone proxy server, not as an add-on for any specific browser.
 
+[Video: Quick Introduction](http://www.youtube.com/watch?v=_V0x-khzCXo)
+
 Starting Hoxy
 ---------------
 
