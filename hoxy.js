@@ -7,6 +7,9 @@ http://github.com/greim
 // #############################################################################
 // read cmd line args
 
+
+
+
 var defaultRules = './rules/rules.txt';
 
 var opts = require('./lib/tav.js').set({
@@ -42,6 +45,14 @@ var debug = opts.debug;
 if (opts.args.length && parseInt(opts.args[0])) {
 	console.log('!!! old: please use --port=something to specify port. thank you. exiting.');
 	process.exit(1);
+}
+// proxy config
+var useproxy = null;
+if(process.env.HTTP_PROXY || process.env.http_proxy) {
+    var proxy = (process.env.HTTP_PROXY || process.env.http_proxy);
+    console.log('hoxy using proxy '+proxy);
+    var url = URL.parse(proxy);
+    useproxy = url;
 }
 
 // done declaring
@@ -131,13 +142,19 @@ HTTP.createServer(function(request, response) {
 						reqInfo.headers.host += ':'+reqInfo.port;
 					}
 				}
-
-				var proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
+				var proxy;
+				if(typeof useproxy !== 'object') {
+				    proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
+				}
+				else {
+				    proxy = HTTP.createClient(useproxy.port || 80, useproxy.hostname);
+				}
 
 				// create request, queue up body writes, execute it
+				if(!reqInfo.protocol) reqInfo.protocol = 'http:';
 				var proxyReq = proxy.request(
 					reqInfo.method,
-					reqInfo.url,
+					(typeof useproxy === 'object') ? URL.format(reqInfo) : reqInfo.url,
 					reqInfo.headers
 				);
 				proxyReq.socket.on("error",function(err){
