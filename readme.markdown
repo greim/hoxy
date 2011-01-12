@@ -22,6 +22,11 @@ Note: hoxy catches as many errors as possible in an effort to stay running. By d
 
 Now hoxy will print out all errors to the console.
 
+Using Hoxy With Another Proxy
+-----------------------------------------------
+
+Hoxy looks for the `HTTP_PROXY` environment variable and, if found, uses it. So you will in effect be using two proxies.
+
 How to Use Hoxy
 ---------------
 
