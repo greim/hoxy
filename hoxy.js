@@ -7,9 +7,6 @@ http://github.com/greim
 // #############################################################################
 // read cmd line args
 
-
-
-
 var defaultRules = './rules/rules.txt';
 
 var opts = require('./lib/tav.js').set({
@@ -148,7 +145,7 @@ HTTP.createServer(function(request, response) {
 				}
 
 				// create request, queue up body writes, execute it
-				if(!reqInfo.protocol) reqInfo.protocol = 'http:'; // so we can call parseUrl() on it
+				if(!reqInfo.protocol) reqInfo.protocol = 'http:'; // so we can call URL.format() on it
 				var proxyReq = proxy.request(
 					reqInfo.method,
 					useproxy ? URL.format(reqInfo) : reqInfo.url, // TODO: make getter for reqInfo.absUrl or something
