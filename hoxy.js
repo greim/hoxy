@@ -137,18 +137,14 @@ HTTP.createServer(function(request, response) {
 						reqInfo.headers.host += ':'+reqInfo.port;
 					}
 				}
-				var proxy;
-				if(!useproxy) {
-				    proxy = HTTP.createClient(reqInfo.port, reqInfo.hostname);
-				} else {
-				    proxy = HTTP.createClient(useproxy.port || 80, useproxy.hostname);
-				}
+				var proxy = useproxy
+					? HTTP.createClient(useproxy.port || 80, useproxy.hostname)
+					: HTTP.createClient(reqInfo.port, reqInfo.hostname);
 
 				// create request, queue up body writes, execute it
-				if(!reqInfo.protocol) reqInfo.protocol = 'http:'; // so we can call URL.format() on it
 				var proxyReq = proxy.request(
 					reqInfo.method,
-					useproxy ? URL.format(reqInfo) : reqInfo.url, // TODO: make getter for reqInfo.absUrl or something
+					useproxy ? reqInfo.absUrl : reqInfo.url,
 					reqInfo.headers
 				);
 				proxyReq.socket.on("error",function(err){
