@@ -47,7 +47,7 @@ if (opts.args.length && parseInt(opts.args[0])) {
 var useproxy = false, envProxy = process.env.HTTP_PROXY || process.env.http_proxy;
 if(envProxy) {
     useproxy = URL.parse(envProxy);
-    console.log('hoxy using proxy '+proxy);
+    console.log('hoxy using proxy '+envProxy);
 }
 
 // done declaring
