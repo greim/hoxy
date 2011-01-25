@@ -25,13 +25,15 @@ Now hoxy will print out all errors to the console.
 Using Hoxy With Another Proxy
 -----------------------------------------------
 
-Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it. In which case you will in effect be using two proxies. You could in theory chain several instances of hoxy together using this method, but that would be silly, right?
+Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it. In which case you will in effect be using two proxies. You could in theory chain several instances of hoxy together using this method, each with its own rules, but that would be silly, right?
 
-    node hoxy.js --port=8082 &
+    node hoxy.js --port=8082 --rules=8082-rules.txt &
     export HTTP_PROXY=localhost:8082
-    node hoxy.js --port=8081 &
+    node hoxy.js --port=8081 --rules=8081-rules.txt &
     export HTTP_PROXY=localhost:8081
-    node hoxy.js --port=8080 &
+    node hoxy.js --port=8080 --rules=8080-rules.txt &
+
+This is more likely to be useful for situations where you're behind a firewall and already need to use a proxy.
 
 How to Use Hoxy
 ---------------
