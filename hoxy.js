@@ -43,14 +43,19 @@ if (opts.args.length && parseInt(opts.args[0])) {
 	console.log('!!! old: please use --port=something to specify port. thank you. exiting.');
 	process.exit(1);
 }
-// proxy config
-var useproxy = false, envProxy = process.env.HTTP_PROXY || process.env.http_proxy;
-if(envProxy) {
-    useproxy = URL.parse(envProxy);
-    console.log('hoxy using proxy '+envProxy);
+
+// done
+// #############################################################################
+// environment proxy config
+
+var useProxy, envProxy = process.env.HTTP_PROXY || process.env.http_proxy;
+if(useProxy = !!envProxy) {
+	if(!/^http:\/\//.test(envProxy)) { envProxy = 'http://'+envProxy; }
+	var pEnvProxy = URL.parse(envProxy);
+	console.log('hoxy using proxy '+envProxy);
 }
 
-// done declaring
+// done
 // #############################################################################
 // error handling and subs
 
@@ -137,14 +142,14 @@ HTTP.createServer(function(request, response) {
 						reqInfo.headers.host += ':'+reqInfo.port;
 					}
 				}
-				var proxy = useproxy
-					? HTTP.createClient(useproxy.port || 80, useproxy.hostname)
+				var proxy = useProxy
+					? HTTP.createClient(pEnvProxy.port || 80, pEnvProxy.hostname)
 					: HTTP.createClient(reqInfo.port, reqInfo.hostname);
 
 				// create request, queue up body writes, execute it
 				var proxyReq = proxy.request(
 					reqInfo.method,
-					useproxy ? reqInfo.absUrl : reqInfo.url,
+					useProxy ? reqInfo.absUrl : reqInfo.url,
 					reqInfo.headers
 				);
 				proxyReq.socket.on("error",function(err){
