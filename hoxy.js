@@ -152,9 +152,13 @@ HTTP.createServer(function(request, response) {
 					useProxy ? reqInfo.absUrl : reqInfo.url,
 					reqInfo.headers
 				);
-				proxyReq.socket.on("error",function(err){
-					logError(err,'PROXY REQUEST', request.url);
-				});
+				try{
+					proxyReq.socket.on("error",function(err){
+						logError(err,'PROXY REQUEST', request.url);
+					});
+				}catch(err){
+					logError(err,'NO PROXY REQUEST SOCKET', request.url);
+				}
 				var reqBodyQ = new Q.AsynchQueue();
 				reqInfo.body.forEach(function(chunk){
 					reqBodyQ.push(function(notifier){
