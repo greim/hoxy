@@ -142,9 +142,9 @@ HTTP.createServer(function(request, response) {
 						reqInfo.headers.host += ':'+reqInfo.port;
 					}
 				}
-				var proxy = useProxy
-					? HTTP.createClient(pEnvProxy.port || 80, pEnvProxy.hostname)
-					: HTTP.createClient(reqInfo.port, reqInfo.hostname);
+				var proxy = useProxy ?
+                                    HTTP.createClient(pEnvProxy.port || 80, pEnvProxy.hostname) :
+                                    HTTP.createClient(reqInfo.port, reqInfo.hostname);
 
 				// create request, queue up body writes, execute it
 				var proxyReq = proxy.request(
@@ -153,7 +153,7 @@ HTTP.createServer(function(request, response) {
 					reqInfo.headers
 				);
 				try{
-					proxyReq.socket.on("error",function(err){
+					proxy.on("error",function(err){
 						logError(err,'PROXY REQUEST', request.url);
 					});
 				}catch(err){
