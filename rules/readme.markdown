@@ -44,7 +44,8 @@ Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a
 
 * `$hostname` (alias: `$host`) - Hostname of destination server to which request is being made.
 * `$port` - Port on destination server on which to connect.
-* `$url` - Root-relative URL of the resource being requested.
+* `$url` (alias: `$rurl`) - Root-relative URL of the resource being requested.
+* `$absolute-url` (alias: `$aurl`) - Absolute URL of the resource being requested.
 * `$filename` (alias: `$file`) - By convention, any non-slash characters at the end of the URL path.
 * `$extension` (alias: `$ext`) - The filename extension matching the convention `file.ext`
 * `$request-headers[key]` (alias: `$qh[key]`) - A dictionary object containing request header names and their values.
