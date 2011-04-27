@@ -105,6 +105,8 @@ RDB.setRules([
 	new Rule('response: if $port not gt 9597, @test("notGt")'),
 	new Rule('response: if $port not gte 9597, @test("notGte")'),
 	new Rule('response: @test-api()'),
+	new Rule('response: $absolute-url.set-to("http://example.com:9876/foo.html?bar=baz")'),
+	new Rule('response: if $absolute-url eq "http://example.com:9876/foo.html?bar=baz" and $aurl eq "http://example.com:9876/foo.html?bar=baz", @test("aurl")'),
 ]);
 
 var url = 'http://localhost:9596/foo.html?bar=baz&bar%202=baz%202';
@@ -126,7 +128,7 @@ var passes = {
 	ext:false,extChange:false,extClear:false,extEmpty:false,filenameEmpty:false,matchesAmong:false,
 	notMatchesAmong:false,containsAmong:false,notContainsAmong:false,
 	lt:false,lte:false,gt:false,gte:false,lte2:false,gte2:false,
-	notLt:false,notLte:false,notGt:false,notGte:false,
+	notLt:false,notLte:false,notGt:false,notGte:false,aurl:false,
 };
 
 exports.run = function(api) {
