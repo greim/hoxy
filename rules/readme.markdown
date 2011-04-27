@@ -42,7 +42,8 @@ Things
 
 Things are the nouns of the rule syntax. They're preceded by `$`, and possibly a key if it's a dictionary variable. They include:
 
-* `$hostname` (alias: `$host`) - Hostname of destination server to which request is being made.
+* `$hostname` - Hostname of destination server to which request is being made (doesn't include port).
+* `$host` - Hostname plus port (`<hostname>:<port>`) of destination server to which request is being made. If port is 80 will just return hostname.
 * `$port` - Port on destination server on which to connect.
 * `$url` (alias: `$rurl`) - Root-relative URL of the resource being requested.
 * `$absolute-url` (alias: `$aurl`) - Absolute URL of the resource being requested.

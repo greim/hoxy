@@ -5,9 +5,9 @@
 #response: if $content-type contains 'html', @banner("currently browsing through a web hacking proxy")
 
 # log every request to a given host
-#response: if $host eq 'example.com', $url.log()
+#response: if $hostname eq 'example.com', $url.log()
 
 # use css and js from the staging server
-#request: if $content-type contains "javascript" and $host eq "www.example.com", $host.set-to('www-stage.example.com')
-#request: if $content-type contains "css" and $host eq "www.example.com", $host.set-to('www-stage.example.com')
+#request: if $content-type contains "javascript" and $host eq "www.example.com", $host.set-to('www-stage.example.com:83')
+#request: if $content-type contains "css" and $host eq "www.example.com", $host.set-to('www-stage.example.com:83')
 
