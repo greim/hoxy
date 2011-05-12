@@ -8,6 +8,6 @@
 #response: if $hostname eq 'example.com', $url.log()
 
 # use css and js from the staging server
-#request: if $content-type contains "javascript" and $host eq "www.example.com", $host.set-to('www-stage.example.com:83')
-#request: if $content-type contains "css" and $host eq "www.example.com", $host.set-to('www-stage.example.com:83')
+#request: if $ext eq "js" and $host eq "www.example.com", $host.set-to('www-stage.example.com:83')
+#request: if $ext eq "css" and $host eq "www.example.com", $host.set-to('www-stage.example.com:83')
 
