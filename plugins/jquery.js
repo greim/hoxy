@@ -1,28 +1,44 @@
 /*
 Written by Greg Reimer
-Copyright (c) 2010
+Copyright (c) 2011
 http://github.com/greim
 */
 
 /**
 Manipulate the response body as DOM using jQuery.
-usage: @jquery('path/to/script.js')
+usage: @jquery('path/to/your/script.js')
+
+NOTES:
+ * This plugin is experimental, use at own risk.
+ * If path is relative, it resolves to dir hoxy was launched from.
+ * Your script will execute in an env similar to browser scripts, with a base window object and a $ var defined.
+ * jQuery 1.6.1 is currently used.
 */
 
-var JSDOM = require('jsdom');
+var jsdomExists = true;
+try { var JSDOM = require('jsdom'); }
+catch (err) { jsdomExists = false; }
 var PATH = require('path');
+
 var doctypePatt = /(<!doctype[^>]*>)/i;
 
 exports.run = function(api){
+	if (!jsdomExists) {
+		console.log('The jQuery DOM-manipulation plugin can\'t run because no jsdom library is available.');
+		api.notify();
+		return;
+	}
 	var respInf = api.getResponseInfo();
 	var ct = respInf.headers['content-type'];
 	if (ct && ct.indexOf('html')>-1) {
 		var html = api.getResponseBody();
 		var script = api.arg(0);
-		// TODO: resolve and normalize script path to absolute, using as context the dir from which this node process was launched
 		JSDOM.env({
 			html: html,
-			scripts: ['./lib/jquery-1.6.1.min.js',script],
+			scripts: [
+				PATH.resolve(__dirname,'./lib/jquery-1.6.1.min.js'),
+				PATH.resolve('.',script),
+			],
 			done: function(errors, window){
 				if (errors) {
 					var errStrings = errors.map(function(e){return e.toString();});
