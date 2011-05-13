@@ -17,6 +17,7 @@ List of OOTB Plugins
 * `@html-beautify()` - reformat html code. [credit](http://github.com/einars/js-beautify)
 * `@internal-redirect(url)` - silent redirect
 * `@js-beautify()` - reformat javascrit code. [credit](http://github.com/einars/js-beautify)
+* `@jquery()` - DOM-manipulate a page using jQuery before sending it along to the client. [credit](http://jquery.com/)
 * `@send-404()` - sends a 404 response
 * `@throttle(ms, chunkSize)` - throttle back the transfer speed
 * `@unconditional()` - suppress http conditional get headers
