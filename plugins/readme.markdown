@@ -17,7 +17,7 @@ List of OOTB Plugins
 * `@html-beautify()` - reformat html code. [credit](http://github.com/einars/js-beautify)
 * `@internal-redirect(url)` - silent redirect
 * `@js-beautify()` - reformat javascrit code. [credit](http://github.com/einars/js-beautify)
-* `@jquery()` - DOM-manipulate a page using jQuery before sending it along to the client. [credit](http://jquery.com/)
+* `@jquery()` - DOM-manipulate a page using jQuery before sending it along to the client. [credit](http://jquery.com/), [credit](https://github.com/tmpvar/jsdom)
 * `@send-404()` - sends a 404 response
 * `@throttle(ms, chunkSize)` - throttle back the transfer speed
 * `@unconditional()` - suppress http conditional get headers
@@ -90,7 +90,9 @@ If the plugin is executing in the request phase, calling this method prevents ho
 
 ### api.notify()
 
-Must be called after the plugin is done executing or hoxy will hang indefinitely.
+Understanding why this method is called is *critical*. By default, hoxy will hang indefinitely on the execution of each plugin until this method is called, regardless of when and how the plugin returns or errors out. One way or another, therefore, this method must be called for each plugin execution.
+
+Furthermore, all modifications by your plugin to the request/response *must* happen before `api.notify()` is called. If modifications happen after it's called, the behavior is undefined.
 
 ### api.setResponseBody(string)
 
