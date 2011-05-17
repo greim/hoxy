@@ -70,6 +70,7 @@ exports.run = function(api){
 		api.notify();
 		return;
 	}
+	var reqInf = api.getRequestInfo();
 	var respInf = api.getResponseInfo();
 	var ct = respInf.headers['content-type'];
 	if (ct && ct.indexOf('html')>-1) {
@@ -78,7 +79,7 @@ exports.run = function(api){
 			var runMe = api.arg(0);
 			runMe = PATH.resolve('.',runMe);
 			runMe = getScript(runMe);
-			var window = JSDOM.jsdom(html).createWindow();
+			var window = JSDOM.html(html).createWindow();
 			runMe.runInNewContext(window);
 			var dt = html.match(doctypePatt);
 			dt = dt ? dt[1]+'\r\n' : '';
