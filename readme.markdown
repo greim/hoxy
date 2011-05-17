@@ -42,7 +42,7 @@ If you're comfortable writing JavaScript for node.js, you can also write plugins
 System Requirements
 --------------------
 
-Hoxy requires [node.js](http://nodejs.org/) to run, version 0.3 or higher. (Anecdotal evidence suggests it *may* work on earlier versions, YMMV.) Any browser can be used that can be configured to use a proxy, and that can see your hoxy instance on the network.
+Hoxy requires [node.js](http://nodejs.org/) to run, version 0.4 or higher.
 
 Architectural Overview
 ======================

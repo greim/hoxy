@@ -92,14 +92,6 @@ HTTP.createServer(function(request, response) {
 		delete request.headers[name];
 	});
 
-	// handle these noisy error sources with less verbose errors
-	request.socket.on("error",function(err){
-		logError(err,'REQUEST', request.url);
-	});
-	response.socket.on("error",function(err){
-		logError(err,'RESPONSE', request.url);
-	});
-
 	// grab fresh copy of rules for each request
 	var rules = RDB.getRules();
 
@@ -108,10 +100,10 @@ HTTP.createServer(function(request, response) {
 		// entire request body is now loaded
 		// process request phase rules
 		var reqPhaseRulesQ = new Q.AsynchQueue();
-		rules.forEach(function(rule){
-			if(rule.phase==='request'){
-				reqPhaseRulesQ.push(rule.getExecuter(hts));
-			}
+		rules.filter(function(rule){
+			return rule.phase==='request';
+		}).forEach(function(rule){
+			reqPhaseRulesQ.push(rule.getExecuter(hts));
 		});
 
 		reqPhaseRulesQ.execute(function(){
@@ -142,23 +134,19 @@ HTTP.createServer(function(request, response) {
 						reqInfo.headers.host += ':'+reqInfo.port;
 					}
 				}
-				var proxy = useProxy
-					? HTTP.createClient(pEnvProxy.port || 80, pEnvProxy.hostname)
-					: HTTP.createClient(reqInfo.port, reqInfo.hostname);
 
-				// create request, queue up body writes, execute it
-				var proxyReq = proxy.request(
-					reqInfo.method,
-					useProxy ? reqInfo.absUrl : reqInfo.url,
-					reqInfo.headers
-				);
-				try{
-					proxyReq.socket.on("error",function(err){
-						logError(err,'PROXY REQUEST', request.url);
-					});
-				}catch(err){
-					logError(err,'NO PROXY REQUEST SOCKET', request.url);
-				}
+				// this method makes node re-use client objects if needed
+				var proxyReq = HTTP.request({
+					method: reqInfo.method,
+					host: useProxy ? pEnvProxy.hostname : reqInfo.hostname,
+					port: useProxy ? pEnvProxy.port : reqInfo.port,
+					path: useProxy ? reqInfo.absUrl : reqInfo.url,
+					headers: reqInfo.headers,
+				},function(proxyResp){
+					hts.setResponse(proxyResp, sendResponse);
+				});
+
+				// write out to dest server
 				var reqBodyQ = new Q.AsynchQueue();
 				reqInfo.body.forEach(function(chunk){
 					reqBodyQ.push(function(notifier){
@@ -171,14 +159,6 @@ HTTP.createServer(function(request, response) {
 				reqBodyQ.execute(function(){
 					proxyReq.end();
 				});
-
-				// handle response from server
-				proxyReq.on('response', function(proxyResp){
-					proxyResp.socket.on("error",function(err){
-						logError(err,'PROXY RESPONSE', request.url);
-					});
-					hts.setResponse(proxyResp, sendResponse);
-				});
 			}
 
 			// same subroutine used in either case
@@ -187,10 +167,10 @@ HTTP.createServer(function(request, response) {
 				// entire response body is now available
 				// do response phase rule processing
 				var respPhaseRulesQ = new Q.AsynchQueue();
-				rules.forEach(function(rule){
-					if(rule.phase==='response'){
-						respPhaseRulesQ.push(rule.getExecuter(hts));
-					}
+				rules.filter(function(rule){
+					return rule.phase==='response';
+				}).forEach(function(rule){
+					respPhaseRulesQ.push(rule.getExecuter(hts));
 				});
 
 				respPhaseRulesQ.execute(function(){
