@@ -56,8 +56,7 @@ var getScript = (function(){
 	return function(path){
 		if (!scriptCache[path]){
 			var code = FS.readFileSync(path, 'utf8');
-//			scriptCache[path] = VM.createScript(jQueryCode+'\n\n\n'+code);
-			scriptCache[path] = VM.createScript('var x = 1+1;');
+			scriptCache[path] = VM.createScript(jQueryCode+'\n\n\n'+code);
 		}
 		return scriptCache[path];
 	};
