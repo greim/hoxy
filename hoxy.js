@@ -22,6 +22,10 @@ var opts = require('./lib/tav.js').set({
 		note: 'Specify port to listen on. (default 8080)',
 		value: 8080,
 	},
+	stage: {
+		note: 'Host that hoxy will act as a staging server for.',
+		value: false,
+	},
 }, "Hoxy, the web-hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [--port=port]");
 
 // done reading args
@@ -41,6 +45,11 @@ var debug = opts.debug;
 
 if (opts.args.length && parseInt(opts.args[0])) {
 	console.log('!!! old: please use --port=something to specify port. thank you. exiting.');
+	process.exit(1);
+}
+
+if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
+	console.log('error: stage must be of the form <hostname> or <hostname>:<port> exiting.');
 	process.exit(1);
 }
 
@@ -86,6 +95,11 @@ var stripRqHdrs = [
 ];
 
 HTTP.createServer(function(request, response) {
+
+	if (/^\//.test(request.url) && opts.stage){
+		request.url = 'http://'+opts.stage+request.url;
+		request.headers.host = opts.stage;
+	}
 
 	// strip out certain request headers
 	stripRqHdrs.forEach(function(name){
