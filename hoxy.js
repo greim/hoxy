@@ -229,8 +229,9 @@ HTTP.createServer(function(request, response) {
 // #############################################################################
 // print a nice info message
 
-console.log(projectName+' running at http://localhost:'+proxyPort);
-if (debug) console.log('debug mode is on');
+console.log(projectName+' running at localhost:'+proxyPort);
+if (opts.stage) console.log('staging mode is on. http://localhost:'+proxyPort+'/ will stage for http://'+opts.stage+'/');
+if (debug) console.log('debug mode is on.');
 
 // done with message
 // #############################################################################
