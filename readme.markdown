@@ -12,7 +12,7 @@ Stand in the hoxy project dir and type:
 
     node hoxy.js
 
-This will start hoxy on port 8080. (For a different port, use `--port=port`.) Next, configure your browser's proxy settings to point to hoxy.
+This will start hoxy on port 8080. (For a different port, e.g. 8081, use `--port=8081`.) Next, configure your browser's proxy settings to point to hoxy.
 
 If it doesn't already exist, upon startup hoxy will create a file in the `rules` dir called `rules.txt`. Open this file in your text editor and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
@@ -20,16 +20,14 @@ Note: hoxy catches as many errors as possible in an effort to stay running. By d
 
     node hoxy.js --debug
 
-Now hoxy will print out all errors to the console.
+Now hoxy will dump all errors to the console.
 
 Using Hoxy With Another Proxy
 -----------------------------------------------
 
-WARNING: this feature is still experimental. Expect bugs.
-
 Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it.
 
-    export HTTP_PROXY=proxy.myschool.edu:80
+    export HTTP_PROXY=proxy.example.edu:80
     node hoxy.js
 
 How to Use Hoxy
@@ -94,7 +92,7 @@ Hoxy differs from a normal HTTP proxy by adding two additional processing steps,
 * Phase 1: Client prepares to make request.
 * Hop: Client transmits to hoxy.
 * Phase 2: Hoxy executes request-phase rules.
-* Hop: Hoxy transmits (a potentially altered) request to server.
+* Hop: Hoxy transmits (a potentially altered) request to (a potentially different) server.
 * Phase 3: Server processes request and prepares response.
 * Hop: Server transmits to hoxy.
 * Phase 4: Hoxy executes response-phase rules.
