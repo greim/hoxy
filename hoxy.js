@@ -22,7 +22,7 @@ var opts = require('./lib/tav.js').set({
 		note: 'Specify port to listen on. (default 8080)',
 		value: 8080,
 	},
-	stage: {
+	staging: {
 		note: 'Host that hoxy will act as a staging server for.',
 		value: false,
 	},
@@ -48,8 +48,8 @@ if (opts.args.length && parseInt(opts.args[0])) {
 	process.exit(1);
 }
 
-if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
-	console.log('error: stage must be of the form <hostname> or <hostname>:<port> exiting.');
+if (opts.staging && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.staging)) {
+	console.log('error: staging must be of the form <hostname> or <hostname>:<port> exiting.');
 	process.exit(1);
 }
 
@@ -96,9 +96,9 @@ var stripRqHdrs = [
 
 HTTP.createServer(function(request, response) {
 
-	if (/^\//.test(request.url) && opts.stage){
-		request.url = 'http://'+opts.stage+request.url;
-		request.headers.host = opts.stage;
+	if (/^\//.test(request.url) && opts.staging){
+		request.url = 'http://'+opts.staging+request.url;
+		request.headers.host = opts.staging;
 	}
 
 	// strip out certain request headers
@@ -230,7 +230,7 @@ HTTP.createServer(function(request, response) {
 // print a nice info message
 
 console.log(projectName+' running at localhost:'+proxyPort);
-if (opts.stage) console.log('staging mode is on. http://localhost:'+proxyPort+'/ will stage for http://'+opts.stage+'/');
+if (opts.staging) console.log('staging mode is on. http://localhost:'+proxyPort+'/ will stage for http://'+opts.staging+'/');
 if (debug) console.log('debug mode is on.');
 
 // done with message
