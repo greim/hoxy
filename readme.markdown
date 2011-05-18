@@ -131,7 +131,7 @@ Staging Server Mode
 
 Hoxy has an optional staging server mode, where in addition to functioning as a proxy, it can also serve as a direct URL which mirrors another environment. To start up hoxy in staging server mode:
 
-    node hoxy.js --port=83 --staging=www.example.com
+    node hoxy.js --port=83 --stage=www.example.com
 
 Supposing you launched this instance of Hoxy on a machine called `dev.example.com`, now you can either configure your browser to proxy through `dev.example.com:83`, or you can hit `http://dev.example.com:83/` directly in your browser, in which case it will mirror over to `http://www.example.com/` but still run your rules in the interim.
 
