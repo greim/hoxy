@@ -5,9 +5,10 @@ http://github.com/greim
 */
 
 // #############################################################################
-// read cmd line args
+// read cmd line args and declare stuff
 
 var defaultRules = './rules/rules.txt';
+var projectName = 'Hoxy';
 
 var opts = require('./lib/tav.js').set({
 	debug: {
@@ -23,14 +24,14 @@ var opts = require('./lib/tav.js').set({
 		value: 8080,
 	},
 	stage: {
-		note: 'Host that hoxy will act as a staging server for.',
+		note: 'Host that '+projectName+' will act as a staging server for.',
+		value: false,
+	},
+	'no-version-check': {
+		note: 'Attempt to run '+projectName+' without the startup version check.',
 		value: false,
 	},
 }, "Hoxy, the web-hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [--port=port]");
-
-// done reading args
-// #############################################################################
-// declare stuff
 
 var HTTP  = require('http');
 var URL   = require('url');
@@ -39,7 +40,6 @@ var Q     = require('./lib/asynch-queue.js');
 var RULES = require('./lib/rules.js');
 var RDB   = require('./lib/rules-db.js');
 
-var projectName = 'Hoxy';
 var proxyPort = opts.port || 8080;
 var debug = opts.debug;
 
@@ -72,9 +72,11 @@ if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
 			}
 		}
 		return true;
-	})()){
-		console.log(projectName+' requires Node.js v'+requiredVer.join('.')
-		+' or higher but you\'re running v'+actualVer.join('.')+' ... Quitting.');
+	})() && !opts['no-version-check']){
+		console.log('Error: '+projectName+' requires Node.js v'+requiredVer.join('.')
+		+' or higher but you\'re running '+process.version);
+		console.log('Use --no-version-check to attempt to run '+projectName+' without this check.');
+		console.log('Quitting.');
 		process.exit(1);
 	}
 })();
