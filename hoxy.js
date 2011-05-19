@@ -39,7 +39,7 @@ var Q     = require('./lib/asynch-queue.js');
 var RULES = require('./lib/rules.js');
 var RDB   = require('./lib/rules-db.js');
 
-var projectName = 'hoxy';
+var projectName = 'Hoxy';
 var proxyPort = opts.port || 8080;
 var debug = opts.debug;
 
@@ -52,6 +52,32 @@ if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
 	console.log('error: stage must be of the form <hostname> or <hostname>:<port> exiting.');
 	process.exit(1);
 }
+
+// done
+// #############################################################################
+// startup version check
+
+(function(){
+	// requiring v0.4.x or higher because of http connection pooling
+	var requiredVer = [0,4];
+	var actualVer = process.version.split('.').map(function(s){
+		return parseInt(s.replace(/\D/g,''));
+	});
+	if (!(function(){
+		for (var i=0;i<requiredVer.length;i++){
+			if (isNaN(actualVer[i]) || actualVer[i] < requiredVer[i]) {
+				return false;
+			} else if (actualVer[i] > requiredVer[i]) {
+				return true;
+			}
+		}
+		return true;
+	})()){
+		console.log(projectName+' requires Node.js v'+requiredVer.join('.')
+		+' or higher but you\'re running v'+actualVer.join('.')+' ... Quitting.');
+		process.exit(1);
+	}
+})();
 
 // done
 // #############################################################################

@@ -129,10 +129,10 @@ Plugins running in the request phase have the option to write the response thems
 Staging Server Mode
 ===================
 
-Hoxy has an optional staging server mode, where in addition to functioning as a proxy, it can also serve as a direct URL which mirrors another environment. To start up hoxy in staging server mode:
+Hoxy has an optional staging server mode, where in addition to functioning as a proxy, it can also serve as a mirror of another server. To start up hoxy in staging server mode:
 
     node hoxy.js --port=83 --stage=www.example.com
 
-Supposing you launched this instance of Hoxy on a machine called `dev.example.com`, now you can either configure your browser to proxy through `dev.example.com:83`, or you can hit `http://dev.example.com:83/` directly in your browser, in which case it will mirror over to `http://www.example.com/` but still run your rules in the interim.
+Supposing you launched this instance of Hoxy on a machine called `dev.example.com`, you can still configure your browser to proxy through `dev.example.com:83`, but now you can also hit `http://dev.example.com:83/` directly from your browser, in which case it will mirror over to `http://www.example.com/` but still run your rules in the interim.
 
 This is useful in testing and QA scenarios where you're testing changes on a specific website. You can then pass out Hoxy links to various testers without needing them to configure their proxy settings.
