@@ -58,7 +58,10 @@ if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
 // startup version check
 
 (function(){
-	// requiring v0.4.x or higher because of http connection pooling
+	/*
+	Requiring v0.4.x or higher because we depend on http client connection pooling.
+	Also because of jsdom.
+	*/
 	var requiredVer = [0,4];
 	var actualVer = process.version.split('.').map(function(s){
 		return parseInt(s.replace(/\D/g,''));
