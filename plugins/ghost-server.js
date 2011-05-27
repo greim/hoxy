@@ -9,7 +9,7 @@ Replace response from remote server by static file service out of a dir local to
 hoxy, but only when a match is found. Otherwise serve response from remote
 server as normal.
 
-usage: @ghost-server(htdocs)
+usage: @ghost-server(htdocs[, indexFile])
 
 See if request URL path exists under htdocs. If found, serve that file instead
 of one on remote server. If not found, serves file on the remote server as
@@ -21,8 +21,9 @@ This plugin is hostname-agnostic. Unless the calling rule is scoped to a
 specific host, /path/to/htdocs/foo.html will be served for both
 domain1.com/foo.html and domain2.com/foo.html
 
-Note: ghost-server will treat 'path/' as 'path/index.html' when looking for the
-file locally.
+Note: By default, ghost-server will treat 'path/' as 'path/index.html' when
+looking for the file locally. If you supply a second argument, ghost-server will
+use that instead of 'index.html', for example: @ghost-server('/some/path','home.php')
 */
 
 var PATH = require('path');
@@ -31,6 +32,7 @@ var FS = require('fs');
 
 exports.run = function(api){
 	var htdocs = api.arg(0);
+	var indexFile = api.arg(1) || 'index.html';
 	var qi = api.getRequestInfo();
 	var si = api.getResponseInfo();
 	var pUrl = URL.parse(qi.url);
@@ -52,7 +54,7 @@ exports.run = function(api){
 				throw new Error('ghost server: bad path: '+htdocs+' => '+fullPath);
 			} else {
 				if (fullPath.charAt(fullPath.length-1)==='/'){
-					fullPath += 'index.html';
+					fullPath += indexFile;
 				}
 				FS.stat(fullPath, function(err, stats){
 					if (err || stats.isDirectory()) {
