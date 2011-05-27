@@ -20,6 +20,9 @@ use remote server's response headers if status == 200.
 This plugin is hostname-agnostic. Unless the calling rule is scoped to a
 specific host, /path/to/htdocs/foo.html will be served for both
 domain1.com/foo.html and domain2.com/foo.html
+
+Note: ghost-server will treat 'path/' as 'path/index.html' when looking for the
+file locally.
 */
 
 var PATH = require('path');
