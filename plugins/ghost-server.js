@@ -48,6 +48,9 @@ exports.run = function(api){
 				api.notify();
 				throw new Error('ghost server: bad path: '+htdocs+' => '+fullPath);
 			} else {
+				if (fullPath.charAt(fullPath.length-1)==='/'){
+					fullPath += 'index.html';
+				}
 				FS.stat(fullPath, function(err, stats){
 					if (err || stats.isDirectory()) {
 						// file to be ghost served doesn't exist or is a directory
