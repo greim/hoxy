@@ -8,6 +8,7 @@ http://github.com/greim
 Manipulate the response body as DOM using jQuery.
 
     usage: @jquery('path/to/your/script.js')
+    -or-   @jquery('my script to eval')
 
 You provide a path to a script which you created and saved somewhere on the same
 filesystem as your hoxy instance. This script will execute in the following
@@ -41,26 +42,30 @@ var doctypePatt = /(<!doctype[^>]*>)/i;
 
 // make sure jsdom gives us an inert DOM
 JSDOM.defaultDocumentFeatures = {
-  FetchExternalResources : false,
-  ProcessExternalResources : false,
-  MutationEvents : false,
-  QuerySelector : false,
+	FetchExternalResources : false,
+	ProcessExternalResources : false,
+	MutationEvents : false,
+	QuerySelector : false,
 };
 
 // utility to cache script objects
-var getScript = (function(){
-	var scriptCache = {};
-	var jQueryCode = './lib/jquery-1.6.1.min.js';
-	jQueryCode = PATH.resolve(__dirname, jQueryCode);
-	jQueryCode = FS.readFileSync(jQueryCode,'utf8');
-	return function(path){
-		if (!scriptCache[path]){
-			var code = FS.readFileSync(path, 'utf8');
-			scriptCache[path] = VM.createScript(jQueryCode+'\n\n\n'+code);
-		}
-		return scriptCache[path];
-	};
-})();
+var scriptCache = {};
+var jQueryCode = './lib/jquery-1.6.1.min.js';
+jQueryCode = PATH.resolve(__dirname, jQueryCode);
+jQueryCode = FS.readFileSync(jQueryCode,'utf8');
+function getScriptFromPath(path){
+	if (!scriptCache[path]){
+		var code = FS.readFileSync(path, 'utf8');
+		scriptCache[path] = VM.createScript(jQueryCode+'\n\n\n'+code);
+	}
+	return scriptCache[path];
+};
+function getScriptFromEval(code){
+	if (!scriptCache[code]){
+		scriptCache[code] = VM.createScript(jQueryCode+'\n\n\n'+code);
+	}
+	return scriptCache[code];
+};
 
 
 exports.run = function(api){
@@ -76,11 +81,20 @@ exports.run = function(api){
 	if (ct && ct.indexOf('html')>-1) {
 		var html = api.getResponseBody();
 		try{
-			var runMe = api.arg(0);
-			runMe = PATH.resolve('.',runMe);
-			runMe = getScript(runMe);
+			var path = api.arg(0);
+			path = PATH.resolve('.',path);
+			var scriptObj = getScriptFromPath(path);
+		}catch(err){
+			try{
+				var scriptObj = getScriptFromEval(api.args(0));
+			}catch(err){
+				api.notify();
+				throw err;
+			}
+		}
+		try{
 			var window = JSDOM.html(html).createWindow();
-			runMe.runInNewContext(window);
+			scriptObj.runInNewContext(window);
 			var dt = html.match(doctypePatt);
 			dt = dt ? dt[1]+'\r\n' : '';
 			var newHTML = dt + window.document.outerHTML;
