@@ -27,9 +27,11 @@ Starting Hoxy (Quickstart)
 
 Alternatively, if you type the command:
 
-    quickstart-hoxy
+    ./quickstart-hoxy
 
-You will be thrown into a `vi` session against a temp rules file. When you exit the `vi` session, hoxy will launch against that rules file. Every time you do this, that rules file starts over as blank. This is a convenience method to launch hoxy for quick experiments.
+You'll be thrown into a `vi` session against a temp rules file. When you exit the `vi` session, hoxy will launch against that rules file. Every time you do this, that rules file starts over as blank. This is a convenience method to launch hoxy for quick experiments.
+
+Command line args for `quickstart-hoxy` are identical to hoxy's startup args, such as port, etc. (except `--rules`)
 
 Using Hoxy With Another Proxy
 -----------------------------
