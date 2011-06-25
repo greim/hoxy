@@ -43,15 +43,13 @@ function getScriptFromEval(code){
 }
 
 exports.run = function(api){
-	var reqInf = api.getRequestInfo();
-	var respInf = api.getResponseInfo();
 	var isJson = true;
-	var isRequest = !!respInf;
-	var getBody = isRequest ? api.getRequestBody : api.getResponseBody;
-	var setBody = isRequest ? api.setRequestBody : api.setResponseBody;
+	var isRequest = !api.getResponseInfo();
+	api.getBody = isRequest ? api.getRequestBody : api.getResponseBody;
+	api.setBody = isRequest ? api.setRequestBody : api.setResponseBody;
 
 	try{
-		var jsonObj = JSON.parse(getBody());
+		var jsonObj = JSON.parse(api.getBody());
 	} catch (err) {
 		isJson = false;
 	}
@@ -59,7 +57,7 @@ exports.run = function(api){
 		try{
 			var path = api.arg(0);
 			path = PATH.resolve('.',path);
-			var scriptObj = getScriptFromPath(runMe);
+			var scriptObj = getScriptFromPath(path);
 		}catch(err){
 			try{
 				var scriptObj = getScriptFromEval(api.arg(0));
@@ -69,7 +67,7 @@ exports.run = function(api){
 			}
 		}
 		scriptObj.runInNewContext({console:console,json:jsonObj});
-		setBody(JSON.stringify(jsonObj));
+		api.setBody(JSON.stringify(jsonObj));
 		api.notify();
 	} else {
 		api.notify();

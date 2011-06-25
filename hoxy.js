@@ -166,6 +166,7 @@ HTTP.createServer(function(request, response) {
 			// response directly without hitting up the server for a response.
 			// obviously, this will only work if the response was somehow
 			// already populated, e.g. during request-phase rule processing
+			// otherwise it throws an error and we send for the response.
 			try {
 				hts.doResponse(sendResponse);
 			} catch (ex) {
