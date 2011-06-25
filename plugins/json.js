@@ -46,9 +46,12 @@ exports.run = function(api){
 	var reqInf = api.getRequestInfo();
 	var respInf = api.getResponseInfo();
 	var isJson = true;
+	var isRequest = !!respInf;
+	var getBody = isRequest ? api.getRequestBody : api.getResponseBody;
+	var setBody = isRequest ? api.setRequestBody : api.setResponseBody;
 
 	try{
-		var jsonObj = JSON.parse(api.getResponseBody());
+		var jsonObj = JSON.parse(getBody());
 	} catch (err) {
 		isJson = false;
 	}
@@ -66,7 +69,7 @@ exports.run = function(api){
 			}
 		}
 		scriptObj.runInNewContext({console:console,json:jsonObj});
-		api.setResponseBody(JSON.stringify(jsonObj));
+		setBody(JSON.stringify(jsonObj));
 		api.notify();
 	} else {
 		api.notify();
