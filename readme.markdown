@@ -6,7 +6,7 @@ Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use 
 [Video: Quick Introduction](http://www.youtube.com/watch?v=2YLfBTrVgZU)
 
 Starting Hoxy
----------------
+-------------
 
 Stand in the hoxy project dir and type:
 
@@ -22,8 +22,17 @@ Note: hoxy catches as many errors as possible in an effort to stay running. By d
 
 Now hoxy will dump all errors to the console.
 
+Starting Hoxy (Quickstart)
+--------------------------
+
+If you type:
+
+    quickstart-hoxy
+
+You will be thrown into a `vi` session against a temp rules file. When you exit the `vi` session, hoxy will launch against that rules file. Every time you do this, that rules file starts over as blank. This is a convenience method to launch hoxy for quick experiments.
+
 Using Hoxy With Another Proxy
------------------------------------------------
+-----------------------------
 
 Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it.
 

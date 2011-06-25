@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+RULES_FILE=".quickstart-rules"
+SCRIPT_DIR=$(dirname $0)
+
+cd $SCRIPT_DIR
+
+echo "\n" > $RULES_FILE
+echo "# =============================================" >> $RULES_FILE
+echo "# Welcome to hoxy quickstart!" >> $RULES_FILE
+echo "# Type your rules above the line and then save." >> $RULES_FILE
+echo "" >> $RULES_FILE
+
+vi $RULES_FILE
+
+node hoxy.js $* --rules=$RULES_FILE
