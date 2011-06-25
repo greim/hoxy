@@ -8,7 +8,7 @@ Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use 
 Starting Hoxy
 -------------
 
-Stand in the hoxy project dir and type:
+Stand in the hoxy project dir and type the command:
 
     node hoxy.js
 
@@ -25,7 +25,7 @@ Now hoxy will dump all errors to the console.
 Starting Hoxy (Quickstart)
 --------------------------
 
-If you type:
+Alternatively, if you type the command:
 
     quickstart-hoxy
 
