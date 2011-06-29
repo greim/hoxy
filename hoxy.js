@@ -10,7 +10,7 @@ http://github.com/greim
 try {
 	process.chdir(__dirname);
 } catch (err) {
-	console.log('couldn\'t change to dir: ' + __dirname + ': ' + err);
+	console.error('couldn\'t change to dir: ' + __dirname + ': ' + err);
 }
 
 // #############################################################################
@@ -53,12 +53,12 @@ var proxyPort = opts.port || 8080;
 var debug = opts.debug;
 
 if (opts.args.length && parseInt(opts.args[0])) {
-	console.log('!!! old: please use --port=something to specify port. thank you. exiting.');
+	console.error('!!! old: please use --port=something to specify port. thank you. exiting.');
 	process.exit(1);
 }
 
 if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
-	console.log('error: stage must be of the form <hostname> or <hostname>:<port> exiting.');
+	console.error('error: stage must be of the form <hostname> or <hostname>:<port> exiting.');
 	process.exit(1);
 }
 
@@ -85,10 +85,10 @@ if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
 		}
 		return true;
 	})() && !opts['no-version-check']){
-		console.log('Error: '+projectName+' requires Node.js v'+requiredVer.join('.')
+		console.error('Error: '+projectName+' requires Node.js v'+requiredVer.join('.')
 		+' or higher but you\'re running '+process.version);
-		console.log('Use --no-version-check to attempt to run '+projectName+' without this check.');
-		console.log('Quitting.');
+		console.error('Use --no-version-check to attempt to run '+projectName+' without this check.');
+		console.error('Quitting.');
 		process.exit(1);
 	}
 })();
@@ -120,7 +120,7 @@ function turl(url){
 
 function logError(err, errType, url) {
 	if (debug) {
-		console.log(errType+' error: '+turl(url)+': '+err.message);
+		console.error(errType+' error: '+turl(url)+': '+err.message);
 	}
 }
 
@@ -281,7 +281,7 @@ if (debug) console.log('debug mode is on.');
 // helps to ensure the proxy stays up and running
 process.on('uncaughtException',function(err){
 	if (debug) {
-		console.log('uncaught exception: '+err.message);
-		console.log(err.stack);
+		console.error('uncaught exception: '+err.message);
+		console.error(err.stack);
 	}
 });
