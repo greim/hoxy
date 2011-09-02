@@ -5,6 +5,13 @@ Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use 
 
 [Video: Quick Introduction](http://www.youtube.com/watch?v=2YLfBTrVgZU)
 
+Table of Contents
+-------------
+This file: quickstart guide and arcitectural overview
+[Rules readme](rules/readme.markdown): Info on how to formulate and use rules
+[Plugins readme](plugins/readme.markdown): Info on how to create plugins
+
+
 Starting Hoxy
 -------------
 
