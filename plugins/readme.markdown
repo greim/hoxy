@@ -9,7 +9,7 @@ List of OOTB Plugins
 ========================
 
 * `@allow-origin()` - allows cross-origin resource sharing
-* `@banner(textToShow)` - display a banner on html pages
+* `@banner(textToShow,styleOverrides)` - display a banner on html pages.  textToShow shows in banner, styleOverrides is a css style attribute type string that override the default styling of the banner.
 * `@css-beautify()` - reformat css code
 * `@empty-text()` - send an empty text response
 * `@external-redirect(url)` - send an http redirect
