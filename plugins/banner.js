@@ -15,8 +15,36 @@ exports.run = function(api){
 	if (ct && ct.indexOf('html')>-1) {
 		var html = api.getResponseBody();
 		var contents = api.arg(0);
+		var defs = {
+			position: 'absolute',
+			top: '0',
+			left: '0',
+			right: '0',
+			margin: '0',
+			padding: '2px 3px',
+			background: '#c00',
+			opacity: '.3',
+			color: '#fff',
+			'font-size': '11px',
+			'font-weight': 'normal',
+			'font-family': 'helvetica,arial,sans-serif',
+			'text-align': 'left',
+			'z-index': '99999999999'
+		};
+		var styleOverride = api.arg(1);
+		if (typeof styleOverride == "string"){
+			var orList = styleOverride.split(';');
+			for (var i=0;i<orList.length;i++){
+				var props = orList[i].split(':');
+				defs[props[0]] = props[1];
+			}
+		}
+		var styleString = "";
+		for (var q in defs){
+			styleString += q+':'+defs[q]+';'
+		}
 		try {
-			var banner = '<div style="position:absolute;top:0;left:0;right:0;margin:0;padding:2px 3px;background:#c00;opacity:.3;color:#fff;font-size:11px;font-weight:normal;font-family:helvetica,arial,sans-serif;text-align:left;z-index:99999999999">'+contents+'</div>';
+			var banner = '<div style="'+styleString+'">'+contents+'</div>';
 			html=html.replace(/<body([^>]*)>/, '<body$1>'+banner);
 			api.setResponseBody(html);
 		} catch (ex) {
