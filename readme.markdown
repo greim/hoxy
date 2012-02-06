@@ -1,7 +1,7 @@
 Overview
 ========
 
-Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Using hoxy, you can act as a "man in the middle" and alter HTTP requests and responses as they flow through, based on a set of conditional rules. As a running process, hoxy otherwise behaves like a standalone proxy server. Hoxy was inspired as a way to complement debuggers like Firebug, which let you manipulate the client runtime but not the underlying HTTP conversation.
+Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Using hoxy, you can act as a "man in the middle" and alter HTTP requests and responses as they flow through, based on a set of conditional rules. Hoxy otherwise behaves like a standalone proxy server. Hoxy was conceived as a way to complement debuggers like Firebug, which let you manipulate the client runtime but not the underlying HTTP conversation.
 
 [Video: Quick Introduction](http://www.youtube.com/watch?v=2YLfBTrVgZU)
 
@@ -45,7 +45,7 @@ Command line args for `quickstart-hoxy` are identical to hoxy's startup args, su
 Using Hoxy With Another Proxy
 -----------------------------
 
-Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it.
+Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it. Note that this entails the chaining of two proxies.
 
     export HTTP_PROXY=proxy.example.edu:80
     node hoxy.js

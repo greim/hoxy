@@ -108,6 +108,7 @@ if(useProxy = !!envProxy) {
 // #############################################################################
 // error handling and subs
 
+// truncates a URL
 function turl(url){
 	if (url.length > 64) {
 		var pUrl = URL.parse(url);
@@ -118,6 +119,7 @@ function turl(url){
 	return url;
 }
 
+// debug-flag-aware error logger
 function logError(err, errType, url) {
 	if (debug) {
 		console.error(errType+' error: '+turl(url)+': '+err.message);
@@ -134,8 +136,13 @@ var stripRqHdrs = [
 	'proxy-authorization',
 ];
 
-HTTP.createServer(function(request, response) {
+HTTP.createServer(function handleRequest(request, response) {
 
+	// Handle the case where people put http://hoxy.host:port/ directly into
+	// their browser's location field, rather than configuring hoxy.host:port in
+	// their browser's proxy settings. In such cases, the URL won't have a
+	// scheme or host. This is what staging mode is for, since it provides a
+	// scheme and host in the absence of one.
 	if (/^\//.test(request.url) && opts.stage){
 		request.url = 'http://'+opts.stage+request.url;
 		request.headers.host = opts.stage;
