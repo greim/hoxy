@@ -1,10 +1,6 @@
-# Warning
-
-Hoxy now follows the Node JS convention where odd minor versions indicate a certain degree of instability. Hoxy is currently in its 0.3.x incarnation. Feel free to report and help track down any issues you may find. Thanks.
-
 # Overview
 
-Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Using hoxy, you can act as a "man in the middle" and alter HTTP requests and responses as they flow over the network, based on a set of conditional rules. Hoxy otherwise behaves like a standalone proxy server. Hoxy was conceived as a way to complement debuggers like Firebug, which let you manipulate the client runtime but not the underlying HTTP conversation.
+Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Using hoxy, you can act as a "man in the middle" and alter HTTP requests and responses as they flow over the network, based on a set of conditional rules. Hoxy otherwise behaves like a standalone proxy server. Hoxy supplements debuggers like Firebug, which let you manipulate the client runtime but not the underlying HTTP conversation.
 
 ## Table of Contents
 
