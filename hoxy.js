@@ -5,15 +5,6 @@ http://github.com/greim
 */
 
 // #############################################################################
-// jump into the project dir
-
-try {
-	process.chdir(__dirname);
-} catch (err) {
-	console.error('couldn\'t change to dir: ' + __dirname + ': ' + err);
-}
-
-// #############################################################################
 // read cmd line args and declare stuff
 
 var defaultRules = './rules/rules.txt';
