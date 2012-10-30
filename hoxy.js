@@ -19,7 +19,7 @@ try {
 var defaultRules = './rules/rules.txt';
 var projectName = 'Hoxy';
 
-var opts = require('./lib/tav.js').set({
+var opts = require('tav').set({
 	debug: {
 		note: 'Turn on debug mode, print errors to console.',
 		value: false,
