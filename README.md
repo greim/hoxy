@@ -1,69 +1,53 @@
-Overview
-========
+# Warning
 
-Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Using hoxy, you can act as a "man in the middle" and alter HTTP requests and responses as they flow through, based on a set of conditional rules. Hoxy otherwise behaves like a standalone proxy server. Hoxy was conceived as a way to complement debuggers like Firebug, which let you manipulate the client runtime but not the underlying HTTP conversation.
+Hoxy now follows the Node JS convention where odd minor versions indicate a certain degree of instability. Hoxy is currently in its 0.3.x incarnation. Feel free to report and help track down any issues you may find. Thanks.
 
-[Video: Quick Introduction](http://www.youtube.com/watch?v=2YLfBTrVgZU)
+# Overview
 
-Table of Contents
--------------
+Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use by web developers. Using hoxy, you can act as a "man in the middle" and alter HTTP requests and responses as they flow over the network, based on a set of conditional rules. Hoxy otherwise behaves like a standalone proxy server. Hoxy was conceived as a way to complement debuggers like Firebug, which let you manipulate the client runtime but not the underlying HTTP conversation.
+
+## Table of Contents
+
 * This file: quickstart guide and arcitectural overview
 * [Rules readme](rules/readme.markdown): Info on how to formulate and use rules
 * [Plugins readme](plugins/readme.markdown): Info on how to create plugins
 
+## Installation
 
-Starting Hoxy
--------------
+Hoxy is availabe via npm. In install it, type:
 
-Stand in the hoxy project dir and type the command:
+    npm install -g hoxy
 
-    node hoxy.js
+## Startup
 
-This will start hoxy on port 8080. (For a different port, e.g. 8081, use `--port=8081`.) Next, configure your browser's proxy settings to point to hoxy.
+npm will install the `hoxy` executable. To run it, simply type:
+
+    hoxy
+
+This will start hoxy on port 8080 by default. For a different port, use `--port=8081` for example. Next, configure your browser's proxy settings to point to hoxy.
 
 If it doesn't already exist, upon startup hoxy will create a file in the `rules` dir called `rules.txt`. Open this file in your text editor and edit/add rules as needed. There's no need to restart hoxy each time you save the rules file.
 
 Note: hoxy catches as many errors as possible in an effort to stay running. By default, error messages are suppressed. If you're writing rules or developing plugins (or developing hoxy itself), you should run in debug mode so you can see syntax or runtime errors as they occur:
 
-    node hoxy.js --debug
+    hoxy --debug
 
-Now hoxy will dump all errors to the console.
+Now hoxy will dump errors to the console.
 
-Starting Hoxy (Quickstart)
---------------------------
+## Using Hoxy With Another Proxy
 
-Alternatively, if you type the command:
-
-    ./quickstart-hoxy
-
-You'll be thrown into a `vi` session against a temp rules file. When you exit the `vi` session, hoxy will launch against that rules file. Every time you do this, that rules file starts over as blank.
-
-This is a convenience method to launch hoxy for quick experiments with throwaway rules files.
-
-Command line args for `quickstart-hoxy` are identical to hoxy's startup args, such as port, etc. (except `--rules`)
-
-Using Hoxy With Another Proxy
------------------------------
-
-Hoxy looks for the optional `HTTP_PROXY` environment variable and, if found, uses it. Note that this entails the chaining of two proxies.
+If you're sitting behind a firewall and you're forced to use a NON-transparent proxy, then configure your browser to use hoxy instead, and make sure that `HTTP_PROXY` exists in hoxy's environment, and that it identifies the proxy which you're required to use. Your browser will talk to hoxy, which will then talk to the actual proxy.
 
     export HTTP_PROXY=proxy.example.edu:80
-    node hoxy.js
+    hoxy
 
-How to Use Hoxy
----------------
+## How to Use Hoxy
 
-If you have a good grasp of HTTP basics, hoxy itself isn't wildly complicated, and reading the architectural overview below should give you a basic idea of how it works. From there, the readme file in the `rules` dir should give you enough info to get on your way writing rules.
+You really need a solid grasp of HTTP basics, but if you have that, the rest is easy street. Reading the architectural overview below should give you a good idea of how it works. From there, the readme file in the `rules` dir should give you enough info to get on your way writing rules.
 
-If you're comfortable writing JavaScript for node.js, you can also write plugins for hoxy. See the readme file in the `plugins` dir for more info.
+If you're comfortable writing JavaScript for node.js, you can also write plugins for hoxy. See the readme file in the `plugins` dir for more info. Plugins let you intercept and manipulate HTTP requests programmatically, instead of limiting you to the rules syntax.
 
-System Requirements
---------------------
-
-Hoxy requires [node.js](http://nodejs.org/) to run, version 0.4 or higher.
-
-Architectural Overview
-======================
+# Architectural Overview
 
 An HTTP conversation could be illustrated like this:
 
@@ -125,8 +109,7 @@ Furthermore, a rule will fire only when certain conditions are met. For example,
 
 Finally, while hoxy has a broad set of out-of-the-box capabilities, its plugin API allows developers to extend it in arbitrary ways. Plugins are written in JavaScript and invoked using the same conditional logic described above. For example, IF the content type is "text/html", THEN run the foo plugin.
 
-A Twist in the Plot
--------------------
+## A Twist in the Plot
 
 Plugins running in the request phase have the option to write the response themselves, which effectively preempts the hit to the server. In such cases, hoxy's behavior would look like this:
 
@@ -146,13 +129,10 @@ Plugins running in the request phase have the option to write the response thems
 * Hop: Hoxy transmits to client.
 * Phase 4: Client processes response.
 
-Staging Server Mode
-===================
+# Staging Server Mode
 
-Hoxy has an optional staging server mode, where in addition to functioning as a proxy, it can also serve as a mirror of another server. To start up hoxy in staging server mode:
+Hoxy has an optional staging server mode, where in addition to functioning as a normal proxy, it can function as a reverse proxy. To start up hoxy in staging server mode:
 
-    node hoxy.js --port=83 --stage=www.example.com
+    hoxy --port=80 --stage=www.example.com
 
-Supposing you launched this instance of Hoxy on a machine called `dev.example.com`, you can still configure your browser to proxy through `dev.example.com:83`, but now you can also hit `http://dev.example.com:83/` directly from your browser, in which case it will mirror over to `http://www.example.com/` but still run your rules in the interim.
-
-This is useful in testing and QA scenarios where you're testing changes on a specific website. You can then pass out Hoxy links to various testers without needing them to configure their proxy settings.
+Supposing you launched this instance of Hoxy on a machine called `dev.example.com`, you can visit `http://dev.example.com/` and it will be a mirror of `http://www.example.com/` except of course for whatever rules you're running. This is useful in testing and QA scenarios where you're testing changes on a specific website. You can then distribute test URLs to people without needing them to configure their proxy settings.
