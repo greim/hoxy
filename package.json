@@ -1,0 +1,30 @@
+{
+  "name": "hoxy",
+  "preferGlobal": "true",
+  "version": "0.2.0",
+  "author": "Greg Reimer <gregreimer@gmail.com>",
+  "description": "Web-hacking proxy",
+  "bin": {
+    "hoxy": "./bin/hoxy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/greim/hoxy.git"
+  },
+  "keywords": [
+    "web",
+    "traffic",
+    "debug",
+    "proxy",
+    "request",
+    "response",
+    "http"
+  ],
+  "dependencies" : {
+    "tav": "0.1.x"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6"
+  }
+}
