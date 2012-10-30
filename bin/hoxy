@@ -1,7 +1,3 @@
-#!/usr/bin/env sh
+#!/usr/bin/env node
 
-THIS_SCRIPT_DIR=$(dirname $0)
-
-cd $THIS_SCRIPT_DIR/..
-
-node hoxy.js $*
+require('../hoxy');

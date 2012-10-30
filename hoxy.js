@@ -7,7 +7,7 @@ http://github.com/greim
 // #############################################################################
 // read cmd line args and declare stuff
 
-var defaultRules = './rules/rules.txt';
+var defaultRules = './hoxy-rules.txt';
 var projectName = 'Hoxy';
 
 var opts = require('tav').set({
