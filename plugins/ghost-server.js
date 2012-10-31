@@ -40,18 +40,15 @@ exports.run = function(api){
 	FS.stat(htdocs, function(err, hstats){
 		if (err) {
 			// docroot doesn't exist or we can't read it
-			api.notify();
-			throw new Error('ghost server: '+err.message);
+			api.notify(err);
 		} else if (!hstats.isDirectory()) {
 			// docroot is not a directory
-			api.notify();
-			throw new Error('ghost server: '+htdocs+' is not a directory');
+			api.notify(new Error(htdocs+' is not a directory'));
 		} else {
 			var fullPath = PATH.normalize(htdocs + pUrl.pathname);
 			if (fullPath.indexOf(htdocs) !== 0) {
 				// theoretically should never happen
-				api.notify();
-				throw new Error('ghost server: bad path: '+htdocs+' => '+fullPath);
+				api.notify(new Error('bad path: '+htdocs+' => '+fullPath));
 			} else {
 				if (fullPath.charAt(fullPath.length-1)==='/'){
 					fullPath += indexFile;
@@ -70,8 +67,7 @@ exports.run = function(api){
 								m = new Date(qi.headers['if-modified-since']);
 								send304 = m.getTime() < stats.mtime.getTime();
 							} catch(err) {
-								api.notify();
-								throw new Error('ghost server: '+err.message);
+								api.notify(err);
 							}
 						}
 						if (send304) {
