@@ -141,6 +141,6 @@ function getContentType(path, accept){
 	accept = accept.split(',')[0];
 	var ext = PATH.extname(path).toLowerCase() || accept;
 	var ctype = ctypes[ext];
-	if(isText(ctype)){ ctype += '; charset=utf-8'; }
+	if(ctype && isText(ctype)){ ctype += '; charset=utf-8'; }
 	return ctype;
 }
