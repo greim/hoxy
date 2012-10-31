@@ -24,7 +24,8 @@
     "tav": "0.1.x",
     "await": "0.1.x",
     "js-beautify": "0.2.x",
-    "cheerio": "0.10.x"
+    "cheerio": "0.10.x",
+    "PrettyCSS": "0.3.x"
   },
   "license": "MIT",
   "engines": {

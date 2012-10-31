@@ -9,19 +9,22 @@ Plugin to beautify minified or otherwise hard-to-debug CSS.
 usage: @css-beautify
 */
 
+var PrettyCSS = require('PrettyCSS');
+
 exports.run = function(api) {
 	var ct = api.getResponseInfo().headers['content-type'];
 	if (ct && ct.indexOf('text/css')===0) {
 		var css = api.getResponseBody();
 		try {
-			var beautify = require('./lib/css-beautify.js').css_beautify;
-			var beautifulCss = beautify(css);
+			var beautifulCss = PrettyCSS.parse(css).toString();
 			api.setResponseBody(beautifulCss);
+			api.notify();
 		} catch (ex) {
-			console.log("css-beautify error: "+ex.message);
+			api.notify(ex);
 		}
+	} else {
+		api.notify()
 	}
-	api.notify();
 };
 
 
