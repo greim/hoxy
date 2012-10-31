@@ -6,18 +6,16 @@ http://github.com/greim
 
 /**
 
-Manipulate the response body as DOM using cheerio,
-which is very similar to jquery.
+Manipulate the response body as JSON.
 
-    usage: @cheerio-script('path/to/your/script.js')
+    usage: @json-script('path/to/your/script.js')
 
 You provide a path to a script which will execute
-in an environment where $ is available.
+in an environment where the variable 'json' is available.
 
 */
 
 // declare vars, import libs, etc
-var CHEERIO = require('cheerio');
 var PATH = require('path');
 var VM = require('vm');
 var FS = require('fs');
@@ -37,13 +35,13 @@ exports.run = function(api){
 		var path = api.arg(0);
 		getScript(path)
 		.onkeep(function(got){
-			var html = api.getResponseBody();
+			var json = api.getResponseBody();
 			try{
 				var script = VM.createScript(got.code);
-				var window = {$:CHEERIO.load(html)};
+				var window = {json:JSON.parse(json)};
 				script.runInNewContext(window);
-				var newHTML = window.$.html();
-				api.setResponseBody(newHTML);
+				var newJson = JSON.stringify(window.json);
+				api.setResponseBody(newJson);
 				api.notify();
 			}catch(err){
 				api.notify(err);
