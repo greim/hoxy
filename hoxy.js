@@ -122,7 +122,7 @@ function logError(err, errType, url) {
 // create proxy server
 
 var stripRqHdrs = [
-	'accept-encoding', // TODO support gzip
+	'accept-encoding',
 	'proxy-connection', // causes certain sites to hang
 	'proxy-authorization',
 ];

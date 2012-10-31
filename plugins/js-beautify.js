@@ -10,18 +10,22 @@ Plugin to beautify minified or otherwise hard-to-debug JS.
 usage: @js-beautify
 */
 
+var beautify = require('js-beautify').js_beautify;
+
 exports.run = function(api) {
-	var ct = api.getResponseInfo().headers['content-type'];
-	if (ct && ct.indexOf('javascript')>-1) {
+	if ((/javascript/i).test(api.getResponseInfo().headers['content-type'])) {
 		var js = api.getResponseBody();
 		try {
-			var beautify = require('./lib/js-beautify.js').js_beautify;
-			var beautifulJs = beautify(js);
-			api.setResponseBody(beautifulJs);
+			var beautifulJs = beautify(js, { indent_size: 2 });
+			if (js !== beautifulJs && beautifulJs.indexOf('function') != -1) {
+				api.setResponseBody(beautifulJs);
+			}
+			api.notify();
 		} catch (ex) {
-			console.log("js-beautify error: "+ex.message);
+			api.notify(ex);
 		}
+	} else {
+		api.notify();
 	}
-	api.notify();
 };
 
