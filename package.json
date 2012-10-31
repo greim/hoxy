@@ -1,7 +1,7 @@
 {
   "name": "hoxy",
   "preferGlobal": "true",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy",
   "bin": {
@@ -21,7 +21,9 @@
     "http"
   ],
   "dependencies" : {
-    "tav": "0.1.x"
+    "tav": "0.1.x",
+    "await": "0.1.x",
+    "cheerio": "0.10.x"
   },
   "license": "MIT",
   "engines": {
