@@ -62,8 +62,7 @@ exports.run = function(api){
 			try{
 				var scriptObj = getScriptFromEval(api.arg(0));
 			}catch(err){
-				api.notify();
-				throw err;
+				api.notify(err);
 			}
 		}
 		scriptObj.runInNewContext({console:console,json:jsonObj});

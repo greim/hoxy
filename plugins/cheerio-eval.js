@@ -35,8 +35,7 @@ exports.run = function(api){
 			api.setResponseBody(newHTML);
 			api.notify();
 		}catch(err){
-			api.notify();
-			throw err;
+			api.notify(err);
 		}
 	} else {
 		api.notify();

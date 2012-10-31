@@ -88,8 +88,7 @@ exports.run = function(api){
 			try{
 				var scriptObj = getScriptFromEval(api.args(0));
 			}catch(err){
-				api.notify();
-				throw err;
+				api.notify(err);
 			}
 		}
 		try{
@@ -99,8 +98,7 @@ exports.run = function(api){
 			dt = dt ? dt[1]+'\r\n' : '';
 			var newHTML = dt + window.document.outerHTML;
 		}catch(err){
-			api.notify();
-			throw err;
+			api.notify(err);
 		}
 		api.setResponseBody(newHTML);
 		api.notify();

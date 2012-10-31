@@ -46,13 +46,11 @@ exports.run = function(api){
 				api.setResponseBody(newHTML);
 				api.notify();
 			}catch(err){
-				api.notify();
-				throw err;
+				api.notify(err);
 			}
 		})
 		.onfail(function(why, err){
-			api.notify();
-			throw err || new Error(why);
+			api.notify(err || new Error(why));
 		});
 	} else {
 		api.notify();
