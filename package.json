@@ -25,7 +25,8 @@
     "await": "0.1.x",
     "js-beautify": "0.2.x",
     "cheerio": "0.10.x",
-    "PrettyCSS": "0.3.x"
+    "PrettyCSS": "0.3.x",
+    "html": "0.0.x"
   },
   "license": "MIT",
   "engines": {

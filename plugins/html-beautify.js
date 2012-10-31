@@ -10,18 +10,21 @@ Plugin to beautify minified or otherwise hard-to-debug HTML.
 usage: @html-beautify
 */
 
+var HTML = require('html');
+
 exports.run = function(api) {
 	var ct = api.getResponseInfo().headers['content-type'];
 	if (ct && ct.indexOf('html')>-1) {
 		var html = api.getResponseBody();
 		try {
-			var beautify = require('./lib/html-beautify.js').style_html;
-			var beautifulHtml = beautify(html);
+			var beautifulHtml = HTML.prettyPrint(html, {indent_size: 2});
 			api.setResponseBody(beautifulHtml);
+			api.notify();
 		} catch (ex) {
-			console.log("html-beautify error: "+ex.message);
+			api.notify(ex);
 		}
+	} else {
+		api.notify();
 	}
-	api.notify();
 };
 
