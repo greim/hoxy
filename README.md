@@ -10,7 +10,7 @@ Hoxy is a web-hacking proxy for [node.js](http://nodejs.org/), intended for use 
 
 ## Installation
 
-Hoxy is availabe via npm. In install it, type:
+Hoxy is availabe via npm. Install it with npm's global option to make it available in your $PATH:
 
     npm install -g hoxy
 
