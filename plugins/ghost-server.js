@@ -29,6 +29,7 @@ use that instead of 'index.html', for example: @ghost-server('/some/path','home.
 var PATH = require('path');
 var URL = require('url');
 var FS = require('fs');
+var MIME = require('mime');
 
 exports.run = function(api){
 	var htdocs = api.arg(0);
@@ -118,20 +119,6 @@ exports.run = function(api){
 	});
 };
 
-// todo: use an actual mime types lib
-var ctypes = {
-	'.html':'text/html',
-	'.shtml':'text/html',
-	'.htm':'text/html',
-	'.css':'text/css',
-	'.js':'text/javascript',
-	'.gif':'image/gif',
-	'.png':'image/png',
-	'.jpg':'image/jpeg',
-	'.jpeg':'image/jpeg',
-	'.xml':'application/xml',
-	'.xsl':'application/xml',
-};
 function isText(ctype) {
 	return ctype.indexOf('text') > -1
 		|| ctype.indexOf('xml') > -1;
@@ -139,8 +126,10 @@ function isText(ctype) {
 function getContentType(path, accept){
 	accept = accept || 'text/plain';
 	accept = accept.split(',')[0];
-	var ext = PATH.extname(path).toLowerCase() || accept;
-	var ctype = ctypes[ext];
-	if(ctype && isText(ctype)){ ctype += '; charset=utf-8'; }
+	var ctype = MIME.lookup(path) || accept,
+	    cset  = MIME.charsets.lookup(ctype);
+	if(ctype && isText(ctype) && cset){
+		ctype += '; charset=' + cset;
+	}
 	return ctype;
 }
