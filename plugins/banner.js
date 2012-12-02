@@ -43,9 +43,14 @@ exports.run = function(api){
 		for (var q in defs){
 			styleString += q+':'+defs[q]+';'
 		}
+		var append = api.arg(2) || false;
 		try {
 			var banner = '<div style="'+styleString+'">'+contents+'</div>';
-			html=html.replace(/<body([^>]*)>/, '<body$1>'+banner);
+			if (append) {
+				html=html.replace(/<\/body([^>]*)>/, '</body$1>'+banner);
+			} else {
+				html=html.replace(/<body([^>]*)>/, '<body$1>'+banner);
+			}
 			api.setResponseBody(html);
 		} catch (ex) {
 			console.log("banner error: "+ex.message);
