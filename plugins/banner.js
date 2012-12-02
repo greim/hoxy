@@ -47,7 +47,7 @@ exports.run = function(api){
 		try {
 			var banner = '<div style="'+styleString+'">'+contents+'</div>';
 			if (append) {
-				html=html.replace(/<\/body([^>]*)>/, '</body$1>'+banner);
+				html=html.replace(/<\/body([^>]*)>/, banner+'</body$1>');
 			} else {
 				html=html.replace(/<body([^>]*)>/, '<body$1>'+banner);
 			}
