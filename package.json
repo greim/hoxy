@@ -7,10 +7,6 @@
   "bin": {
     "hoxy": "./bin/hoxy"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/greim/hoxy.git"
-  },
   "keywords": [
     "web",
     "traffic",
