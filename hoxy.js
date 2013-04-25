@@ -33,6 +33,10 @@ var opts = require('tav').set({
 	},
 }, "Hoxy, the web-hacking proxy.\nusage: node hoxy.js [--debug] [--rules=file] [--port=port]");
 
+if (opts.args.length && parseInt(opts.args[0])) {
+    console.error('!!! old: please use --port=something to specify port. thank you. exiting.');
+    process.exit(1);
+}
 
 require('./runner.js')(projectName, opts);
 

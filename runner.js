@@ -10,15 +10,13 @@ module.exports = function(projectName, opts){
     var proxyPort = opts.port || 8080;
     var debug = opts.debug;
 
-    if (opts.args.length && parseInt(opts.args[0])) {
-        console.error('!!! old: please use --port=something to specify port. thank you. exiting.');
-        process.exit(1);
-    }
 
     if (opts.stage && !(/^[a-z0-9-]+(\.[a-z0-9-]+)*(:\d+)?$/i).test(opts.stage)) {
         console.error('error: stage must be of the form <hostname> or <hostname>:<port> exiting.');
         process.exit(1);
     }
+
+    RDB.init(opts);
 
     // done
     // #############################################################################
@@ -244,4 +242,4 @@ module.exports = function(projectName, opts){
     // start catching errors
 
 
-}
+};
