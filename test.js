@@ -25,7 +25,11 @@ HTTP.createServer(function(req, resp){
 }).listen(8081);
 console.log('created test server');
 
-var cl = HTTP.createClient(8080, 'localhost');
+var options = {
+    hostname: 'localhost',
+    port: 8080
+};
+var req = HTTP.get(options);
 var req = cl.request('get', 'http://localhost:8081/', {host:'localhost'});
 req.end();
 

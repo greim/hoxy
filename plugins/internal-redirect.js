@@ -26,8 +26,7 @@ exports.run = function(api) {
 	var rootRelUrl = pUrl.pathname;
 	if (pUrl.search) rootRelUrl += pUrl.search;
 
-	var client = HTTP.createClient(port, hostname);
-	var clientReq = client.request('GET', rootRelUrl, { host: hostname });
+    var clientReq = HTTP.request('GET', rootRelUrl, { host: hostname });
 	clientReq.end();
 	clientReq.on('response', function(resp) {
 		var hts = new HTS.HttpTransactionState();
