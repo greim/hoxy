@@ -16,6 +16,8 @@ module.exports = function(projectName, opts){
         process.exit(1);
     }
 
+    HTS.pluginPath = opts.pluginPath || function(name){ return name};
+
     RDB.init(opts);
 
     // done

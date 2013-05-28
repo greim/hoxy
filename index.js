@@ -7,7 +7,8 @@ module.exports = function(opts){
         rules: './hoxy-rules.txt', //Specify rules file location
         port: 8080, //Specify port to listen on.
         stage: false, //Host that proxy will act as a staging server for.
-        'no-version-check': false //Attempt to run proxy without the startup version check.
+        'no-version-check': false, //Attempt to run proxy without the startup version check.
+        pluginPath: null //function that takes a name and returns path to plugin that can be required
     };
 
     for(var key in defaults){
