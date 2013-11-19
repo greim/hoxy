@@ -1,0 +1,23 @@
+{
+  "name": "hoxy",
+  "version": "1.0.0",
+  "author": "Greg Reimer <gregreimer@gmail.com>",
+  "description": "The web-hacking proxy",
+  "main": "./hoxy",
+  "keywords": [
+    "develop",
+    "test",
+    "debug",
+    "proxy",
+    "web"
+  ],
+  "dependencies" : {
+    "lodash-node": "2.3.x",
+    "await": "0.2.x",
+    "cheerio": "0.12.x",
+    "union"    :  "0.1.x",
+    "ecstatic" :  "0.1.x",
+    "plates"   :  "https://github.com/flatiron/plates/tarball/master"
+  },
+  "license": "MIT"
+}
