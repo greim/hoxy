@@ -273,6 +273,14 @@ describe('Request', function(){
     assert.strictEqual(req.buffers.join(''), '123456789')
   })
 
+  it('should get and set json', function(){
+    var req = new Request()
+    req.setRawData(rawRequestData)
+    req.json = {foo:'bar'}
+    assert.deepEqual(req.json, {foo:'bar'})
+    assert.strictEqual(req.body, JSON.stringify({foo:'bar'}))
+  })
+
   it('should get parsed url', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
@@ -405,6 +413,14 @@ describe('Response', function(){
     assert.strictEqual(resp.body, '<!doctype html><html><head></head><body><p>foo</p></body></html>')
     resp.body = '123456789'
     assert.strictEqual(resp.buffers.join(''), '123456789')
+  })
+
+  it('should get and set json', function(){
+    var resp = new Response()
+    resp.setRawData(rawResponseData)
+    resp.json = {foo:'bar'}
+    assert.deepEqual(resp.json, {foo:'bar'})
+    assert.strictEqual(resp.body, JSON.stringify({foo:'bar'}))
   })
 
   it('should get and set dom', function(){
