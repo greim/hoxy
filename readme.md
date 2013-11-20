@@ -8,7 +8,7 @@ var proxy = require('hoxy').start({
 });
 
 proxy.intercept('request', function(req, resp){
-  req.headers.cookie = undefined;
+  req.headers['cookie'] = undefined;
 });
 
 proxy.intercept('response', function(req, resp){

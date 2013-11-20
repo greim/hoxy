@@ -257,11 +257,11 @@ describe('Request', function(){
     assert.strictEqual(req.headers['content-type'], 'text/javascript; charset=utf-8')
   })
 
-  it('should get and set encoding', function(){
+  it('should get and set charset', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.getEncoding(), 'utf-8')
-    req.setEncoding('ascii')
+    assert.strictEqual(req.getCharset(), 'utf-8')
+    req.setCharset('ascii')
     assert.strictEqual(req.headers['content-type'], 'text/html; charset=ascii')
   })
 
@@ -418,11 +418,11 @@ describe('Response', function(){
     assert.strictEqual(resp.headers['content-type'], 'text/javascript; charset=utf-8')
   })
 
-  it('should get and set encoding', function(){
+  it('should get and set charset', function(){
     var resp = new Response()
     resp.setRawData(rawResponseData)
-    assert.strictEqual(resp.getEncoding(), 'utf-8')
-    resp.setEncoding('ascii')
+    assert.strictEqual(resp.getCharset(), 'utf-8')
+    resp.setCharset('ascii')
     assert.strictEqual(resp.headers['content-type'], 'text/html; charset=ascii')
   })
 
