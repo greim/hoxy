@@ -85,7 +85,7 @@ module.exports = function roundTrip(opts,me){
     proxy.intercept('start', opts.startIntercept);
     proxy.intercept('request', opts.requestIntercept);
     proxy.intercept('response', opts.responseIntercept);
-    proxy.intercept('request', function(api){
+    proxy.intercept('request', function(req){
       server = http.createServer(function(sReq, sResp){
         var chunks = [];
         sReq.on('data', function(chunk){
@@ -101,7 +101,7 @@ module.exports = function roundTrip(opts,me){
             sResp.end();
           }
         });
-      }).listen(api.request.port);
+      }).listen(req.port);
     });
     if (opts.proxyOptions.stage) {
       var url = opts.proxyOptions.url;

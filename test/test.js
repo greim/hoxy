@@ -181,38 +181,38 @@ describe('Request', function(){
   it('should get and set host', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.host, 'example.com:8080')
-    req.host = 'example.biz:8081'
-    assert.strictEqual(req.host, 'example.biz:8081')
+    assert.strictEqual(req.getHost(), 'example.com:8080')
+    req.setHost('example.biz:8081')
+    assert.strictEqual(req.getHost(), 'example.biz:8081')
     assert.strictEqual(req.hostname, 'example.biz')
     assert.strictEqual(req.port, 8081)
     req.port = 8080
-    assert.strictEqual(req.host, 'example.biz:8080')
+    assert.strictEqual(req.getHost(), 'example.biz:8080')
     assert.throws(function(){
-      req.host = 'foo:bar'
+      req.setHost('foo:bar')
     }, Error)
   })
 
   it('should handle undefined port', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    req.host = 'foo.com'
+    req.setHost('foo.com')
     assert.ok(req.port === undefined)
-    assert.strictEqual(req.absUrl, 'http://foo.com/foo.html')
-    req.host = 'foo.com:80'
+    assert.strictEqual(req.getAbsUrl(), 'http://foo.com/foo.html')
+    req.setHost('foo.com:80')
     assert.ok(req.port === 80)
-    assert.strictEqual(req.absUrl, 'http://foo.com:80/foo.html')
+    assert.strictEqual(req.getAbsUrl(), 'http://foo.com:80/foo.html')
     req.port = undefined
     assert.ok(req.port === undefined)
-    assert.strictEqual(req.absUrl, 'http://foo.com/foo.html')
+    assert.strictEqual(req.getAbsUrl(), 'http://foo.com/foo.html')
   })
 
   it('should get and set abs url', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.absUrl, 'http://example.com:8080/foo.html')
-    req.absUrl = 'https://example.biz:8081/bar.html'
-    assert.strictEqual(req.host, 'example.biz:8081')
+    assert.strictEqual(req.getAbsUrl(), 'http://example.com:8080/foo.html')
+    req.setAbsUrl('https://example.biz:8081/bar.html')
+    assert.strictEqual(req.getHost(), 'example.biz:8081')
     assert.strictEqual(req.protocol, 'https:')
     assert.strictEqual(req.url, '/bar.html')
   })
@@ -220,64 +220,64 @@ describe('Request', function(){
   it('should get and set filename', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.filename, 'foo.html')
-    req.filename = 'bar.html'
+    assert.strictEqual(req.getFilename(), 'foo.html')
+    req.setFilename('bar.html')
     assert.strictEqual(req.url, '/bar.html')
   })
 
   it('should get and set extension', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.extension, 'html')
-    req.extension = 'js'
+    assert.strictEqual(req.getExtension(), 'html')
+    req.setExtension('js')
     assert.strictEqual(req.url, '/foo.js')
   })
 
   it('should get and set origin', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.origin, headers.origin)
-    req.origin = 'foo'
+    assert.strictEqual(req.getOrigin(), headers.origin)
+    req.setOrigin('foo')
     assert.strictEqual(req.headers.origin, 'foo')
   })
 
   it('should get and set referrer', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.referrer, headers.referer)
-    req.referrer = 'foo'
+    assert.strictEqual(req.getReferrer(), headers.referer)
+    req.setReferrer('foo')
     assert.strictEqual(req.headers.referer, 'foo')
   })
 
   it('should get and set content type', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.contentType, 'text/html')
-    req.contentType = 'text/javascript'
+    assert.strictEqual(req.getContentType(), 'text/html')
+    req.setContentType('text/javascript')
     assert.strictEqual(req.headers['content-type'], 'text/javascript; charset=utf-8')
   })
 
   it('should get and set encoding', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.encoding, 'utf-8')
-    req.encoding = 'ascii'
+    assert.strictEqual(req.getEncoding(), 'utf-8')
+    req.setEncoding('ascii')
     assert.strictEqual(req.headers['content-type'], 'text/html; charset=ascii')
   })
 
   it('should get and set body', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    assert.strictEqual(req.body, '<!doctype html><html><head></head><body><p>foo</p></body></html>')
-    req.body = '123456789'
+    assert.strictEqual(req.getBody(), '<!doctype html><html><head></head><body><p>foo</p></body></html>')
+    req.setBody('123456789')
     assert.strictEqual(req.buffers.join(''), '123456789')
   })
 
   it('should get and set json', function(){
     var req = new Request()
     req.setRawData(rawRequestData)
-    req.json = {foo:'bar'}
-    assert.deepEqual(req.json, {foo:'bar'})
+    req.setJson({foo:'bar'})
+    assert.deepEqual(req.getJson(), {foo:'bar'})
     assert.strictEqual(req.body, JSON.stringify({foo:'bar'}))
   })
 
@@ -315,7 +315,7 @@ describe('Request', function(){
     assert.strictEqual($('p').text(), 'foo')
     $('p').text('bar')
     req.setDom($)
-    assert.strictEqual(req.body, '<!doctype html><html><head></head><body><p>bar</p></body></html>')
+    assert.strictEqual(req.getBody(), '<!doctype html><html><head></head><body><p>bar</p></body></html>')
   })
 
   it('should get and set body params', function(){
@@ -394,33 +394,33 @@ describe('Response', function(){
   it('should get and set content type', function(){
     var resp = new Response()
     resp.setRawData(rawResponseData)
-    assert.strictEqual(resp.contentType, 'text/html')
-    resp.contentType = 'text/javascript'
+    assert.strictEqual(resp.getContentType(), 'text/html')
+    resp.setContentType('text/javascript')
     assert.strictEqual(resp.headers['content-type'], 'text/javascript; charset=utf-8')
   })
 
   it('should get and set encoding', function(){
     var resp = new Response()
     resp.setRawData(rawResponseData)
-    assert.strictEqual(resp.encoding, 'utf-8')
-    resp.encoding = 'ascii'
+    assert.strictEqual(resp.getEncoding(), 'utf-8')
+    resp.setEncoding('ascii')
     assert.strictEqual(resp.headers['content-type'], 'text/html; charset=ascii')
   })
 
   it('should get and set body', function(){
     var resp = new Response()
     resp.setRawData(rawResponseData)
-    assert.strictEqual(resp.body, '<!doctype html><html><head></head><body><p>foo</p></body></html>')
-    resp.body = '123456789'
+    assert.strictEqual(resp.getBody(), '<!doctype html><html><head></head><body><p>foo</p></body></html>')
+    resp.setBody('123456789')
     assert.strictEqual(resp.buffers.join(''), '123456789')
   })
 
   it('should get and set json', function(){
     var resp = new Response()
     resp.setRawData(rawResponseData)
-    resp.json = {foo:'bar'}
-    assert.deepEqual(resp.json, {foo:'bar'})
-    assert.strictEqual(resp.body, JSON.stringify({foo:'bar'}))
+    resp.setJson({foo:'bar'})
+    assert.deepEqual(resp.getJson(), {foo:'bar'})
+    assert.strictEqual(resp.getBody(), JSON.stringify({foo:'bar'}))
   })
 
   it('should get and set dom', function(){
@@ -430,7 +430,7 @@ describe('Response', function(){
     assert.strictEqual($('p').text(), 'foo')
     $('p').text('bar')
     resp.setDom($)
-    assert.strictEqual(resp.body, '<!doctype html><html><head></head><body><p>bar</p></body></html>')
+    assert.strictEqual(resp.getBody(), '<!doctype html><html><head></head><body><p>bar</p></body></html>')
   })
 })
 
@@ -455,20 +455,42 @@ describe('serializer', function(){
 
 describe('streams', function(){
 
-  var buffs = [
-    new Buffer('abc', 'utf8'),
-    new Buffer('def', 'utf8'),
-    new Buffer('ghi', 'utf8')
-  ]
+  var buffs = []
+  function pad(n,len){
+    n = n+''
+    while (n.length < len) n = '0' + n
+    return n
+  }
+  for (var i=0; i<1000; i++){
+    buffs.push(new Buffer(pad(i,3),'ascii'))
+  }
 
-  it('should work', function(done){
-    var fake = streams.createReadable(buffs)
+  it('should wrap buffer lists', function(done){
+    var fake = streams.from(buffs)
     var chunks = []
     fake.on('data', function(buffer){
       chunks.push(buffer)
     })
     fake.on('end', function(){
-      assert.strictEqual(chunks.join(':'), buffs.join(':'))
+      assert.strictEqual(chunks.join(''), buffs.join(''))
+      done()
+    })
+  })
+
+  it('should throttle streams', function(done){
+    var fake = streams
+    .from(buffs)
+    .pipe(streams.brake(3000,500))
+    var chunks = []
+    var start = Date.now()
+    fake.on('data', function(buffer){
+      chunks.push(buffer)
+    })
+    fake.on('end', function(){
+      var time = Date.now() - start
+      assert.ok(time > 490, 'stream throttler too fast. expected > '+490+', got '+time)
+      assert.ok(time < 510, 'stream throttler too slow. expected < '+510+', got '+time)
+      assert.strictEqual(chunks.join(''), buffs.join(''))
       done()
     })
   })
@@ -501,13 +523,13 @@ describe('Hoxy', function(){
   it('should round trip asynchronously', function(done){
     var steps = ''
     roundTrip({
-      startIntercept: function(api, itsDone){
+      startIntercept: function(req, resp, itsDone){
         setTimeout(function(){
           steps += '0'
           itsDone()
         },10)
       },
-      requestIntercept: function(api, itsDone){
+      requestIntercept: function(req, resp, itsDone){
         setTimeout(function(){
           steps += '1'
           itsDone()
@@ -516,7 +538,7 @@ describe('Hoxy', function(){
       server: function(){
         steps += '2'
       },
-      responseIntercept: function(api, itsDone){
+      responseIntercept: function(req, resp, itsDone){
         setTimeout(function(){
           steps += '3'
           itsDone()
@@ -576,9 +598,8 @@ describe('Hoxy', function(){
           'x-foo': 'bar'
         }
       },
-      requestIntercept: function(api){
-        var req = api.request
-        req.body = '123'
+      requestIntercept: function(req){
+        req.setBody('123')
         req.url = '/'
         req.headers['x-foo'] = 'baz'
         req.urlParam('foo','bar')
@@ -603,10 +624,9 @@ describe('Hoxy', function(){
           'x-foo': 'bar'
         }
       },
-      responseIntercept: function(api){
-        var resp = api.response
+      responseIntercept: function(req, resp){
         resp.statusCode = 200
-        resp.body = '123'
+        resp.setBody('123')
         resp.headers['x-foo'] = 'baz'
       },
       client: function(resp, body){
@@ -620,7 +640,7 @@ describe('Hoxy', function(){
 
   it('should behave asynchronously in the request phase', function(done){
     roundTrip({
-      requestIntercept: function(api, next){
+      requestIntercept: function(req, resp, next){
         setTimeout(next,0)
       },
       server: function(){
@@ -631,7 +651,7 @@ describe('Hoxy', function(){
 
   it('should behave asynchronously in the response phase', function(done){
     roundTrip({
-      responseIntercept: function(api, next){
+      responseIntercept: function(req, resp, next){
         setTimeout(next,0)
       },
       client: function(){
@@ -642,8 +662,8 @@ describe('Hoxy', function(){
 
   it('should skip the server hit if the response is populated', function(done){
     roundTrip({
-      requestIntercept: function(api){
-        api.response.body = 'hello'
+      requestIntercept: function(req, resp){
+        resp.setBody('hello')
       },
       server: function(){
         done(new Error('server hit was not skipped'))
@@ -659,8 +679,7 @@ describe('Hoxy', function(){
       request: {
         method: 'GET'
       },
-      requestIntercept: function(api){
-        var req = api.request
+      requestIntercept: function(req){
         req.body = '12345'
         req.headers.host = 'foo:3456'
         req.headers['content-type'] = 'text/garbage'
@@ -682,8 +701,8 @@ describe('Hoxy', function(){
         method: 'POST',
         body: 'abc'
       },
-      requestIntercept: function(api){
-        api.request.headers['content-length'] = 999999999
+      requestIntercept: function(req){
+        req.headers['content-length'] = 999999999
       },
       server: function(req, body){
         assert.equal(req.headers['content-length'], new Buffer(body, 'utf8').length)
@@ -694,8 +713,8 @@ describe('Hoxy', function(){
 
   it('should sanitize broken responses', function(done){
     roundTrip({
-      requestIntercept: function(api){
-        api.response.headers['content-length'] = 999999999
+      requestIntercept: function(req, resp){
+        resp.headers['content-length'] = 999999999
       },
       client: function(resp, body){
         assert.equal(resp.headers['content-length'], new Buffer(body, 'utf8').length)
@@ -709,8 +728,8 @@ describe('Hoxy', function(){
       response: {
         body: ''
       },
-      responseIntercept: function(api){
-        api.response.headers['content-length'] = 999999999
+      responseIntercept: function(req, resp){
+        resp.headers['content-length'] = 999999999
       },
       client: function(resp, body){
         assert.strictEqual(resp.headers['content-length'], undefined)
@@ -727,15 +746,15 @@ describe('Hoxy', function(){
         method: 'POST',
         body: alpha
       },
-      startIntercept: function(api){
-        api.request.pipe()
-        api.request.on('log', function(log){
+      startIntercept: function(req){
+        req.pipe()
+        req.on('log', function(log){
           if (log.level === 'warn')
             warning = true
         })
       },
-      requestIntercept: function(api){
-        api.request.body = 'x'
+      requestIntercept: function(req){
+        req.setBody('x')
       },
       server: function(req, body){
         assert.strictEqual(body, alpha)
@@ -753,15 +772,41 @@ describe('Hoxy', function(){
         statusCode: 200,
         body: alpha
       },
-      startIntercept: function(api){
-        api.response.pipe()
-        api.response.on('log', function(log){
+      startIntercept: function(req, resp){
+        resp.pipe()
+        resp.on('log', function(log){
           if (log.level === 'warn')
             warning = true
         })
       },
-      responseIntercept: function(api){
-        api.response.body = 'x'
+      responseIntercept: function(req, resp){
+        resp.setBody('x')
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, alpha)
+        assert.ok(warning, 'attempt to access piped body failed to emit warning')
+        done()
+      }
+    },true)
+  })
+
+  it('should pipe response bodies set during the request phase', function(done){
+    var alpha = 'abcdefghijklmnopqrstuvwzyz'
+    var warning = false
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: alpha
+      },
+      requestIntercept: function(req, resp){
+        resp.pipe()
+        resp.on('log', function(log){
+          if (log.level === 'warn')
+            warning = true
+        })
+      },
+      responseIntercept: function(req, resp){
+        resp.setBody('x')
       },
       client: function(resp, body){
         assert.strictEqual(body, alpha)

@@ -12,12 +12,10 @@
     "web"
   ],
   "dependencies" : {
+    "brake": "0.1.x",
     "lodash-node": "2.3.x",
     "await": "0.2.x",
-    "cheerio": "0.12.x",
-    "union"    :  "0.1.x",
-    "ecstatic" :  "0.1.x",
-    "plates"   :  "https://github.com/flatiron/plates/tarball/master"
+    "cheerio": "0.12.x"
   },
   "license": "MIT"
 }

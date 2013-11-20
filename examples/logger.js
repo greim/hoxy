@@ -7,11 +7,11 @@ var proxy = require('../hoxy').start({
   port: 8765
 });
 
-proxy.intercept('response', function(api){
+proxy.intercept('response', function(req, resp){
   console.log('-------------------------');
-  console.log('========> '+api.request.toString());
+  console.log('========> '+req.toString());
   console.log('-------------------------');
-  console.log('<======== '+api.response.toString());  
+  console.log('<======== '+resp.toString());  
 });
 
 proxy.log('info');
