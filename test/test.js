@@ -278,7 +278,7 @@ describe('Request', function(){
     req.setRawData(rawRequestData)
     req.setJson({foo:'bar'})
     assert.deepEqual(req.getJson(), {foo:'bar'})
-    assert.strictEqual(req.body, JSON.stringify({foo:'bar'}))
+    assert.strictEqual(req.getBody(), JSON.stringify({foo:'bar'}))
   })
 
   it('should get parsed url', function(){
@@ -365,6 +365,25 @@ describe('Request', function(){
     assert.strictEqual(req.bodyParam('bar'), newParam)
     assert.deepEqual(req.getBodyParams(), {bar:newParam,'foo x':'qux x'})
   })
+
+  it('should work with DOM', function(){
+    var req = new Request()
+    req.setRawData(rawRequestDataPost)
+    req.setBody('<foo><bar abc="xyz"></bar></foo>')
+    req.dom(function($){
+      $('bar').attr('abc','pqr')
+    })
+    assert.strictEqual(req.getBody(), '<foo><bar abc="pqr"></bar></foo>')
+  })
+
+  it('should work with JSON', function(){
+    var req = new Request()
+    req.setBody(JSON.stringify({foo:'bar'}))
+    req.json(function(o){
+      o.foo = 'baz'
+    })
+    assert.strictEqual(req.getBody(), JSON.stringify({foo:'baz'}))
+  })
 })
 
 describe('Response', function(){
@@ -431,6 +450,25 @@ describe('Response', function(){
     $('p').text('bar')
     resp.setDom($)
     assert.strictEqual(resp.getBody(), '<!doctype html><html><head></head><body><p>bar</p></body></html>')
+  })
+
+  it('should work with DOM', function(){
+    var resp = new Response()
+    resp.setRawData(rawResponseData)
+    resp.setBody('<foo><bar abc="xyz"></bar></foo>')
+    resp.dom(function($){
+      $('bar').attr('abc','pqr')
+    })
+    assert.strictEqual(resp.getBody(), '<foo><bar abc="pqr"></bar></foo>')
+  })
+
+  it('should work with JSON', function(){
+    var resp = new Response()
+    resp.setBody(JSON.stringify({foo:'bar'}))
+    resp.json(function(o){
+      o.foo = 'baz'
+    })
+    assert.strictEqual(resp.getBody(), JSON.stringify({foo:'baz'}))
   })
 })
 
@@ -680,7 +718,7 @@ describe('Hoxy', function(){
         method: 'GET'
       },
       requestIntercept: function(req){
-        req.body = '12345'
+        req.setBody('12345')
         req.headers.host = 'foo:3456'
         req.headers['content-type'] = 'text/garbage'
         req.headers['content-length'] = 999999999
