@@ -106,13 +106,13 @@ describe('Request', function(){
 
   it('should accept raw data', function(){
     var request = new Request()
-    request.setRawData(rawRequestData)
+    request._setRawData(rawRequestData)
     assert.ok(true)
   })
 
   it('should get and set protocol', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.protocol, 'http:')
     req.protocol = 'https:'
     assert.strictEqual(req.protocol, 'https:')
@@ -120,7 +120,7 @@ describe('Request', function(){
 
   it('should get and set hostname', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.hostname, 'example.com')
     req.hostname = 'www.example.com'
     assert.strictEqual(req.hostname, 'www.example.com')
@@ -131,7 +131,7 @@ describe('Request', function(){
 
   it('should get and set port', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.port, 8080)
     req.port = '8081'
     assert.strictEqual(req.port, 8081)
@@ -142,7 +142,7 @@ describe('Request', function(){
 
   it('should get and set method', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.method, 'GET')
     req.method = 'put'
     assert.strictEqual(req.method, 'PUT')
@@ -153,7 +153,7 @@ describe('Request', function(){
 
   it('should get and set url', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.url, '/foo.html')
     req.url = '/bar.html'
     assert.strictEqual(req.url, '/bar.html')
@@ -164,14 +164,14 @@ describe('Request', function(){
 
   it('should get and set headers', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.ok(req.headers !== headers)
     assert.deepEqual(req.headers, headers)
   })
 
   it('should get and set buffers', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.buffers.length, 3)
     assert.throws(function(){
       req.buffers = 'foo:'
@@ -180,7 +180,7 @@ describe('Request', function(){
 
   it('should get and set host', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.getHost(), 'example.com:8080')
     req.setHost('example.biz:8081')
     assert.strictEqual(req.getHost(), 'example.biz:8081')
@@ -195,23 +195,23 @@ describe('Request', function(){
 
   it('should handle undefined port', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     req.setHost('foo.com')
     assert.ok(req.port === undefined)
-    assert.strictEqual(req.getAbsUrl(), 'http://foo.com/foo.html')
+    assert.strictEqual(req.getAbsoluteUrl(), 'http://foo.com/foo.html')
     req.setHost('foo.com:80')
     assert.ok(req.port === 80)
-    assert.strictEqual(req.getAbsUrl(), 'http://foo.com:80/foo.html')
+    assert.strictEqual(req.getAbsoluteUrl(), 'http://foo.com:80/foo.html')
     req.port = undefined
     assert.ok(req.port === undefined)
-    assert.strictEqual(req.getAbsUrl(), 'http://foo.com/foo.html')
+    assert.strictEqual(req.getAbsoluteUrl(), 'http://foo.com/foo.html')
   })
 
   it('should get and set abs url', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
-    assert.strictEqual(req.getAbsUrl(), 'http://example.com:8080/foo.html')
-    req.setAbsUrl('https://example.biz:8081/bar.html')
+    req._setRawData(rawRequestData)
+    assert.strictEqual(req.getAbsoluteUrl(), 'http://example.com:8080/foo.html')
+    req.setAbsoluteUrl('https://example.biz:8081/bar.html')
     assert.strictEqual(req.getHost(), 'example.biz:8081')
     assert.strictEqual(req.protocol, 'https:')
     assert.strictEqual(req.url, '/bar.html')
@@ -219,7 +219,7 @@ describe('Request', function(){
 
   it('should get and set filename', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.getFilename(), 'foo.html')
     req.setFilename('bar.html')
     assert.strictEqual(req.url, '/bar.html')
@@ -227,31 +227,15 @@ describe('Request', function(){
 
   it('should get and set extension', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.getExtension(), 'html')
     req.setExtension('js')
     assert.strictEqual(req.url, '/foo.js')
   })
 
-  it('should get and set origin', function(){
-    var req = new Request()
-    req.setRawData(rawRequestData)
-    assert.strictEqual(req.getOrigin(), headers.origin)
-    req.setOrigin('foo')
-    assert.strictEqual(req.headers.origin, 'foo')
-  })
-
-  it('should get and set referrer', function(){
-    var req = new Request()
-    req.setRawData(rawRequestData)
-    assert.strictEqual(req.getReferrer(), headers.referer)
-    req.setReferrer('foo')
-    assert.strictEqual(req.headers.referer, 'foo')
-  })
-
   it('should get and set content type', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.getContentType(), 'text/html')
     req.setContentType('text/javascript')
     assert.strictEqual(req.headers['content-type'], 'text/javascript; charset=utf-8')
@@ -259,7 +243,7 @@ describe('Request', function(){
 
   it('should get and set charset', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.getCharset(), 'utf-8')
     req.setCharset('ascii')
     assert.strictEqual(req.headers['content-type'], 'text/html; charset=ascii')
@@ -267,70 +251,32 @@ describe('Request', function(){
 
   it('should get and set body', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     assert.strictEqual(req.getBody(), '<!doctype html><html><head></head><body><p>foo</p></body></html>')
     req.setBody('123456789')
     assert.strictEqual(req.buffers.join(''), '123456789')
   })
 
-  it('should get and set json', function(){
-    var req = new Request()
-    req.setRawData(rawRequestData)
-    req.setJson({foo:'bar'})
-    assert.deepEqual(req.getJson(), {foo:'bar'})
-    assert.strictEqual(req.getBody(), JSON.stringify({foo:'bar'}))
-  })
-
   it('should get parsed url', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     var purl = req.getParsedUrl()
     assert.strictEqual(purl.hostname, 'example.com')
   })
 
-  it('should get and set cookie', function(){
+  it('should work with cookies', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
-    var cookie = req.getCookies()
-    assert.deepEqual(cookie, {foo:'bar','buz yak':'baz qux'})
-    cookie.pop = 'wax'
-    req.setCookies(cookie)
-    assert.strictEqual(req.headers.cookie, 'foo=bar; buz%20yak=baz%20qux; pop=wax')
-  })
-
-  it('should get set and url params', function(){
-    var req = new Request()
-    req.setRawData(rawRequestDataQS)
-    var params = req.getUrlParams()
-    assert.deepEqual(params, {foo:'qux',bar:'baz'})
-    params.pop = 'wax'
-    req.setUrlParams(params)
-    assert.deepEqual(params, req.getUrlParams())
-  })
-
-  it('should get and set dom', function(){
-    var req = new Request()
-    req.setRawData(rawRequestData)
-    var $ = req.getDom()
-    assert.strictEqual($('p').text(), 'foo')
-    $('p').text('bar')
-    req.setDom($)
-    assert.strictEqual(req.getBody(), '<!doctype html><html><head></head><body><p>bar</p></body></html>')
-  })
-
-  it('should get and set body params', function(){
-    var req = new Request()
-    req.setRawData(rawRequestDataPost)
-    var params = req.getBodyParams()
-    assert.deepEqual(params, {bar:'baz','foo x':'qux x'})
-    params.bar = 'biz'
-    req.setBodyParams(params)
-    assert.deepEqual(req.getBodyParams(), {bar:'biz','foo x':'qux x'})
+    req._setRawData(rawRequestData)
+    req.cookies(function(cookies){
+      assert.strictEqual(cookies['buz yak'], 'baz qux')
+      cookies.a123 = 7
+    })
+    assert.ok(/a123/.test(req.headers.cookie), 'cookie not present')
   })
 
   it('should get and set individual cookies', function(){
     var req = new Request()
-    req.setRawData(rawRequestData)
+    req._setRawData(rawRequestData)
     var c = req.cookie('buz yak')
     assert.strictEqual(c, 'baz qux')
     assert.strictEqual(req.headers.cookie, 'foo=bar; buz%20yak=baz%20qux')
@@ -340,35 +286,69 @@ describe('Request', function(){
     assert.strictEqual(req.headers.cookie, 'foo=bar; buz%20yak=%25()%25))')
   })
 
+  it('should work with url params', function(){
+    var req = new Request()
+    req._setRawData(rawRequestData)
+    req.url = '/?a%20a=b%20b&c=d'
+    req.urlParams(function(params){
+      assert.strictEqual(params['a a'], 'b b')
+      params.a123 = 7
+    })
+    assert.ok(/a123/.test(req.url), 'url param not present')
+    req.urlParams(function(params){
+      return {}
+    })
+    assert.strictEqual(req.url, '/')
+  })
+
   it('should get and set individual url params', function(){
     var req = new Request()
-    req.setRawData(rawRequestDataQS)
+    req._setRawData(rawRequestDataQS)
     //bar=baz&foo=qux
     var p = req.urlParam('bar')
     assert.strictEqual(p, 'baz')
-    assert.deepEqual(req.getUrlParams(), {bar:'baz',foo:'qux'})
+    req.urlParams(function(params){
+      assert.deepEqual(params, {bar:'baz',foo:'qux'})
+    })
     var newParam = '%()%))'
     req.urlParam('bar', newParam)
     assert.strictEqual(req.urlParam('bar'), newParam)
-    assert.deepEqual(req.getUrlParams(), {bar:newParam,foo:'qux'})
+    req.urlParams(function(params){
+      assert.deepEqual(params, {bar:newParam,foo:'qux'})
+    })
+  })
+
+  it('should work with body params', function(){
+    var req = new Request()
+    req._setRawData(rawRequestData)
+    req.setBody('a%20a=b%20b&c=d')
+    req.bodyParams(function(params){
+      assert.strictEqual(params['a a'], 'b b')
+      params.a123 = 7
+    })
+    assert.ok(/a123/.test(req.getBody()), 'body param not present')
   })
 
   it('should get and set individual body params', function(){
     var req = new Request()
-    req.setRawData(rawRequestDataPost)
+    req._setRawData(rawRequestDataPost)
     //bar=baz&foo%20x=qux%20x
     var p = req.bodyParam('foo x')
     assert.strictEqual(p, 'qux x')
-    assert.deepEqual(req.getBodyParams(), {'bar':'baz','foo x':'qux x'})
+    req.bodyParams(function(params){
+      assert.deepEqual(params, {'bar':'baz','foo x':'qux x'})
+    })
     var newParam = '%()%))'
     req.bodyParam('bar', newParam)
     assert.strictEqual(req.bodyParam('bar'), newParam)
-    assert.deepEqual(req.getBodyParams(), {bar:newParam,'foo x':'qux x'})
+    req.bodyParams(function(params){
+      assert.deepEqual(params, {bar:newParam,'foo x':'qux x'})
+    })
   })
 
   it('should work with DOM', function(){
     var req = new Request()
-    req.setRawData(rawRequestDataPost)
+    req._setRawData(rawRequestDataPost)
     req.setBody('<foo><bar abc="xyz"></bar></foo>')
     req.dom(function($){
       $('bar').attr('abc','pqr')
@@ -394,25 +374,25 @@ describe('Response', function(){
 
   it('should accept raw data', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
   })
 
   it('should get and set headers', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
     assert.ok(resp.headers !== responseHeaders)
     assert.deepEqual(resp.headers, responseHeaders)
   })
 
   it('should get and set buffers', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
     assert.strictEqual(resp.buffers.length, 3)
   })
 
   it('should get and set content type', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
     assert.strictEqual(resp.getContentType(), 'text/html')
     resp.setContentType('text/javascript')
     assert.strictEqual(resp.headers['content-type'], 'text/javascript; charset=utf-8')
@@ -420,7 +400,7 @@ describe('Response', function(){
 
   it('should get and set charset', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
     assert.strictEqual(resp.getCharset(), 'utf-8')
     resp.setCharset('ascii')
     assert.strictEqual(resp.headers['content-type'], 'text/html; charset=ascii')
@@ -428,33 +408,15 @@ describe('Response', function(){
 
   it('should get and set body', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
     assert.strictEqual(resp.getBody(), '<!doctype html><html><head></head><body><p>foo</p></body></html>')
     resp.setBody('123456789')
     assert.strictEqual(resp.buffers.join(''), '123456789')
   })
 
-  it('should get and set json', function(){
-    var resp = new Response()
-    resp.setRawData(rawResponseData)
-    resp.setJson({foo:'bar'})
-    assert.deepEqual(resp.getJson(), {foo:'bar'})
-    assert.strictEqual(resp.getBody(), JSON.stringify({foo:'bar'}))
-  })
-
-  it('should get and set dom', function(){
-    var resp = new Response()
-    resp.setRawData(rawResponseData)
-    var $ = resp.getDom()
-    assert.strictEqual($('p').text(), 'foo')
-    $('p').text('bar')
-    resp.setDom($)
-    assert.strictEqual(resp.getBody(), '<!doctype html><html><head></head><body><p>bar</p></body></html>')
-  })
-
   it('should work with DOM', function(){
     var resp = new Response()
-    resp.setRawData(rawResponseData)
+    resp._setRawData(rawResponseData)
     resp.setBody('<foo><bar abc="xyz"></bar></foo>')
     resp.dom(function($){
       $('bar').attr('abc','pqr')
