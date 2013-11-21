@@ -22,7 +22,7 @@ var Hoxy = eventer.extend(function(opts){
   }.bind(this));
 },{
   intercept: function(phase, cb){
-    this._mitm.intercept(phase, cb);
+    this._mitm.intercept(phase, cb, this);
   },
   reset: function(){
     this._mitm.reset();
