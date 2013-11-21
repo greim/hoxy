@@ -34,15 +34,17 @@ function getScript(path){
 exports.run = function(api){
 	var respInf = api.getResponseInfo();
 	if (/html/.test(respInf.headers['content-type'])) {
-		var path = api.arg(0);
+		var path = api.arg(0),
+		    opts = {xmlMode:!!api.arg(1), ignoreWhitespace:!!api.arg(2)};
+
 		getScript(path)
 		.onkeep(function(got){
 			var html = api.getResponseBody();
 			try{
 				var script = VM.createScript(got.code);
-				var window = {$:CHEERIO.load(html)};
+				var window = {$:CHEERIO.load(html, opts)};
 				script.runInNewContext(window);
-				var newHTML = window.$.html();
+				var newHTML = window.$.html(null, opts);
 				api.setResponseBody(newHTML);
 				api.notify();
 			}catch(err){

@@ -25,13 +25,14 @@ var VM = require('vm');
 exports.run = function(api){
 	var respInf = api.getResponseInfo();
 	if (/html/.test(respInf.headers['content-type'])) {
-		var code = api.arg(0);
-		var html = api.getResponseBody();
+		var code = api.arg(0),
+		    html = api.getResponseBody(),
+		    opts = {xmlMode:!!api.arg(1), ignoreWhitespace:!!api.arg(2)};
 		try{
 			var script = VM.createScript(code);
-			var window = {$:CHEERIO.load(html)};
+			var window = {$:CHEERIO.load(html, opts)};
 			script.runInNewContext(window);
-			var newHTML = window.$.html();
+			var newHTML = window.$.html(null, opts);
 			api.setResponseBody(newHTML);
 			api.notify();
 		}catch(err){

@@ -7,10 +7,6 @@
   "bin": {
     "hoxy": "./bin/hoxy"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/greim/hoxy.git"
-  },
   "keywords": [
     "web",
     "traffic",
@@ -26,7 +22,8 @@
     "js-beautify": "0.2.x",
     "cheerio": "0.10.x",
     "PrettyCSS": "0.3.x",
-    "html": "0.0.x"
+    "html": "0.0.x",
+    "mime": "1.2.x"
   },
   "license": "MIT",
   "engines": {
