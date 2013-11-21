@@ -7,6 +7,7 @@ var proxy = require('../hoxy').start({
   port: 8765
 });
 
+// Log every request/response transaction to the console.
 proxy.intercept('response', function(req, resp){
   console.log('-------------------------');
   console.log('========> '+req.toString());

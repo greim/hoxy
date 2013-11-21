@@ -233,6 +233,17 @@ describe('Request', function(){
     assert.strictEqual(req.url, '/foo.js')
   })
 
+  it('should get and set pathname', function(){
+    var req = new Request()
+    req._setRawData(rawRequestDataQS)
+    assert.strictEqual(req.getPathname(), '/foo.html')
+    req.setPathname('/baz.php')
+    assert.strictEqual(req.url, '/baz.php?bar=baz&foo=qux')
+    req.url = '/baz.php'
+    req.setPathname('/foo.html')
+    assert.strictEqual(req.url, '/foo.html')
+  })
+
   it('should get and set content type', function(){
     var req = new Request()
     req._setRawData(rawRequestData)
