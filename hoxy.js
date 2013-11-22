@@ -5,14 +5,14 @@
 
 var Logger = require('./lib/logger');
 var Mitm = require('./lib/mitm');
-var eventer = require('./lib/eventer');
+var Base = require('./lib/base');
+var GhostServer = require('./lib/ghost-server');
 var _ = require('lodash-node');
 var events = require('events');
 
 // ---------------------------
 
-var Hoxy = eventer.extend(function(opts){
-  instances.push(this);
+var Hoxy = Base.extend(function(opts){
   opts = _.extend({
     port: 8080
   }, opts);
@@ -29,6 +29,7 @@ var Hoxy = eventer.extend(function(opts){
   },
   close: function(){
     this._mitm.close();
+    this._ghost && this._ghost.close();
   },
   log: function(level){
     var logger = new Logger(level);
@@ -39,19 +40,26 @@ var Hoxy = eventer.extend(function(opts){
       }
       logger[log.level](message);
     });
-  }
-});
-
-var instances = [];
-
-process.on('uncaughtException', function(err){
-  instances.forEach(function(instance){
-    instance.emit('log',{
-      level: 'error',
-      message: 'uncaught error: '+err.message,
-      error: err
+  },
+  serve: function(opts, cb){
+    if (!this._ghost){
+      this._ghost = new GhostServer(opts.docroot || process.cwd());
+      this._ghost.on('error', function(err){
+        this.emit('log', {
+          level:'error',
+          message:'proxy listening on port '+opts.port,
+          error: err
+        });
+      }.bind(this));
+    }
+    this._ghost.serve()
+    .onkeep(function(got){
+      cb();
+    })
+    .onfail(function(err){
+      cb(err);
     });
-  });
+  }
 });
 
 module.exports = {

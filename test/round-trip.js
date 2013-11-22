@@ -5,6 +5,7 @@
 
 var hoxy = require('../hoxy');
 var chunker = require('../lib/chunker');
+var streams = require('../lib/streams');
 var _ = require('lodash-node');
 var await = require('await');
 var http = require('http');
@@ -78,21 +79,23 @@ module.exports = function roundTrip(opts,me){
       requestIntercept: function(){},
       server: function(){},
       responseIntercept: function(){},
-      client: function(){}
+      client: function(){},
+      error: function(){}
     };
     opts = _.merge(defaults, opts);
     var proxy = hoxy.start(opts.proxyOptions);
-    proxy.intercept('start', opts.startIntercept);
+    proxy.on('log',function(log){
+      if (log.level === 'error'){
+        opts.error(log.error, log.message);
+      }
+    });
     proxy.intercept('request', opts.requestIntercept);
     proxy.intercept('response', opts.responseIntercept);
     proxy.intercept('request', function(req){
       server = http.createServer(function(sReq, sResp){
-        var chunks = [];
-        sReq.on('data', function(chunk){
-          chunks.push(chunk);
-        });
-        sReq.on('end', function(){
-          opts.server(sReq, chunker.chunksToString(chunks));
+        streams.collect(sReq)
+        .onkeep(function(got){
+          opts.server(sReq, chunker.chunksToString(got.buffers));
           opts.response.headers['content-length'] = new Buffer(opts.response.body, 'utf8').length;
           sResp.writeHead(opts.response.statusCode, opts.response.headers);
           if (opts.response.body) {
@@ -100,6 +103,9 @@ module.exports = function roundTrip(opts,me){
           } else {
             sResp.end();
           }
+        })
+        .onfail(function(err){
+          console.log(err);
         });
       }).listen(req.port);
     });
@@ -119,12 +125,14 @@ module.exports = function roundTrip(opts,me){
       method: opts.request.method,
       headers: opts.request.headers
     }, function(cResp){
-      var chunks = [];
-      cResp.on('data', function(chunk){
-        chunks.push(chunk);
-      });
-      cResp.on('end', function(){
-        opts.client(cResp, chunker.chunksToString(chunks));
+      streams.collect(cResp)
+      .onkeep(function(got){
+        opts.client(cResp, chunker.chunksToString(got.buffers));
+      })
+      .onfail(function(err){
+        console.log(err);
+      })
+      .onresolve(function(){
         proxy.close();
         server.close();
         waiting.keep('next');

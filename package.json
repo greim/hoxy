@@ -12,6 +12,8 @@
     "web"
   ],
   "dependencies" : {
+    "slugs": "0.1.x",
+    "node-static": "0.7.x",
     "brake": "0.1.x",
     "lodash-node": "2.3.x",
     "await": "0.2.x",
