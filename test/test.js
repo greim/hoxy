@@ -472,7 +472,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        this.ghostServe('./files', function(){
+        this.ghost('./files', function(){
           next();
         })
       },
@@ -501,7 +501,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        this.ghostServe('./files', function(){
+        this.ghost('./files', function(){
           next();
         })
       },
