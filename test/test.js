@@ -82,6 +82,17 @@ describe('Request', function(){
     }, Error)
   })
 
+  it('should keep host header up to date', function(){
+    var req = new Request()
+    req.setHttpSource(getRequestData())
+    assert.strictEqual(req.hostname, 'example.com')
+    assert.strictEqual(req.headers.host, 'example.com:8080')
+    req.port = 81
+    assert.strictEqual(req.headers.host, 'example.com:81')
+    req.hostname = 'foo.example.com'
+    assert.strictEqual(req.headers.host, 'foo.example.com:81')
+  })
+
   it('should get and set port', function(){
     var req = new Request()
     req.setHttpSource(getRequestData())
