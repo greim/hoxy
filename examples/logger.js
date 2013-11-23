@@ -10,9 +10,8 @@ var proxy = require('../hoxy').start({
 // Log every request/response transaction to the console.
 proxy.intercept('response', function(req, resp){
   console.log('-------------------------');
-  console.log('========> '+req.toString());
-  console.log('-------------------------');
-  console.log('<======== '+resp.toString());  
+  console.log('==> '+req.url);
+  console.log('<== '+resp.statusCode);  
 });
 
 proxy.log('info');

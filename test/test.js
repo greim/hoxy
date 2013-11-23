@@ -366,6 +366,9 @@ describe('Hoxy', function(){
 
   it('should behave asynchronously in the request phase', function(done){
     roundTrip({
+      error: function(err, mess){
+        done(err)
+      },
       requestIntercept: function(req, resp, next){
         setTimeout(next,0)
       },
@@ -377,6 +380,9 @@ describe('Hoxy', function(){
 
   it('should behave asynchronously in the response phase', function(done){
     roundTrip({
+      error: function(err, mess){
+        done(err)
+      },
       responseIntercept: function(req, resp, next){
         setTimeout(next,0)
       },
@@ -388,6 +394,9 @@ describe('Hoxy', function(){
 
   it('should skip the server hit if the response is populated', function(done){
     roundTrip({
+      error: function(err, mess){
+        done(err)
+      },
       requestIntercept: function(req, resp){
         resp.statusCode = 404
       },
@@ -395,6 +404,113 @@ describe('Hoxy', function(){
         done(new Error('server hit was not skipped'))
       },
       client: function(){
+        done()
+      }
+    })
+  })
+
+  it('should serve', function(done){
+    roundTrip({
+      request:{
+        url: '/abc',
+        method: 'GET'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        this.serve('./files', function(){
+          next();
+        })
+      },
+      server: function(){
+        done(new Error('server hit was not skipped'))
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'abc')
+        done()
+      }
+    })
+  })
+
+  it('should not fallback silently with serve', function(done){
+    roundTrip({
+      request:{
+        url: '/def',
+        method: 'GET'
+      },
+      response:{
+        statusCode: 200,
+        body: 'def'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        this.serve('./files', function(){
+          next();
+        })
+      },
+      server: function(){
+        done(new Error('server hit was not skipped'))
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, '')
+        assert.strictEqual(resp.statusCode, 404)
+        done()
+      }
+    })
+  })
+
+  it('should ghost serve', function(done){
+    roundTrip({
+      request:{
+        url: '/abc',
+        method: 'GET'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        this.ghostServe('./files', function(){
+          next();
+        })
+      },
+      server: function(){
+        done(new Error('server hit was not skipped'))
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'abc')
+        done()
+      }
+    })
+  })
+
+  it('should fallback silently with ghost serve', function(done){
+    var serverHit = false;
+    roundTrip({
+      request:{
+        url: '/def',
+        method: 'GET'
+      },
+      response:{
+        statusCode: 200,
+        body: 'def'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        this.ghostServe('./files', function(){
+          next();
+        })
+      },
+      server: function(){
+        serverHit = true;
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'def')
+        assert.ok(serverHit);
         done()
       }
     })

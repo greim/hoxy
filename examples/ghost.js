@@ -11,7 +11,12 @@ var proxy = require('../hoxy').start({
 
 // Log every request/response transaction to the console.
 proxy.intercept('response', function(req, resp, done){
-  resp.ghostServe(req.url);
+  this.serve({
+    request: req,
+    response: resp
+  }, function(err){
+    done(err);
+  });
 });
 
 proxy.log('info');

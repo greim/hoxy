@@ -6,7 +6,6 @@
 var Logger = require('./lib/logger');
 var Mitm = require('./lib/mitm');
 var Base = require('./lib/base');
-var GhostServer = require('./lib/ghost-server');
 var _ = require('lodash-node');
 var events = require('events');
 
@@ -20,16 +19,19 @@ var Hoxy = Base.extend(function(opts){
   this._mitm.on('log', function(item){
     this.emit('log', item);
   }.bind(this));
+  this._ghosts = {};
 },{
   intercept: function(phase, cb){
-    this._mitm.intercept(phase, cb, this);
+    this._mitm.intercept(phase, cb);
   },
   reset: function(){
     this._mitm.reset();
   },
   close: function(){
     this._mitm.close();
-    this._ghost && this._ghost.close();
+    Object.keys(this._ghosts).forEach(function(key){
+      this._ghosts[key].close();
+    }.bind(this));
   },
   log: function(level){
     var logger = new Logger(level);
@@ -39,25 +41,6 @@ var Hoxy = Base.extend(function(opts){
         message+='\n'+log.error.stack;
       }
       logger[log.level](message);
-    });
-  },
-  serve: function(opts, cb){
-    if (!this._ghost){
-      this._ghost = new GhostServer(opts.docroot || process.cwd());
-      this._ghost.on('error', function(err){
-        this.emit('log', {
-          level:'error',
-          message:'proxy listening on port '+opts.port,
-          error: err
-        });
-      }.bind(this));
-    }
-    this._ghost.serve()
-    .onkeep(function(got){
-      cb();
-    })
-    .onfail(function(err){
-      cb(err);
     });
   }
 });
