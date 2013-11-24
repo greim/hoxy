@@ -213,24 +213,6 @@ describe('streams', function(){
       done()
     })
   })
-
-  it('should throttle streams', function(done){
-    var fake = streams
-    .from(buffs)
-    .pipe(streams.brake(300,50))
-    var chunks = []
-    var start = Date.now()
-    fake.on('data', function(buffer){
-      chunks.push(buffer)
-    })
-    fake.on('end', function(){
-      var time = Date.now() - start
-      assert.ok(time > 45, 'stream throttler too fast. expected > '+45+', got '+time)
-      assert.ok(time < 55, 'stream throttler too slow. expected < '+55+', got '+time)
-      assert.strictEqual(chunks.join(''), buffs.join(''))
-      done()
-    })
-  })
 })
 
 describe('Hoxy', function(){
@@ -504,9 +486,6 @@ describe('Hoxy', function(){
       }
     })
   })
-})
-
-describe('API', function(){
 
   it('should serve', function(done){
     roundTrip({
@@ -610,6 +589,130 @@ describe('API', function(){
       client: function(resp, body){
         assert.strictEqual(body, 'def')
         assert.ok(serverHit);
+        done()
+      }
+    })
+  })
+
+  it('should simulate latency upload', function(done){
+
+    var start, end
+    roundTrip({
+      request:{
+        url: '/def',
+        method: 'POST'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp){
+        req.slow({ latency: 100 })
+        start = Date.now()
+      },
+      server: function(){
+        end = Date.now()
+        var upper = 110,
+          lower = 90,
+          actual = end - start
+        assert.ok(actual > lower, 'latency should be above '+lower+'ms (was '+actual+')')
+        assert.ok(actual < upper, 'latency should be below '+upper+'ms (was '+actual+')')
+        done()
+      }
+    })
+  })
+
+  it('should simulate latency download', function(done){
+
+    var start, end
+    roundTrip({
+      response:{
+        statusCode: 200
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      responseIntercept: function(req, resp){
+        resp.slow({ latency: 100 })
+        start = Date.now()
+      },
+      client: function(){
+        end = Date.now()
+        var upper = 110,
+          lower = 90,
+          actual = end - start
+        assert.ok(actual > lower, 'latency should be above '+lower+'ms (was '+actual+')')
+        assert.ok(actual < upper, 'latency should be below '+upper+'ms (was '+actual+')')
+        done()
+      }
+    })
+  })
+
+  var getMegaSource = (function(){
+    var hex = '0123456789abcdef'
+    var kb = []
+    for (var i=0; i<64; i++)
+      kb.push(hex)
+    kb = kb.join('')
+    return function(){
+      var result = []
+      for (var i=0; i<1000; i++)
+        result.push(new Buffer(kb, 'utf8'))
+      return streams.from(result)
+    }
+  })()
+
+  it('should simulate slow upload', function(done){
+
+    var start, end
+    roundTrip({
+      request:{
+        url: '/def',
+        method: 'POST'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp){
+        req.source = getMegaSource()
+        req.slow({ rate: 1024000 })
+        start = Date.now()
+      },
+      server: function(req, body){
+        end = Date.now()
+        assert.strictEqual(body.length, 1024000)
+        var upper = 1100,
+          lower = 950,
+          actual = end - start
+        assert.ok(actual > lower, 'transfer time should be above '+lower+'ms (was '+actual+')')
+        assert.ok(actual < upper, 'transfer time should be below '+upper+'ms (was '+actual+')')
+        done()
+      }
+    })
+  })
+
+  it('should simulate slow download', function(done){
+
+    var start, end
+    roundTrip({
+      response:{
+        statusCode: 200
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      responseIntercept: function(req, resp){
+        resp.source = getMegaSource()
+        resp.slow({ rate: 1024000 })
+        start = Date.now()
+      },
+      client: function(resp, body){
+        end = Date.now()
+        assert.strictEqual(body.length, 1024000)
+        var upper = 1100,
+          lower = 950,
+          actual = end - start
+        assert.ok(actual > lower, 'transfer time should be above '+lower+'ms (was '+actual+')')
+        assert.ok(actual < upper, 'transfer time should be below '+upper+'ms (was '+actual+')')
         done()
       }
     })
