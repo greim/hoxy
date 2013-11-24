@@ -29,6 +29,10 @@ Capabilities include:
 
     npm install hoxy
 
+# Note: 1.x versus 0.x
+
+1.x is a ground-up rewrite and re-envisioning of the project. 0.x was a command line utility, whereas 1.x is a programming API. In 0.x you controlled Hoxy using a custom rule syntax, whereas in 1.x you simply `require('hoxy')` and code in JavaScript. The custom rule syntax made it easy for me personally to spin up various debugging proxy instances, but it was understandably a hinderance to general adoption.
+
 # How it works
 
 An HTTP conversation could be illustrated like this:

@@ -5,7 +5,7 @@
 In the rest of the examples, it's assumed this is already done.
 
 ```javascript
-var proxy = require('../hoxy').start({
+var proxy = require('hoxy').start({
   port: 8765
 });
 ```
