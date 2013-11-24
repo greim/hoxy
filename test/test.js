@@ -232,6 +232,7 @@ describe('streams', function(){
     })
   })
 })
+
 describe('Hoxy', function(){
 
   it('should round trip synchronously', function(done){
@@ -419,6 +420,93 @@ describe('Hoxy', function(){
       }
     })
   })
+
+  it('should load request bodies', function(done){
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        req.load(function(err){
+          assert.strictEqual(req.getBody(), 'abcdefg')
+          next()
+        })
+      },
+      server: function(req, body){
+        assert.strictEqual(body, 'abcdefg')
+        done()
+      }
+    })
+  })
+
+  it('should load response bodies', function(done){
+    roundTrip({
+      response: {
+        status: 200,
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      responseIntercept: function(req, resp, next){
+        resp.load(function(err){
+          assert.strictEqual(resp.getBody(), 'abcdefg')
+          next()
+        })
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'abcdefg')
+        done()
+      }
+    })
+  })
+
+  it('should set request bodies', function(done){
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp){
+        req.setBody('foobarbaz')
+      },
+      server: function(req, body){
+        assert.strictEqual(body, 'foobarbaz')
+        done()
+      }
+    })
+  })
+
+  it('should set response bodies', function(done){
+    roundTrip({
+      response: {
+        status: 200,
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      responseIntercept: function(req, resp){
+        resp.setBody('foobarbaz')
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'foobarbaz')
+        done()
+      }
+    })
+  })
+})
+
+describe('API', function(){
 
   it('should serve', function(done){
     roundTrip({
