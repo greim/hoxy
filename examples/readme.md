@@ -32,6 +32,16 @@ proxy.intercept('request', function(req, resp, next){
 });
 ```
 
+## Replace production JavaScript with staged JavaScript
+
+```javascript
+proxy.intercept('request', function(req, resp, next){
+  if (req.hostname === 'www.mysite.com' && /\.js$/.test(req.url)){
+    req.hostname = 'www-stage.mysite.com';
+  }
+});
+```
+
 ## Simulate a slow connection
 
 ```javascript
@@ -40,7 +50,7 @@ proxy.intercept('request', function(req, resp){
   req.slow({
     latency: 200, // milliseconds
     rate: 10000   // bytes per second
-  })
+  });
 });
 
 // download
@@ -48,7 +58,7 @@ proxy.intercept('response', function(req, resp){
   resp.slow({
     latency: 50, // milliseconds
     rate: 50000  // bytes per second
-  })
+  });
 });
 ```
 

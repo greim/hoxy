@@ -1,6 +1,8 @@
 # Overview
 
-Hoxy is a debugging toolkit for web developers. Using hoxy, you can intercept HTTP requests and responses, analyze and operate on them in JavaScript, and send them skipping merrily on their way. Hoxy is a standalone proxy server; so as long as you've got an proxy-capable HTTP client, Hoxy can debug it.
+Hoxy is a debugging proxy for web developers.
+Using hoxy, you can intercept HTTP requests and responses, analyze and operate on them in JavaScript, and send them skipping merrily on their way.
+Hoxy is a standalone proxy server; so as long as you've got an proxy-capable HTTP client, Hoxy can debug it.
 
 ```javascript
 var proxy = require('hoxy').start({ port: 8080 });
@@ -28,10 +30,6 @@ Capabilities include:
 # Installation
 
     npm install hoxy
-
-# Note: 1.x versus 0.x
-
-1.x is a ground-up rewrite and re-envisioning of the project. 0.x was a command line utility, whereas 1.x is a programming API. In 0.x you controlled Hoxy using a custom rule syntax, whereas in 1.x you simply `require('hoxy')` and code in JavaScript. The custom rule syntax made it easy for me personally to spin up various debugging proxy instances, but it was understandably a hinderance to general adoption.
 
 # How it works
 
@@ -72,14 +70,16 @@ Hoxy secretly adds two additional checkpoints, acting as a man in the middle bet
     -----------------------
 
 1. Client sends request.
-2. Hoxy operates on request.
+2. Hoxy intercepts the request.
 3. Server receives request and sends response.
-4. Hoxy operates on response.
+4. Hoxy intercepts the response.
 5. Client receives response.
 
-You provide callback functions for steps 2 and/or 4. Within those, the entire contents of the request and response—including the body contents—are available to you as JavaScript variables.
+You provide callback functions for steps 2 and/or 4.
+Within those, the entire contents of the request and response—including the body contents—are available to you as JavaScript variables.
 
-During the request phase the response object is unpopulated, but is still available as a JavaScript variable. If you populate it yourself, Hoxy will notice, and won't send the request to the server, but rather will skip directly to the response phase.
+During the request phase the response object is unpopulated, but is still available as a JavaScript variable.
+If you populate it yourself, Hoxy will notice, and won't send the request to the server, but rather will skip directly to the response phase.
 
     ------------------------------
     server:  *remains ignorant*
@@ -90,6 +90,14 @@ During the request phase the response object is unpopulated, but is still availa
     ------------------------------
 
 1. Client sends request.
-2. Hoxy operates on request (response gets populated).
-3. Hoxy operates on response.
+2. Hoxy intercepts the request (response gets populated).
+3. Hoxy intercepts the response.
 4. Client receives response.
+
+# Note: 1.x versus 0.x
+
+1.x is a ground-up rewrite and re-envisioning of the project.
+0.x was a command line utility, whereas 1.x is a programming API.
+In 0.x you controlled Hoxy using a custom rule syntax, whereas in 1.x you simply `require('hoxy')` and code in JavaScript.
+The custom rule syntax made it easy for me personally to spin up various debugging proxy instances, but it was understandably a hinderance to general adoption.
+Plus, as a general-purpose npm module, other projects can build upon Hoxy's capabilities.
