@@ -6,6 +6,7 @@
 var Logger = require('./lib/logger');
 var Mitm = require('./lib/mitm');
 var Base = require('./lib/base');
+var StreamBrake = require('./lib/stream-brake');
 var _ = require('lodash-node');
 var events = require('events');
 
@@ -48,5 +49,8 @@ var Hoxy = Base.extend(function(opts){
 module.exports = {
   start: function(opts){
     return new Hoxy(opts);
+  },
+  u: {
+    StreamBrake: StreamBrake
   }
 };

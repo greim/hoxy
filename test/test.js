@@ -153,6 +153,15 @@ describe('Request', function(){
     req.setHttpSource(data)
     assert.deepEqual(req.source, data)
   })
+
+  it('should get absolute URL', function(){
+    var req = new Request()
+    var data = getRequestData()
+    req.setHttpSource(data)
+    assert.strictEqual(req.getAbsoluteUrl(), 'http://example.com:8080/foo.html')
+    req.port = undefined;
+    assert.strictEqual(req.getAbsoluteUrl(), 'http://example.com/foo.html')
+  })
 })
 
 describe('Response', function(){
@@ -282,14 +291,20 @@ describe('Hoxy', function(){
       requestIntercept: function(){
         steps += '1'
       },
-      server: function(){
+      sentIntercept: function(){
         steps += '2'
       },
-      responseIntercept: function(){
+      server: function(){
         steps += '3'
       },
+      responseIntercept: function(){
+        steps += '4'
+      },
+      receivedIntercept: function(){
+        steps += '5'
+      },
       client: function(){
-        assert.strictEqual(steps, '123')
+        assert.strictEqual(steps, '12345')
         done()
       }
     })
@@ -305,20 +320,31 @@ describe('Hoxy', function(){
         setTimeout(function(){
           steps += '1'
           itsDone()
-        },10)
+        },0)
       },
-      server: function(){
-        steps += '2'
+      sentIntercept: function(req, resp, itsDone){
+        setTimeout(function(){
+          steps += '2'
+          itsDone()
+        },0)
       },
       responseIntercept: function(req, resp, itsDone){
         setTimeout(function(){
           steps += '3'
           itsDone()
-        },10)
+        },0)
+      },
+      receivedIntercept: function(req, resp, itsDone){
+        setTimeout(function(){
+          steps += '4'
+          itsDone()
+        },0)
       },
       client: function(){
-        assert.strictEqual(steps, '123')
-        done()
+        setTimeout(function(){
+          assert.strictEqual(steps, '1234')
+          done()
+        },10)
       }
     })
   })

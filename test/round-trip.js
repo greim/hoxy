@@ -20,27 +20,14 @@ var http = require('http');
  * step along the way.
  * 
  * roundTrip({
- *   request: {
- *     // details of request go here
- *   },
- *   response: {
- *     // details of response go here
- *   },
- *   startIntercept: function(req, resp, [next]){
- *     // manipulate request before body
- *   },
- *   requestIntercept: function(req, resp, [next]){
- *     // manipulate request
- *   },
- *   server: function(nativeRequest, body){
- *     // analyze what server receives
- *   },
- *   responseIntercept: function(req, resp, [next]){
- *     // manipulate response
- *   },
- *   client: function(nativeResponse, body){
- *     // analyze what client receives
- *   }
+ *   request: { ... }
+ *   response: { ... }
+ *   requestIntercept: function(req, resp, [next]){ ... }
+ *   sentIntercept: function(req, resp, [next]){ ... }
+ *   server: function(nativeRequest, body){ ... }
+ *   responseIntercept: function(req, resp, [next]){ ... }
+ *   receivedIntercept: function(req, resp, [next]){ ... }
+ *   client: function(nativeResponse, body){ ... }
  * });
  */
 
@@ -75,10 +62,11 @@ module.exports = function roundTrip(opts,me){
         },
         body: body
       },
-      startIntercept: function(){},
       requestIntercept: function(){},
+      sentIntercept: function(){},
       server: function(){},
       responseIntercept: function(){},
+      receivedIntercept: function(){},
       client: function(){},
       error: function(){}
     };
@@ -90,7 +78,9 @@ module.exports = function roundTrip(opts,me){
       }
     });
     proxy.intercept('request', opts.requestIntercept);
+    proxy.intercept('sent', opts.sentIntercept);
     proxy.intercept('response', opts.responseIntercept);
+    proxy.intercept('received', opts.receivedIntercept);
     proxy.intercept('request', function(req){
       server = http.createServer(function(sReq, sResp){
         streams.collect(sReq)
