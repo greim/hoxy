@@ -16,6 +16,20 @@ var roundTrip = require('./round-trip')
 
 // ---------------------------
 
+var getMegaSource = (function(){
+  var hex = '0123456789abcdef'
+  var kb = []
+  for (var i=0; i<64; i++)
+    kb.push(hex)
+  kb = kb.join('')
+  return function(){
+    var result = []
+    for (var i=0; i<1000; i++)
+      result.push(new Buffer(kb, 'utf8'))
+    return streams.from(result)
+  }
+})()
+
 function getRequestData(){
   var data = streams.from([
     new Buffer('<!doctype html><html><head></head><body>', 'utf8'),
@@ -212,6 +226,48 @@ describe('streams', function(){
       assert.strictEqual(chunks.join(''), buffs.join(''))
       done()
     })
+  })
+
+  it('should brake a stream', function(done){
+    var start = Date.now();
+    var fake = streams.from([new Buffer('abcdefg')]);
+    var brake = streams.brake(1, 100);
+    var piped = fake.pipe(brake);
+    streams.collect(piped)
+    .onfail(function(err){
+      done(err);
+    })
+    .onkeep(function(got){
+      var stop = Date.now();
+      var lower = 700-20;
+      var upper = 700+20;
+      var time = stop - start;
+      //console.log(time)
+      assert.ok(time < upper, 'took too long, expected < '+upper+', got '+time);
+      assert.ok(time > lower, 'took too short, expected > '+lower+', got '+time);
+      assert.strictEqual(got.buffers.join(''),'abcdefg');
+      done();
+    });
+  })
+
+  it('should brake a big stream', function(done){
+    var start = Date.now();
+    var fake = getMegaSource();
+    var brake = streams.brake(10240, 10);
+    var piped = fake.pipe(brake);
+    streams.collect(piped)
+    .onfail(function(err){
+      done(err);
+    })
+    .onkeep(function(){
+      var stop = Date.now();
+      var lower = 1000-300;
+      var upper = 1000+300;
+      var time = stop - start;
+      assert.ok(time < upper, 'took too long, expected < '+upper+', got '+time);
+      assert.ok(time > lower, 'took too short, expected > '+lower+', got '+time);
+      done();
+    });
   })
 })
 
@@ -414,7 +470,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        req.load(function(err){
+        req.loadBody(function(err){
           assert.strictEqual(req.getBody(), 'abcdefg')
           next()
         })
@@ -436,7 +492,7 @@ describe('Hoxy', function(){
         done(err)
       },
       responseIntercept: function(req, resp, next){
-        resp.load(function(err){
+        resp.loadBody(function(err){
           assert.strictEqual(resp.getBody(), 'abcdefg')
           next()
         })
@@ -647,20 +703,6 @@ describe('Hoxy', function(){
     })
   })
 
-  var getMegaSource = (function(){
-    var hex = '0123456789abcdef'
-    var kb = []
-    for (var i=0; i<64; i++)
-      kb.push(hex)
-    kb = kb.join('')
-    return function(){
-      var result = []
-      for (var i=0; i<1000; i++)
-        result.push(new Buffer(kb, 'utf8'))
-      return streams.from(result)
-    }
-  })()
-
   it('should simulate slow upload', function(done){
 
     var start, end
@@ -680,8 +722,8 @@ describe('Hoxy', function(){
       server: function(req, body){
         end = Date.now()
         assert.strictEqual(body.length, 1024000)
-        var upper = 1100,
-          lower = 950,
+        var upper = 1000+100,
+          lower   = 1000-100,
           actual = end - start
         assert.ok(actual > lower, 'transfer time should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'transfer time should be below '+upper+'ms (was '+actual+')')

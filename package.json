@@ -12,7 +12,6 @@
     "web"
   ],
   "dependencies" : {
-    "stream-throttle": "0.1.x",
     "slugs": "0.1.x",
     "node-static": "0.7.x",
     "lodash-node": "2.3.x",

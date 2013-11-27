@@ -100,4 +100,6 @@ If you populate it yourself, Hoxy will notice, and won't send the request to the
 0.x was a command line utility, whereas 1.x is a programming API.
 In 0.x you controlled Hoxy using a custom rule syntax, whereas in 1.x you simply `require('hoxy')` and code in JavaScript.
 The custom rule syntax made it easy for me personally to spin up various debugging proxy instances, but it was understandably a hinderance to general adoption.
-Plus, as a general-purpose npm module, other projects can build upon Hoxy's capabilities.
+Plus, as a general-purpose npm module, other projects can now build upon Hoxy's capabilities.
+Hoxy 1.x is currently in an alpha state.
+
