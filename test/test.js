@@ -470,7 +470,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        req.loadBody(function(err){
+        req.load(function(err){
           assert.strictEqual(req.getBody(), 'abcdefg')
           next()
         })
@@ -492,7 +492,7 @@ describe('Hoxy', function(){
         done(err)
       },
       responseIntercept: function(req, resp, next){
-        resp.loadBody(function(err){
+        resp.load(function(err){
           assert.strictEqual(resp.getBody(), 'abcdefg')
           next()
         })
