@@ -103,7 +103,7 @@ module.exports = function roundTrip(opts,me){
     opts.intercepts.forEach(function(intercept){
       proxy.intercept(intercept.name, intercept.callback);
     });
-    if (opts.proxyOptions.stage) {
+    if (opts.proxyOptions.reverse) {
       var url = opts.proxyOptions.url;
     } else {
       var url = opts.request.protocol

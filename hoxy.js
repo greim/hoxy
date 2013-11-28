@@ -12,7 +12,7 @@ var events = require('events');
 
 // ---------------------------
 
-var Hoxy = Base.extend(function(opts){
+var Proxy = Base.extend(function(opts){
   opts = _.extend({
     port: 8080
   }, opts);
@@ -51,9 +51,15 @@ var Hoxy = Base.extend(function(opts){
 
 module.exports = {
   start: function(opts){
-    return new Hoxy(opts);
+    return new Proxy(opts);
   },
-  u: {
-    StreamBrake: StreamBrake
+  forever: function(cb){
+    process.on('uncaughtException', function(err){
+      if (typeof cb === 'function'){
+        cb(err);
+      } else {
+        console.log(err.stack);
+      }
+    });
   }
 };
