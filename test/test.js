@@ -162,6 +162,12 @@ describe('Request', function(){
     req.port = undefined;
     assert.strictEqual(req.getAbsoluteUrl(), 'http://example.com/foo.html')
   })
+
+  it('should get and set data', function(){
+    var req = new Request()
+    req.data('foo', 'bar')
+    assert.strictEqual(req.data('foo'), 'bar')
+  })
 })
 
 describe('Response', function(){
@@ -186,6 +192,12 @@ describe('Response', function(){
     var resp = new Response()
     resp.setHttpSource(getResponseData())
     assert.strictEqual(resp.statusCode, 200)
+  })
+
+  it('should get and set data', function(){
+    var resp = new Response()
+    resp.data('foo', 'bar')
+    assert.strictEqual(resp.data('foo'), 'bar')
   })
 })
 
@@ -693,7 +705,7 @@ describe('Hoxy', function(){
       },
       server: function(){
         end = Date.now()
-        var upper = 110,
+        var upper = 130,
           lower = 90,
           actual = end - start
         assert.ok(actual > lower, 'latency should be above '+lower+'ms (was '+actual+')')
@@ -781,6 +793,38 @@ describe('Hoxy', function(){
           actual = end - start
         assert.ok(actual > lower, 'transfer time should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'transfer time should be below '+upper+'ms (was '+actual+')')
+        done()
+      }
+    })
+  })
+
+  it('should get and set data', function(done){
+    roundTrip({
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp){
+        req.data('foo1','bar1')
+        resp.data('foo2','bar2')
+        this.data('foo3','bar3')
+        assert.strictEqual(req.data('foo1'), 'bar1')
+        assert.strictEqual(resp.data('foo2'), 'bar2')
+        assert.strictEqual(this.data('foo3'), 'bar3')
+      },
+      sentIntercept: function(req, resp){
+        assert.strictEqual(req.data('foo1'), 'bar1')
+        assert.strictEqual(resp.data('foo2'), 'bar2')
+        assert.strictEqual(this.data('foo3'), 'bar3')
+      },
+      responseIntercept: function(req, resp){
+        assert.strictEqual(req.data('foo1'), 'bar1')
+        assert.strictEqual(resp.data('foo2'), 'bar2')
+        assert.strictEqual(this.data('foo3'), 'bar3')
+      },
+      receivedIntercept: function(req, resp){
+        assert.strictEqual(req.data('foo1'), 'bar1')
+        assert.strictEqual(resp.data('foo2'), 'bar2')
+        assert.strictEqual(this.data('foo3'), 'bar3')
         done()
       }
     })

@@ -21,6 +21,9 @@ var Hoxy = Base.extend(function(opts){
     this.emit('log', item);
   }.bind(this));
   this._ghosts = {};
+  if (opts.log){
+    this.log(opts.log);
+  }
 },{
   intercept: function(phase, cb){
     this._mitm.intercept(phase, cb);
