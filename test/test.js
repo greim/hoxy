@@ -705,8 +705,8 @@ describe('Hoxy', function(){
       },
       server: function(){
         end = Date.now()
-        var upper = 130,
-          lower = 90,
+        var upper = 100+100,
+          lower = 100-1,
           actual = end - start
         assert.ok(actual > lower, 'latency should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'latency should be below '+upper+'ms (was '+actual+')')
@@ -825,6 +825,54 @@ describe('Hoxy', function(){
         assert.strictEqual(req.data('foo1'), 'bar1')
         assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
+        done()
+      }
+    })
+  })
+
+  it('should intercept response DOM', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        name: 'response:$',
+        callback: function(req, resp){
+          assert.ok(resp.$, '$ should exist')
+          assert.strictEqual(resp.$('title').text(), 'foo')
+          resp.$('title').text('bar')
+        }
+      }],
+      client: function(resp, body){
+        assert.strictEqual(body, '<!doctype html><html><head><title>bar</title></head><body><div id="content"></div></body></html>')
+        done()
+      }
+    })
+  })
+
+  it('should intercept response JSON', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: JSON.stringify({foo:'bar',baz:2})
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        name: 'response:json',
+        callback: function(req, resp){
+          assert.ok(resp.json, 'json should exist')
+          assert.deepEqual(resp.json, {foo:'bar',baz:2})
+          resp.json.qux = {};
+        }
+      }],
+      client: function(resp, body){
+        assert.deepEqual(JSON.parse(body), {foo:'bar',baz:2,qux:{}})
         done()
       }
     })

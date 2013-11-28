@@ -45,20 +45,32 @@ proxy.intercept('request', function(req, resp, next){
 ## Simulate a slow connection
 
 ```javascript
-// upload
-proxy.intercept('request', function(req, resp){
-  req.slow({
-    latency: 200, // milliseconds
-    rate: 10000   // bytes per second
-  });
-});
-
-// download
 proxy.intercept('response', function(req, resp){
   resp.slow({
     latency: 50, // milliseconds
     rate: 50000  // bytes per second
   });
+});
+```
+
+## Manipulate response as JSON
+
+```javascript
+proxy.intercept('response:json', function(req, resp){
+  // assuming response json with this structure:
+  // { id: '12345' }
+  resp.json.id = 'abcde'
+  // client will receive this:
+  // { id: 'abcde' }
+});
+```
+
+## Manipulate response as DOM
+
+```javascript
+proxy.intercept('response:$', function(req, resp){
+  resp.$('title').text('foo'); // change the page title to 'foo'
+  resp.$('#content').addClass('test'); // add class="test" to content div
 });
 ```
 

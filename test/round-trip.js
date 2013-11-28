@@ -62,6 +62,7 @@ module.exports = function roundTrip(opts,me){
         },
         body: body
       },
+      intercepts: [],
       requestIntercept: function(){},
       sentIntercept: function(){},
       server: function(){},
@@ -98,6 +99,9 @@ module.exports = function roundTrip(opts,me){
           console.log(err);
         });
       }).listen(req.port);
+    });
+    opts.intercepts.forEach(function(intercept){
+      proxy.intercept(intercept.name, intercept.callback);
     });
     if (opts.proxyOptions.stage) {
       var url = opts.proxyOptions.url;
