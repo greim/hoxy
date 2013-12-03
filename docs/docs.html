@@ -1,0 +1,466 @@
+<!doctype html>
+<html>
+<head>
+<title>Hoxy API Documentation</title>
+<meta charset="utf8"/>
+<link href='http://fonts.googleapis.com/css?family=Antic+Slab' rel='stylesheet' type='text/css'>
+<link href='styles.css' rel='stylesheet' type='text/css'>
+<link href='api.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+<div id="outer">
+<div id="inner">
+
+<h1>API Documentation</h1>
+
+<h2>Main Module</h2>
+
+<pre>var hoxy = require('hoxy');</pre>
+
+<div class="api-detail" id="hoxy-start">
+  <h3><a href="#hoxy-start">hoxy.start(<span class="args">options</span>) <span class="tldr">start up a new debugging proxy instance</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Factory method that creates a new proxy instance, starts it listening on the given port, and returns it. Configures the instance based on options you provide.
+    </p>
+    <div class="params">
+      <h4>@param <code>options</code> {object}</h4>
+      <ul>
+        <li><code>port</code> {number} - Port to listen on.</li>
+        <li><code>log</code> {string} - Optional. Print log events at or above the given level to stderr. See the logging method below.</li>
+        <li><code>reverse</code> {string} - Reverse proxy to the given URL. In reverse proxy mode, you point your client directly at the proxy and it will mirror the site, rather than configuring the proxy in your client and pointing the client at the site.</li>
+      </ul>
+      <h4>@return {Proxy} - A proxy server instance.</h4>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="hoxy-forever">
+  <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>) <span class="tldr">don't exit the process on uncaught errors</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Keep the process running even if there's an uncaught error. It's likely that if you're hacking web traffic in a debugging proxy that uncaught exceptions will occur, which cause Node to exit by default. This merely sets a global exception handler for all uncaught exceptions, so that you don't have to keep coming back and restarting the proxy.
+    </p>
+    <div class="params">
+      <h4>@param <code>handler</code> {function(err)}</h4>
+      <p>
+        Optional. If provided, errors will be passed to it. Otherwise, they'll be printed to stderr.
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>Class Proxy</h2>
+
+<p>
+  An instance of this is returned from <code>require('hoxy').start()</code>.
+</p>
+
+<div class="api-detail" id="proxy-intercept">
+  <h3><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>) <span class="tldr">intercept requests or responses</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Intercept the request/response cycle during one of several phases. While the handler is running, that phase of the request/response cycle is paused, and you can meddle with the details of requests and responses. Multiple intercept handlers of the same phase are run serially, in the order added.
+    </p>
+    <div class="params">
+      <h4>@param <code>options</code> {object|string}</h4>
+      <p>
+        Options object detailing how to do the intercept.
+      </p>
+      <ul>
+        <li><code>phase</code> {string} - Which phase of the request/response cycle should be intercepted. More info below.</li>
+        <li><code>url</code> {string|regexp} - Optional. Absolute URL (starting with "http:") which should be intercepted. If undefined, all URLs will be intercepted. If it's a regexp, only matching URLs will be intercepted.</li>
+        <li><code>type</code> {string} - Optional. Treat the request/response cycle as this type of content. More info below.</li>
+        <li><code>filter</code> {function(req, resp)} - Optional. If present, request/response cycles will only be intercepted if this functions returns true.</li>
+      </ul>
+      <p>
+        Accepted values for <code>phase</code> are:
+      </p>
+      <ul>
+        <li><code>request</code> - Proxy has received the request, but not forwarded it to the server.</li>
+        <li><code>sent</code> - Proxy has forwarded the entire request to the server, including the request body (if applicable) but has not received a response from the server. Requests and responses are read-only during this phase.</li>
+        <li><code>response</code> - Proxy has received a response from the server, but has not forwarded it to the client. Requests are read-only during this phase.</li>
+        <li><code>received</code> - Proxy has forwarded the entire response to the client. Requests and responses are read-only during this phase.</li>
+      </ul>
+      <p>
+        If the <code>options</code> argument is a string instead of an object, it's used as the phase argument. The <code>request</code> and <code>response</code> phases are more useful for manipulating details of requests and responses. The <code>sent</code> and <code>received</code> phases are only useful for read-only purposes such as benchmarking and profiling.
+      </p>
+      <p>
+        If the <code>type</code> argument is present, the entire request or response body (depending on the <code>phase</code> argument) will be converted to the given data type. This should only be used in tandem with <code>url</code> or <code>filter</code>, in order to avoid situations where hoxy attempts to coerce all HTTP traffic into the given body type. Accepted values are:
+      </p>
+      <ul>
+        <li><code>json</code> - Treat the body as JSON and expose it as the <code>json</code> property of the request or response, which will be a plain old JavaScript object.</li>
+        <li><code>params</code> - Treat the body as form URL-encoded parameters and expose it as the <code>params</code> property of the request or response, which will be a plain old JavaScript object with keys and values. (Likely more usefull for requests than responses.)</li>
+        <li><code>$</code> - Treat the body as HTML (or some other markup language) and expose it as the <code>$</code> property of the request or response. This will be a cheerio object, which is a server-side DOM library closely resembling jQuery. (Likely more useful for responses than requests.)</li>
+        <li><code>string</code> - Treat the body as a string and expose it as the <code>string</code> property of the request or response.</li>
+        <li><code>buffers</code> - Treat the body as arbitrary data (possibly binary) and expose it as the <code>buffers</code> property of the request or response, which will be an array of buffers.</li>
+      </ul>
+      <p>
+        Note that the body type will remain in effect for the duration of this request/response cycle, until it is coerced into a different type.
+      </p>
+      <h4>@param <code>handler</code> {function(req, resp, [done])}</h4>
+      <ul>
+        <li><code>req</code> {Request} - Represents the details of the current request.</li>
+        <li><code>resp</code> {Response} - Represents the details of the current response.</li>
+        <li><code>done</code> {function} - Optional. If declared in the argument list, this handler is treated asynchronously, and the request/response cycle will remain paused until it is called.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="proxy-close">
+  <h3><a href="#proxy-close">proxy.close(<span class="args"></span>) <span class="tldr">stop the proxy server</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Cause this proxy server to stop receiving requests. This will also finalize and/or clean up any resources or services the proxy is using internally.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="proxy-log">
+  <h3><a href="#proxy-log">proxy.log(<span class="args">level, [handler]</span>) <span class="tldr">handle log events</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Start logging events. Only events at or above the given <code>level</code> are captured.
+    </p>
+    <div class="params">
+      <h4>@param <code>level</code> {string}</h4>
+      <p>
+        Accepted values are <code>error</code>, <code>warn</code>, <code>info</code>, and <code>debug</code>.
+      </p>
+      <h4>@param <code>handler</code> {function(log)}</h4>
+      <p>
+        Optional. If not provided, log events are printed to stderr. If provided, gets called and passed an object with these values:
+      </p>
+      <ul>
+        <li><code>level</code> {string} - Which level this log event is.</li>
+        <li><code>message</code> {string} - The contents of the log event.</li>
+        <li><code>error</code> {Error} - Any error object associated with the log event. May be undefined. May exist for more than just <code>error</code> events.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h2>Class Request</h2>
+
+<p>
+  An instance of this is passed as the first argument to every intercept handler. Altering its values during the <code>request</code> phase changes the nature of the request made to the destination server, including <em>which</em> destination server the request is sent to. This object becomes read-only during all other phases, so altering its values during those phases is not allowed.
+</p>
+
+<div class="api-detail" id="request-protocol">
+  <h3><a href="#request-protocol">request.protocol {string} <span class="tldr">protocol used by this request</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The HTTP protocol used to contact the destination server. Includes a colon but not slashes, like <code>http:</code> Setting this to <code>https:</code> requires providing keys and running the proxy server in encrypted mode.
+    </p>
+    <p>
+      NOTE: encrypted mode is not yet implemented. At the moment, only <code>http:</code> is supported.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="request-hostname">
+  <h3><a href="#request-hostname">request.hostname {string} <span class="tldr">name of destination server</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The name of the destination server, sans port.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="request-port">
+  <h3><a href="#request-port">request.port {number} <span class="tldr">port being connected to</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The port on which the destination server is contacted.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="request-method">
+  <h3><a href="#request-method">request.method {string} <span class="tldr">http request method</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The all-caps HTTP method used in the request to the destination server. Lowercase values are converted to uppercase internally.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="request-headers">
+  <h3><a href="#request-headers">request.headers {object} <span class="tldr">http request headers</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The HTTP headers used in the request. Header names are all-lowercase, such as <code>cookie</code>.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="request-url">
+  <h3><a href="#request-url">request.url {string} <span class="tldr">url of requested resource</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Root-relative request URL, including query string, like <code>/foo/bar?baz=qux</code>
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="request-data">
+  <h3><a href="#request-data">request.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The same <code>Request</code> instance is shared across all intercept handlers for a given request/response cycle. This method is a scratch pad for arbitrary data, for example in case you want to set some data in the <code>request</code> phase and access it in the <code>response</code> phase.
+    </p>
+    <div class="params">
+      <h4>@param <code>name</code> {string}</h4>
+      <p>
+        Name of the data to be stored.
+      </p>
+      <h4>@param <code>value</code> {*}</h4>
+      <p>
+        Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
+      </p>
+      <h4>@return {string|undefined} - A value if getter, undefined otherwise.</h4>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="request-slow">
+  <h3><a href="#request-slow">request.slow(<span class="args">options</span>) <span class="tldr">simulate slow a connection</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Set a minimum latency and maximum transfer rate for this request. Useful for testing slow internet connectivity.
+    </p>
+    <div class="params">
+      <h4>@param <code>options</code> {object}</h4>
+      <ul>
+        <li><code>rate</code> {number} - Optional. Maximum transfer rate measured in bytes per second. Specifically, this affects the hop from the proxy to the destination server. Note that this applies to the request body only, not the request headers. Defaults to infinity (AKA as fast as the native connection will allow).</li>
+        <li><code>latency</code> {number} - Optional. Time measured in milliseconds between when all <code>request</code> phase listeners complete, and when the request is sent to the destination server. Defaults to zero (AKA the latency of the actual request).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="request-setBody">
+  <h3><a href="#request-setBody">request.setBody(<span class="args">body, [encoding]</span>) <span class="tldr">set request body as string</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Overwrite the request body as a string. Internally, Hoxy always represents the entity body as a <a href="http://nodejs.org/api/stream.html#stream_class_stream_readable">readable stream</a>. When this method is called, the native readable stream provided from the client is discarded and replaced by a "fake" one that implements the readable stream interface, but which reads from the contents of this string.
+    </p>
+    <div class="params">
+      <h4>@param <code>body</code> {string}</h4>
+      <p>
+        The entity body represented as a string.
+      </p>
+      <h4>@param <code>encoding</code> {string}</h4>
+      <p>
+        Optional. The encoding used to convert the body string into Node <code>Buffer</code> objects. Defaults to <code>utf8</code>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="request-fullUrl">
+  <h3><a href="#request-fullUrl">request.fullUrl(<span class="args"></span>) <span class="tldr">absolute url convenience function</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Convenience method to assemble and return the absolute URL represented by this request.
+    </p>
+    <div class="params">
+      <h4>@return {string} - An absolute URL starting with <code>http://</code></h4>
+    </div>
+  </div>
+</div>
+
+<h2>Class Response</h2>
+
+<p>
+  An instance of this is passed as the second argument to every intercept handler. This object is unpopulated during the <code>request</code> and <code>sent</code> phases. Altering its values during the <code>request</code> phase suppresses the call to the destination server, with the understanding that you intended to replace the contents of the response. Altering its values during the <code>response</code> phase changes the nature of the response to the client. This object is read-only during the <code>sent</code> and <code>received</code> phases, where altering its values is not allowed.
+</p>
+
+<div class="api-detail" id="response-statusCode">
+  <h3><a href="#response-statusCode">response.statusCode {number} <span class="tldr">http response code</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The HTTP response status code sent to the client.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="response-headers">
+  <h3><a href="#response-headers">response.headers {object} <span class="tldr">http response headers</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The HTTP headers used in the response. Header names are all-lowercase, such as <code>content-type</code>.
+    </p>
+  </div>
+</div>
+
+<div class="api-detail" id="response-data">
+  <h3><a href="#response-data">response.data(<span class="args"></span>) <span class="tldr">store arbitrary data</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The same <code>Response</code> instance is shared across all intercept handlers for a given request/response cycle. This method is a scratch pad for arbitrary data, for example in case you want to set some data in one phase and access it in another.
+    </p>
+    <div class="params">
+      <h4>@param <code>name</code> {string}</h4>
+      <p>
+        Name of the data to be stored.
+      </p>
+      <h4>@param <code>value</code> {*}</h4>
+      <p>
+        Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
+      </p>
+      <h4>@return {string|undefined} - A value if getter, undefined otherwise.</h4>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="response-slow">
+  <h3><a href="#response-slow">response.slow(<span class="args"></span>) <span class="tldr">simulate a slow connection</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Set a minimum latency and maximum transfer rate for this response. Useful for testing slow internet connectivity.
+    </p>
+    <div class="params">
+      <h4>@param <code>options</code> {object}</h4>
+      <ul>
+        <li><code>rate</code> {number} - Optional. Maximum transfer rate measured in bytes per second. Specifically, this affects the hop from the proxy to client. Note that this applies to the response body only, not the response headers. Defaults to infinity (AKA as fast as the native connection will allow).</li>
+        <li><code>latency</code> {number} - Optional. Time measured in milliseconds between when all <code>response</code> phase listeners complete, and when the response is sent to the client. Defaults to zero (AKA the latency of the actual response).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="response-setBody">
+  <h3><a href="#response-setBody">response.setBody(<span class="args">body, [encoding]</span>) <span class="tldr">set response body as string</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Overwrite the response body as a string. Internally, Hoxy always represents the entity body as a <a href="http://nodejs.org/api/stream.html#stream_class_stream_readable">readable stream</a>. When this method is called, the native readable stream provided from the server is discarded and replaced by a "fake" one that implements the readable stream interface, but which reads from the contents of this string.
+    </p>
+    <div class="params">
+      <h4>@param <code>body</code> {string}</h4>
+      <p>
+        The entity body represented as a string.
+      </p>
+      <h4>@param <code>encoding</code> {string}</h4>
+      <p>
+        Optional. The encoding used to convert the body string into Node <code>Buffer</code> objects. Defaults to <code>utf8</code>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<h2>Class RequestResponseCycle</h2>
+
+<p>
+  An instance of this is used as the context parameter (the <code>this</code> object) in all intercept handlers. It represents a single request/response cycle. Its purpose is to provide a number of methods not associated specifically to either the request or response.
+</p>
+
+<div class="api-detail" id="cycle-data">
+  <h3><a href="#cycle-data">this.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      The same <code>Cycle</code> instance is shared across all intercept handlers for a given request/response cycle. This method is a scratch pad for arbitrary data, in case for example you want to set some data in one phase and access it in another.
+    </p>
+    <div class="params">
+      <h4>@param <code>name</code> {string}</h4>
+      <p>
+        Name of the data to be stored.
+      </p>
+      <h4>@param <code>value</code> {*}</h4>
+      <p>
+        Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
+      </p>
+      <h4>@return {string|undefined} - A value if getter, undefined otherwise.</h4>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="cycle-serve">
+  <h3><a href="#cycle-serve">this.serve(<span class="args">docroot, [url], callback</span>) <span class="tldr">provision response from local disk</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Serve static files from the local filesystem by replacing the docroot of the destination server with a local docroot. This method only differs from <code>this.ghost()</code> in how it behaves when a file isn't found in the local docroot. If a file is found in the local docroot, that file is used to populate/overwrite the response. If a file is not found in the local docroot, the response is populated/overwritten with a 404, even if the file exists on the destination server.
+    </p>
+    <p>
+      Because this method populates the response, the standard rules apply for what that entails in the various phases. For example, if it populates the response during the request phase, it will prevent the destination server from being contacted. If in the response phase, it will overwrite the response.
+    </p>
+    <div class="params">
+      <h4>@param <code>docroot</code> {string}</h4>
+      <p>
+        Path on the local filesystem to serve out of.
+      </p>
+      <h4>@param <code>url</code> {string}</h4>
+      <p>
+        Optional. The URL to be served. If not provided, the request URL is used. Note that this URL is rooted to the docroot, not the filesystem root.
+      </p>
+      <h4>@param <code>callback</code> {function([err])}</h4>
+      <p>
+        Called when finished. If an error occurred, the <code>err</code> parameter will be present.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="api-detail" id="cycle-ghost">
+<h3><a href="#cycle-ghost">this.ghost(<span class="args">docroot, [url], callback</span>) <span class="tldr">provision response from local disk</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Serve static files from the local filesystem by overlaying a local docroot over the docroot of the destination server. This method only differs from <code>this.serve()</code> in how it behaves when a file isn't found in the local docroot. If a file is found in the local docroot, the response is populated using that file. If a file is not found in the local docroot, the response remains unaffected.
+    </p>
+    <p>
+      Because this method populates the response, the standard rules apply for what that entails in the various phases. For example, if it populates the response during the request phase, it will prevent the destination server from being contacted. If in the response phase, it will overwrite the response.
+    </p>
+    <div class="params">
+      <h4>@param <code>docroot</code> {string}</h4>
+      <p>
+        Path on the local filesystem to serve out of.
+      </p>
+      <h4>@param <code>url</code> {string}</h4>
+      <p>
+        Optional. The URL to be served. If not provided, the request URL is used. Note that this URL is rooted to the docroot, not the filesystem root.
+      </p>
+      <h4>@param <code>callback</code> {function([err])}</h4>
+      <p>
+        Called when finished. If an error occurred, the <code>err</code> parameter will be present.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+</div>
+</div>
+
+<script src="jquery.js"></script>
+<script>
+function expand(hash){
+  var $el = $(hash);
+  if ($el.length) {
+    var $content = $el.find('.api-detail-content');
+    $content.slideDown(200);
+  }
+}
+if (location.hash) {
+  expand(location.hash);
+}
+$(window).on('hashchange', function(){
+  if (location.hash) {
+    expand(location.hash);
+  }
+});
+$('h3 a[href]').on('click', function(ev){
+  ev.preventDefault();
+  var hash = this.href.substring(this.href.indexOf('#'));
+  var $el = $(hash);
+  var $content = $el.find('.api-detail-content');
+  if ($content.is(':visible')) {
+    $content.slideUp(200);
+  } else {
+    $content.slideDown(200);
+  }
+});
+</script>
+
+</body>
+</html>

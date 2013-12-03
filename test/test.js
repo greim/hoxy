@@ -509,7 +509,7 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         req.load(function(err){
-          assert.strictEqual(req.getBody(), 'abcdefg')
+          assert.strictEqual(req.string, 'abcdefg')
           next()
         })
       },
@@ -531,7 +531,7 @@ describe('Hoxy', function(){
       },
       responseIntercept: function(req, resp, next){
         resp.load(function(err){
-          assert.strictEqual(resp.getBody(), 'abcdefg')
+          assert.strictEqual(resp.string, 'abcdefg')
           next()
         })
       },
@@ -553,7 +553,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp){
-        req.setBody('foobarbaz')
+        req.string = 'foobarbaz'
       },
       server: function(req, body){
         assert.strictEqual(body, 'foobarbaz')
@@ -572,7 +572,7 @@ describe('Hoxy', function(){
         done(err)
       },
       responseIntercept: function(req, resp){
-        resp.setBody('foobarbaz')
+        resp.string = 'foobarbaz'
       },
       client: function(resp, body){
         assert.strictEqual(body, 'foobarbaz')

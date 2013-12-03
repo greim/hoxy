@@ -1,0 +1,53 @@
+h3 .tldr{
+    font-size:.7em;
+    color:rgba(0,0,0,0.3);
+    display:block;
+}
+.api-detail{
+    transition-property:background-color,margin,padding;
+    transition-duration:200ms;
+    transition-timing-function:linear;
+    background:rgba(255,255,255,0.5);
+    margin:1em 0;
+    border-radius:.2em;
+    box-shadow:0 0 .1em .2em rgba(0,0,0,0.1);
+}
+.api-detail.target{
+}
+a:link,
+a:visited{
+    text-decoration: inherit;
+    color:inherit;
+}
+.api-detail-content{
+    display:none;
+    padding:.05em 1.5em;
+    border-top:.1rem solid rgba(0,0,0,0.05);
+}
+.api-detail h3{
+    margin:0;
+    padding:.75em 1em;
+}
+.params{
+    padding-left:2em;
+}
+.params h4{
+    font-size:inherit;
+    margin-left:-2em;
+    font-weight: normal;
+}
+.params ul{
+    margin-left:1em;
+    padding-left:0;
+}
+.api-detail pre{
+    font-size:.9em;
+    background:#fff;
+    line-height:1.3;
+    padding:1em 1.5em;
+    border-radius:.2em;
+    box-shadow: 0 0 .1em .1em rgba(0,0,0,0.1);
+}
+code{
+    font-weight:bold;
+}
