@@ -4,7 +4,7 @@
  */
 
 var Logger = require('./lib/logger');
-var Proxy = require('./lib/mitm');
+var Proxy = require('./lib/proxy');
 var Base = require('./lib/base');
 var StreamBrake = require('./lib/stream-brake');
 var _ = require('lodash-node');
