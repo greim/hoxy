@@ -10,7 +10,7 @@ var url = require('url')
 var assert = require('assert')
 var Request = require('../lib/request')
 var Response = require('../lib/response')
-var serialize = require('../lib/serializer')
+var serializer = require('../lib/serializer')
 var streams = require('../lib/streams')
 var roundTrip = require('./round-trip')
 
@@ -206,7 +206,7 @@ describe('serializer', function(){
   it('should work', function(done){
     var callCount = 0,
     arr = [0,0,0,0]
-    serialize(arr, function(item, next){
+    serializer.serialize(arr, function(item, next){
       callCount++
       setTimeout(next, 0)
     })
