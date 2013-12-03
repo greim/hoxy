@@ -6,24 +6,24 @@
 var hoxy = require('hoxy');
 ```
 
-Hoxy's main module provides a small number of methods. Here, we've gotten a reference to it and named it `hoxy`, although `fred` and `george` would also have been good names for it.
+Hoxy's main module provides minimum methods to get up and running. Here, we've gotten a reference to it and named it `hoxy`, although `fred` and `george` would also have worked.
 
 ### `hoxy.start(opts)`
 
 ```javascript
 hoxy.start({
 
-  // port to listen on
-  // optional, defaults to 8080
+  // port to listen on.
+  // optional, defaults to 8080.
   port: 8080,
 
-  // reverse proxy to this server
-  // optional. won't reverse proxy if missing
+  // reverse proxy to this server.
+  // optional. won't reverse proxy if missing.
   reverse: 'http://example.com:81',
 
-  // log to stderr
-  // log levels: error, warn, info, debug
-  // optional. won't log anything if missing
+  // log to stderr.
+  // log levels: error, warn, info, debug.
+  // optional. won't log by default.
   log: 'info'
 });
 ```
