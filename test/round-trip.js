@@ -100,9 +100,13 @@ module.exports = function roundTrip(opts,me){
         });
       }).listen(req.port);
     });
-    opts.intercepts.forEach(function(intercept){
-      proxy.intercept(intercept.name, intercept.callback);
-    });
+    try{
+      opts.intercepts.forEach(function(intercept){
+        proxy.intercept(intercept.opts, intercept.callback);
+      });
+    } catch(err) {
+      opts.error(err, 'error adding intercepts');
+    }
     if (opts.proxyOptions.reverse) {
       var url = opts.proxyOptions.url;
     } else {

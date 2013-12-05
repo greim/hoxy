@@ -69,7 +69,8 @@
       </p>
       <ul>
         <li><code>phase</code> {string} - Which phase of the request/response cycle should be intercepted. More info below.</li>
-        <li><code>url</code> {string|regexp} - Optional. Absolute URL (starting with "http:") which should be intercepted. If undefined, all URLs will be intercepted. If it's a regexp, only matching URLs will be intercepted.</li>
+        <li><code>url</code> {string|regexp} - Optional. Absolute URL (starting with "http:") which should be intercepted. If undefined, all URLs will be intercepted. If it's a regexp, only matching URLs will be intercepted. If it's a string, the URL may contain route-matching and wildcards, such as <code>http://host/images/*</code></li>
+        <li><code>line</code> {string|regexp} - Optional. Same as <code>url</code> except prefixed with the HTTP method. For example, <code>POST http://host/users/:id</code></li>
         <li><code>type</code> {string} - Optional. Treat the request/response cycle as this type of content. More info below.</li>
         <li><code>filter</code> {function(req, resp)} - Optional. If present, request/response cycles will only be intercepted if this functions returns true.</li>
       </ul>
@@ -89,9 +90,9 @@
         If the <code>type</code> argument is present, the entire request or response body (depending on the <code>phase</code> argument) will be converted to the given data type. This should only be used in tandem with <code>url</code> or <code>filter</code>, in order to avoid situations where hoxy attempts to coerce all HTTP traffic into the given body type. Accepted values are:
       </p>
       <ul>
-        <li><code>json</code> - Treat the body as JSON and expose it as the <code>json</code> property of the request or response, which will be a plain old JavaScript object.</li>
-        <li><code>params</code> - Treat the body as form URL-encoded parameters and expose it as the <code>params</code> property of the request or response, which will be a plain old JavaScript object with keys and values. (Likely more usefull for requests than responses.)</li>
-        <li><code>$</code> - Treat the body as HTML (or some other markup language) and expose it as the <code>$</code> property of the request or response. This will be a cheerio object, which is a server-side DOM library closely resembling jQuery. (Likely more useful for responses than requests.)</li>
+        <li><code>json</code> - Treat the body as JSON and expose it as the <code>json</code> property of the request or response, which will be a POJO.</li>
+        <li><code>params</code> - Treat the body as form URL-encoded parameters and expose it as the <code>params</code> property of the request or response, which will be a POJO with keys and values. (Likely more usefull for requests than responses.)</li>
+        <li><code>$</code> - Treat the body as HTML (or some other markup language) and expose it as the <code>$</code> property of the request or response. This will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which is a server-side DOM library closely resembling jQuery. (Likely more useful for responses than requests.)</li>
         <li><code>string</code> - Treat the body as a string and expose it as the <code>string</code> property of the request or response.</li>
         <li><code>buffers</code> - Treat the body as arbitrary data (possibly binary) and expose it as the <code>buffers</code> property of the request or response, which will be an array of buffers.</li>
       </ul>
@@ -204,6 +205,82 @@
   </div>
 </div>
 
+<div class="api-detail" id="request-json">
+  <h3><a href="#request-json">request.json {object} <span class="tldr">json object of request body</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the request as type <code>json</code>, this will be a POJO containing the JSON request body. Changes made to this object will be reflected in the request body the server receives. If you haven't intercepted the request as type <code>json</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'request',
+  type: 'json',
+  line: 'PUT http://example.com/users/123'
+}, function(req, resp){
+  // sign this person up for promo emails next
+  // time they save their preferences
+  req.json.prefs.subscriptions = 'all';
+});
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="request-params">
+  <h3><a href="#request-params">request.params {object} <span class="tldr">params of post/put body</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the request as type <code>params</code>, this will be a POJO containing the name/value form parameters of the request body (i.e., for a application/x-www-form-urlencoded POST request). Changes made to this object will be reflected in the request body the server receives. If you haven't intercepted the request as type <code>params</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'request',
+  type: 'params',
+  line: 'POST http://example.com/register'
+}, function(req, resp){
+  // log someone's zip code when they register
+  console.log(req.params['zip']);
+});
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="request-string">
+  <h3><a href="#request-string">request.string {string} <span class="tldr">request body as a string</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the request as type <code>string</code>, this will be a string containing the request body. Overwriting this object will change the request body the server receives. If you haven't intercepted the request as type <code>string</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'request',
+  type: 'string',
+  line: 'PUT http://example.com/users/123'
+}, function(req, resp){
+  // log the entire request body
+  console.log(req.string);
+});
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="request-buffers">
+  <h3><a href="#request-buffers">request.buffers {array} <span class="tldr">binary data of request body</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the request as type <code>buffers</code>, this will be an array containing Node.js buffer objects. Changes made to this object will be reflected in the request body the server receives. If you haven't intercepted the request as type <code>buffers</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'request',
+  type: 'buffers',
+  line: 'POST http://example.com/images'
+}, function(req, resp){
+  // req.buffers contains multipart request body
+});
+    </pre>
+  </div>
+</div>
+
 <div class="api-detail" id="request-data">
   <h3><a href="#request-data">request.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
   <div class="api-detail-content">
@@ -219,7 +296,7 @@
       <p>
         Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
       </p>
-      <h4>@return {string|undefined} - A value if getter, undefined otherwise.</h4>
+      <h4>@return {*} - The value being read/written.</h4>
     </div>
   </div>
 </div>
@@ -236,25 +313,6 @@
         <li><code>rate</code> {number} - Optional. Maximum transfer rate measured in bytes per second. Specifically, this affects the hop from the proxy to the destination server. Note that this applies to the request body only, not the request headers. Defaults to infinity (AKA as fast as the native connection will allow).</li>
         <li><code>latency</code> {number} - Optional. Time measured in milliseconds between when all <code>request</code> phase listeners complete, and when the request is sent to the destination server. Defaults to zero (AKA the latency of the actual request).</li>
       </ul>
-    </div>
-  </div>
-</div>
-
-<div class="api-detail" id="request-setBody">
-  <h3><a href="#request-setBody">request.setBody(<span class="args">body, [encoding]</span>) <span class="tldr">set request body as string</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      Overwrite the request body as a string. Internally, Hoxy always represents the entity body as a <a href="http://nodejs.org/api/stream.html#stream_class_stream_readable">readable stream</a>. When this method is called, the native readable stream provided from the client is discarded and replaced by a "fake" one that implements the readable stream interface, but which reads from the contents of this string.
-    </p>
-    <div class="params">
-      <h4>@param <code>body</code> {string}</h4>
-      <p>
-        The entity body represented as a string.
-      </p>
-      <h4>@param <code>encoding</code> {string}</h4>
-      <p>
-        Optional. The encoding used to convert the body string into Node <code>Buffer</code> objects. Defaults to <code>utf8</code>.
-      </p>
     </div>
   </div>
 </div>
@@ -295,8 +353,83 @@
   </div>
 </div>
 
+<div class="api-detail" id="response-cheerio">
+  <h3><a href="#response-cheerio">response.$ {cheerio} <span class="tldr">dom of response body</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the response as type <code>$</code>, this will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like interface into the content body. Changes made via this object will be reflected in the response body the client receives. If you haven't intercepted the response as type <code>$</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'response',
+  type: '$',
+  line: 'GET http://example.com/page.html'
+}, function(req, resp){
+  // change the title of the page
+  resp.$('title').text('Fake Title!');
+});
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="response-json">
+  <h3><a href="#response-json">response.json {object} <span class="tldr">json object of response body</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the response as type <code>json</code>, this will be a POJO containing the JSON response body. Changes made to this object will be reflected in the response body the client receives. If you haven't intercepted the response as type <code>json</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'response',
+  type: 'json',
+  line: 'GET http://example.com/users/123'
+}, function(req, resp){
+  // arbitrarily manipulate the response json
+  resp.json.foo = 'bar';
+});
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="response-string">
+  <h3><a href="#response-string">response.string {string} <span class="tldr">response body as a string</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the response as type <code>string</code>, this will be a string containing the response body. Overwriting this object will change the response body the client receives. If you haven't intercepted the response as type <code>string</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'response',
+  type: 'string',
+  line: 'GET http://example.com/page.html'
+}, function(req, resp){
+  // print page to log
+  console.log(resp.string);
+});
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="response-buffers">
+  <h3><a href="#response-buffers">response.buffers {array} <span class="tldr">binary data of response body</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      If you intercept the response as type <code>buffers</code>, this will be an array containing Node.js buffer objects. Changes made to this object will be reflected in the response body the client receives. If you haven't intercepted the response as type <code>buffers</code>, this will be undefined.
+    </p>
+    <pre class="javascript code">
+proxy.intercept({
+  phase: 'response',
+  type: 'buffers',
+  line: 'GET http://example.com/image.jpg'
+}, function(req, resp){
+  // resp.buffers contains a jpg
+});
+    </pre>
+  </div>
+</div>
+
 <div class="api-detail" id="response-data">
-  <h3><a href="#response-data">response.data(<span class="args"></span>) <span class="tldr">store arbitrary data</span></a></h3>
+  <h3><a href="#response-data">response.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
   <div class="api-detail-content">
     <p>
       The same <code>Response</code> instance is shared across all intercept handlers for a given request/response cycle. This method is a scratch pad for arbitrary data, for example in case you want to set some data in one phase and access it in another.
@@ -310,13 +443,13 @@
       <p>
         Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
       </p>
-      <h4>@return {string|undefined} - A value if getter, undefined otherwise.</h4>
+      <h4>@return {*} - The value being read/written.</h4>
     </div>
   </div>
 </div>
 
 <div class="api-detail" id="response-slow">
-  <h3><a href="#response-slow">response.slow(<span class="args"></span>) <span class="tldr">simulate a slow connection</span></a></h3>
+  <h3><a href="#response-slow">response.slow(<span class="args">options</span>) <span class="tldr">simulate a slow connection</span></a></h3>
   <div class="api-detail-content">
     <p>
       Set a minimum latency and maximum transfer rate for this response. Useful for testing slow internet connectivity.
@@ -327,25 +460,6 @@
         <li><code>rate</code> {number} - Optional. Maximum transfer rate measured in bytes per second. Specifically, this affects the hop from the proxy to client. Note that this applies to the response body only, not the response headers. Defaults to infinity (AKA as fast as the native connection will allow).</li>
         <li><code>latency</code> {number} - Optional. Time measured in milliseconds between when all <code>response</code> phase listeners complete, and when the response is sent to the client. Defaults to zero (AKA the latency of the actual response).</li>
       </ul>
-    </div>
-  </div>
-</div>
-
-<div class="api-detail" id="response-setBody">
-  <h3><a href="#response-setBody">response.setBody(<span class="args">body, [encoding]</span>) <span class="tldr">set response body as string</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      Overwrite the response body as a string. Internally, Hoxy always represents the entity body as a <a href="http://nodejs.org/api/stream.html#stream_class_stream_readable">readable stream</a>. When this method is called, the native readable stream provided from the server is discarded and replaced by a "fake" one that implements the readable stream interface, but which reads from the contents of this string.
-    </p>
-    <div class="params">
-      <h4>@param <code>body</code> {string}</h4>
-      <p>
-        The entity body represented as a string.
-      </p>
-      <h4>@param <code>encoding</code> {string}</h4>
-      <p>
-        Optional. The encoding used to convert the body string into Node <code>Buffer</code> objects. Defaults to <code>utf8</code>.
-      </p>
     </div>
   </div>
 </div>
@@ -371,7 +485,7 @@
       <p>
         Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
       </p>
-      <h4>@return {string|undefined} - A value if getter, undefined otherwise.</h4>
+      <h4>@return {*} - The value being read/written.</h4>
     </div>
   </div>
 </div>

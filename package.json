@@ -12,6 +12,7 @@
     "web"
   ],
   "dependencies" : {
+    "route-pattern": "0.0.x",
     "slugs": "0.1.x",
     "node-static": "0.7.x",
     "lodash-node": "2.3.x",

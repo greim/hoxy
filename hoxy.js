@@ -3,12 +3,8 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var Logger = require('./lib/logger');
-var Proxy = require('./lib/proxy');
-var Base = require('./lib/base');
-var StreamBrake = require('./lib/stream-brake');
 var _ = require('lodash-node');
-var events = require('events');
+var Proxy = require('./lib/proxy');
 
 // ---------------------------
 
@@ -19,10 +15,10 @@ module.exports = {
     }, opts);
     return new Proxy(opts);
   },
-  forever: function(cb){
+  forever: function(handler){
     process.on('uncaughtException', function(err){
-      if (typeof cb === 'function'){
-        cb(err);
+      if (typeof handler === 'function'){
+        handler(err);
       } else {
         console.log(err.stack);
       }

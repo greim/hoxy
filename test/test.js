@@ -74,12 +74,12 @@ describe('Request', function(){
 
   it('should accept raw data', function(){
     var req = new Request()
-    req.setHttpSource(getRequestData())
+    req._setHttpSource(getRequestData())
   })
 
   it('should get and set protocol', function(){
     var req = new Request()
-    req.setHttpSource(getRequestData())
+    req._setHttpSource(getRequestData())
     assert.strictEqual(req.protocol, 'http:')
     req.protocol = 'https:'
     assert.strictEqual(req.protocol, 'https:')
@@ -87,7 +87,7 @@ describe('Request', function(){
 
   it('should get and set hostname', function(){
     var req = new Request()
-    req.setHttpSource(getRequestData())
+    req._setHttpSource(getRequestData())
     assert.strictEqual(req.hostname, 'example.com')
     req.hostname = 'www.example.com'
     assert.strictEqual(req.hostname, 'www.example.com')
@@ -96,20 +96,9 @@ describe('Request', function(){
     }, Error)
   })
 
-  it('should keep host header up to date', function(){
-    var req = new Request()
-    req.setHttpSource(getRequestData())
-    assert.strictEqual(req.hostname, 'example.com')
-    assert.strictEqual(req.headers.host, 'example.com:8080')
-    req.port = 81
-    assert.strictEqual(req.headers.host, 'example.com:81')
-    req.hostname = 'foo.example.com'
-    assert.strictEqual(req.headers.host, 'foo.example.com:81')
-  })
-
   it('should get and set port', function(){
     var req = new Request()
-    req.setHttpSource(getRequestData())
+    req._setHttpSource(getRequestData())
     assert.strictEqual(req.port, 8080)
     req.port = '8081'
     assert.strictEqual(req.port, 8081)
@@ -120,7 +109,7 @@ describe('Request', function(){
 
   it('should get and set method', function(){
     var req = new Request()
-    req.setHttpSource(getRequestData())
+    req._setHttpSource(getRequestData())
     assert.strictEqual(req.method, 'GET')
     req.method = 'put'
     assert.strictEqual(req.method, 'PUT')
@@ -131,7 +120,7 @@ describe('Request', function(){
 
   it('should get and set url', function(){
     var req = new Request()
-    req.setHttpSource(getRequestData())
+    req._setHttpSource(getRequestData())
     assert.strictEqual(req.url, '/foo.html')
     req.url = '/bar.html'
     assert.strictEqual(req.url, '/bar.html')
@@ -143,24 +132,27 @@ describe('Request', function(){
   it('should get and set headers', function(){
     var req = new Request()
     var data = getRequestData()
-    req.setHttpSource(data)
+    req._setHttpSource(data)
     assert.deepEqual(req.headers, data.headers)
   })
 
   it('should get and set source', function(){
     var req = new Request()
     var data = getRequestData()
-    req.setHttpSource(data)
-    assert.deepEqual(req.source, data)
+    req._setHttpSource(data)
+    assert.deepEqual(req._source, data)
   })
 
   it('should get absolute URL', function(){
     var req = new Request()
     var data = getRequestData()
-    req.setHttpSource(data)
-    assert.strictEqual(req.getAbsoluteUrl(), 'http://example.com:8080/foo.html')
-    req.port = undefined;
-    assert.strictEqual(req.getAbsoluteUrl(), 'http://example.com/foo.html')
+    req._setHttpSource(data)
+    assert.strictEqual(req.fullUrl(), 'http://example.com:8080/foo.html')
+    req.port = 80;
+    req.headers.host = 'example.com'
+    assert.strictEqual(req.fullUrl(), 'http://example.com/foo.html')
+    req.port = 81;
+    assert.strictEqual(req.fullUrl(), 'http://example.com:81/foo.html')
   })
 
   it('should get and set data', function(){
@@ -178,19 +170,19 @@ describe('Response', function(){
 
   it('should accept raw data', function(){
     var resp = new Response()
-    resp.setHttpSource(getResponseData())
+    resp._setHttpSource(getResponseData())
   })
 
   it('should get and set headers', function(){
     var resp = new Response()
     var data = getResponseData()
-    resp.setHttpSource(data)
+    resp._setHttpSource(data)
     assert.deepEqual(resp.headers, data.headers)
   })
 
   it('should get and set status code', function(){
     var resp = new Response()
-    resp.setHttpSource(getResponseData())
+    resp._setHttpSource(getResponseData())
     assert.strictEqual(resp.statusCode, 200)
   })
 
@@ -508,7 +500,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        req.load(function(err){
+        req._load(function(err){
           assert.strictEqual(req.string, 'abcdefg')
           next()
         })
@@ -530,7 +522,7 @@ describe('Hoxy', function(){
         done(err)
       },
       responseIntercept: function(req, resp, next){
-        resp.load(function(err){
+        resp._load(function(err){
           assert.strictEqual(resp.string, 'abcdefg')
           next()
         })
@@ -753,7 +745,7 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp){
-        req.source = getMegaSource()
+        req._source = getMegaSource()
         req.slow({ rate: 1024000 })
         start = Date.now()
       },
@@ -781,7 +773,7 @@ describe('Hoxy', function(){
         done(err)
       },
       responseIntercept: function(req, resp){
-        resp.source = getMegaSource()
+        resp._source = getMegaSource()
         resp.slow({ rate: 1024000 })
         start = Date.now()
       },
@@ -840,11 +832,13 @@ describe('Hoxy', function(){
         done(err)
       },
       intercepts: [{
-        name: 'response:$',
+        opts: {phase:'response',type:'$'},
         callback: function(req, resp){
+          //try{
           assert.ok(resp.$, '$ should exist')
           assert.strictEqual(resp.$('title').text(), 'foo')
           resp.$('title').text('bar')
+          //}catch(err){console.log(err)}
         }
       }],
       client: function(resp, body){
@@ -864,7 +858,7 @@ describe('Hoxy', function(){
         done(err)
       },
       intercepts: [{
-        name: 'response:json',
+        opts: {phase:'response',type:'json'},
         callback: function(req, resp){
           assert.ok(resp.json, 'json should exist')
           assert.deepEqual(resp.json, {foo:'bar',baz:2})
