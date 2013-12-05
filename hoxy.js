@@ -11,7 +11,7 @@ var Proxy = require('./lib/proxy');
 module.exports = {
   start: function(opts){
     opts = _.extend({
-      port: 8080
+      port: 8080 // TODO: test default port
     }, opts);
     return new Proxy(opts);
   },
