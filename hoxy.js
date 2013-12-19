@@ -150,9 +150,7 @@ module.exports = function (config) {
         var rules = RDB.getRules();
         // grab fresh copy of rules for each request
         if(opts.ruleArray && opts.ruleArray.push) {
-
           rules = opts.ruleArray;
-          console.log(rules);
         }
 
         var hts = new HTS.HttpTransactionState();
@@ -230,7 +228,6 @@ module.exports = function (config) {
               // do response phase rule processing
               var respPhaseRulesQ = new Q.AsynchQueue();
               rules.filter(function (rule) {
-                console.log(rule);
                 return rule.phase === 'response';
               }).forEach(function (rule) {
                   respPhaseRulesQ.push(rule.getExecuter(hts));
@@ -280,10 +277,6 @@ module.exports = function (config) {
       if (!this.server) {
         this.server = this.createServer();
       }
-
-      if(opts.rules)
-
-      console.log(opts);
 
       // done creating proxy
       // #############################################################################
