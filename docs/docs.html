@@ -29,9 +29,16 @@
         <li><code>port</code> {number} - Port to listen on.</li>
         <li><code>log</code> {string} - Optional. Print log events at or above the given level to stderr. See the logging method below.</li>
         <li><code>reverse</code> {string} - Reverse proxy to the given URL. In reverse proxy mode, you point your client directly at the proxy and it will mirror the site, rather than configuring the proxy in your client and pointing the client at the site.</li>
+        <li><code>forever</code> {boolean} - Prevents the process from exiting due to uncaught errors.</li>
       </ul>
       <h4>@return {Proxy} - A proxy server instance.</h4>
     </div>
+    <pre class="javascript code">
+var proxy = hoxy.start({
+  port: 8765,
+  log: 'info',
+  forever: true
+});</pre>
   </div>
 </div>
 
@@ -39,7 +46,7 @@
   <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>) <span class="tldr">don't exit the process on uncaught errors</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Keep the process running even if there's an uncaught error. It's likely that if you're hacking web traffic in a debugging proxy that uncaught exceptions will occur, which cause Node to exit by default. This merely sets a global exception handler for all uncaught exceptions, so that you don't have to keep coming back and restarting the proxy.
+      Keep the process running even if there's an uncaught error. If you're hacking web traffic in a debugging proxy, it's likely that uncaught exceptions will occur, causing Node to exit. This method sets a global exception handler for all uncaught exceptions, so that you don't have to keep coming back and restarting the proxy. Note that this applies at the process level. If you start multiple proxies in a single process, you don't need to call this method multiple times.
     </p>
     <div class="params">
       <h4>@param <code>handler</code> {function(err)}</h4>
@@ -60,7 +67,7 @@
   <h3><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>) <span class="tldr">intercept requests or responses</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Intercept the request/response cycle during one of several phases. While the handler is running, that phase of the request/response cycle is paused, and you can meddle with the details of requests and responses. Multiple intercept handlers of the same phase are run serially, in the order added.
+      Intercept request/response cycles and operate on them, in one of several phases. Multiple intercept handlers of the same phase are run serially, in the order added.
     </p>
     <div class="params">
       <h4>@param <code>options</code> {object|string}</h4>
@@ -90,8 +97,8 @@
         If the <code>type</code> argument is present, the entire request or response body (depending on the <code>phase</code> argument) will be converted to the given data type. This should only be used in tandem with <code>url</code> or <code>filter</code>, in order to avoid situations where hoxy attempts to coerce all HTTP traffic into the given body type. Accepted values are:
       </p>
       <ul>
-        <li><code>json</code> - Treat the body as JSON and expose it as the <code>json</code> property of the request or response, which will be a POJO.</li>
-        <li><code>params</code> - Treat the body as form URL-encoded parameters and expose it as the <code>params</code> property of the request or response, which will be a POJO with keys and values. (Likely more usefull for requests than responses.)</li>
+        <li><code>json</code> - Treat the body as JSON and expose it as the <code>json</code> property of the request or response, which will be a <abbr title="plain old javascript object">POJO</abbr>.</li>
+        <li><code>params</code> - Treat the body as form URL-encoded parameters and expose it as the <code>params</code> property of the request or response, which will be a <abbr title="plain old javascript object">POJO</abbr> with keys and values. (Likely more usefull for requests than responses.)</li>
         <li><code>$</code> - Treat the body as HTML (or some other markup language) and expose it as the <code>$</code> property of the request or response. This will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which is a server-side DOM library closely resembling jQuery. (Likely more useful for responses than requests.)</li>
         <li><code>string</code> - Treat the body as a string and expose it as the <code>string</code> property of the request or response.</li>
         <li><code>buffers</code> - Treat the body as arbitrary data (possibly binary) and expose it as the <code>buffers</code> property of the request or response, which will be an array of buffers.</li>
@@ -106,6 +113,29 @@
         <li><code>done</code> {function} - Optional. If declared in the argument list, this handler is treated asynchronously, and the request/response cycle will remain paused until it is called.</li>
       </ul>
     </div>
+    <pre class="javascript code">
+var proxy = hoxy.start({ port: 8765 });
+
+// synchronous
+proxy.intercept('request', function(req, resp){
+  console.log(req.fullUrl());
+});
+
+// asynchronous
+proxy.intercept('request', function(req, resp, done){
+  console.log(req.fullUrl());
+  setTimeout(done, 1000);
+});
+
+// change images on a page
+proxy.intercept({
+  phase: 'response',
+  line: 'GET http://example.com/page.html',
+  type: '$'
+}, function(req, resp){
+  var unicorn = 'http://example.com/unicorn.gif';
+  resp.$('img[src]').attr('src', unicorn);
+});</pre>
   </div>
 </div>
 
@@ -209,16 +239,16 @@
   <h3><a href="#request-json">request.json {object} <span class="tldr">json object of request body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as type <code>json</code>, this will be a POJO containing the JSON request body. Changes made to this object will be reflected in the request body the server receives. If you haven't intercepted the request as type <code>json</code>, this will be undefined.
+      If you intercept the request as type <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON request body. Changes made to this object will be reflected in the request body the server receives, via <code>JSON.stringify()</code>. If you haven't intercepted the request as type <code>json</code>, this will be undefined.
     </p>
     <pre class="javascript code">
 proxy.intercept({
   phase: 'request',
   type: 'json',
-  line: 'PUT http://example.com/users/123'
+  line: 'PUT http://example.com/users/:id'
 }, function(req, resp){
-  // sign this person up for promo emails next
-  // time they save their preferences
+  // sign everyone up for promo emails
+  // whenever they save their preferences
   req.json.prefs.subscriptions = 'all';
 });
     </pre>
@@ -229,7 +259,7 @@ proxy.intercept({
   <h3><a href="#request-params">request.params {object} <span class="tldr">params of post/put body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as type <code>params</code>, this will be a POJO containing the name/value form parameters of the request body (i.e., for a application/x-www-form-urlencoded POST request). Changes made to this object will be reflected in the request body the server receives. If you haven't intercepted the request as type <code>params</code>, this will be undefined.
+      If you intercept the request as type <code>params</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the name/value form parameters of the request body (i.e., for a application/x-www-form-urlencoded POST request). Changes made to this object will be reflected in the request body the server receives, via Node's <code>querystring.stringify()</code>. If you haven't intercepted the request as type <code>params</code>, this will be undefined.
     </p>
     <pre class="javascript code">
 proxy.intercept({
@@ -254,10 +284,12 @@ proxy.intercept({
 proxy.intercept({
   phase: 'request',
   type: 'string',
-  line: 'PUT http://example.com/users/123'
+  url: /\.html$/
 }, function(req, resp){
-  // log the entire request body
-  console.log(req.string);
+  // save all pages
+  fs.writeFile(req.url, req.string, function(err){
+    if (err) console.error('oops!');
+  });
 });
     </pre>
   </div>
@@ -275,7 +307,7 @@ proxy.intercept({
   type: 'buffers',
   line: 'POST http://example.com/images'
 }, function(req, resp){
-  // req.buffers contains multipart request body
+  // req.buffers contains uploaded image
 });
     </pre>
   </div>
@@ -357,7 +389,7 @@ proxy.intercept({
   <h3><a href="#response-cheerio">response.$ {cheerio} <span class="tldr">dom of response body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as type <code>$</code>, this will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like interface into the content body. Changes made via this object will be reflected in the response body the client receives. If you haven't intercepted the response as type <code>$</code>, this will be undefined.
+      If you intercept the response as type <code>$</code>, this will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like interface into the content body. Changes made via this object will be reflected in the response body the client receives, via <code>$.html()</code>. If you haven't intercepted the response as type <code>$</code>, this will be undefined.
     </p>
     <pre class="javascript code">
 proxy.intercept({
@@ -376,7 +408,7 @@ proxy.intercept({
   <h3><a href="#response-json">response.json {object} <span class="tldr">json object of response body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as type <code>json</code>, this will be a POJO containing the JSON response body. Changes made to this object will be reflected in the response body the client receives. If you haven't intercepted the response as type <code>json</code>, this will be undefined.
+      If you intercept the response as type <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON response body. Changes made to this object will be reflected in the response body the client receives, via <code>JSON.stringify()</code>. If you haven't intercepted the response as type <code>json</code>, this will be undefined.
     </p>
     <pre class="javascript code">
 proxy.intercept({
