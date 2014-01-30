@@ -17,28 +17,12 @@
 
 <pre>var hoxy = require('hoxy');</pre>
 
-<div class="api-detail" id="hoxy-start">
-  <h3><a href="#hoxy-start">hoxy.start(<span class="args">options</span>) <span class="tldr">start up a new debugging proxy instance</span></a></h3>
+<div class="api-detail" id="hoxy-class">
+  <h3><a href="#hoxy-class">hoxy.Proxy <span class="tldr">constructor for a new proxy instance</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Factory method that creates a new proxy instance, starts it listening on the given port, and returns it. Configures the instance based on options you provide.
+      See "Class Proxy" below for more info.
     </p>
-    <div class="params">
-      <h4>@param <code>options</code> {object}</h4>
-      <ul>
-        <li><code>port</code> {number} - Port to listen on.</li>
-        <li><code>log</code> {string} - Optional. Print log events at or above the given level to stderr. See the logging method below.</li>
-        <li><code>reverse</code> {string} - Reverse proxy to the given URL. In reverse proxy mode, you point your client directly at the proxy and it will mirror the site, rather than configuring the proxy in your client and pointing the client at the site.</li>
-        <li><code>forever</code> {boolean} - Prevents the process from exiting due to uncaught errors.</li>
-      </ul>
-      <h4>@return {Proxy} - A proxy server instance.</h4>
-    </div>
-    <pre class="javascript code">
-var proxy = hoxy.start({
-  port: 8765,
-  log: 'info',
-  forever: true
-});</pre>
   </div>
 </div>
 
@@ -46,7 +30,10 @@ var proxy = hoxy.start({
   <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>) <span class="tldr">don't exit the process on uncaught errors</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Keep the process running even if there's an uncaught error. If you're hacking web traffic in a debugging proxy, it's likely that uncaught exceptions will occur, causing Node to exit. This method sets a global exception handler for all uncaught exceptions, so that you don't have to keep coming back and restarting the proxy. Note that this applies at the process level. If you start multiple proxies in a single process, you don't need to call this method multiple times.
+      Convenience method to keep the process running even if there's an uncaught error. If you're hacking web traffic in a debugging proxy, it's likely that uncaught exceptions will occur, causing Node to exit. This method sets a global exception handler for all uncaught exceptions, so that you don't have to keep coming back and restarting the proxy.
+    </p>
+    <p>
+      This applies at the process level. If you start multiple proxies in a single process, you don't need to call this method multiple times.
     </p>
     <div class="params">
       <h4>@param <code>handler</code> {function(err)}</h4>
@@ -59,9 +46,35 @@ var proxy = hoxy.start({
 
 <h2>Class Proxy</h2>
 
-<p>
-  An instance of this is returned from <code>require('hoxy').start()</code>.
-</p>
+<div class="api-detail" id="hoxy-start">
+  <h3><a href="#hoxy-start">new Proxy(<span class="args">options</span>) <span class="tldr">constructor for a new proxy instance</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Creates a new proxy instance. Configures the instance based on options you provide. A proxy instance is a node EventEmitter that emits a number of events (see below).
+    </p>
+    <div class="params">
+      <h4>@param <code>options</code> {object}</h4>
+      <ul>
+        <li><code>reverse</code> {string} - Reverse proxy to the given URL. In reverse proxy mode, Hoxy behaves the same way you point your client directly at the proxy and it will mirror the site, rather than configuring the proxy in your client and pointing the client at the site.</li>
+      </ul>
+      <h4>@events</h4>
+      <p>
+        The <code>"log"</code> event. Fired whenever an event occurs worthy of notice. An object is passed to the handler with the following properties:
+      </p>
+      <ul>
+        <li><code>level</code> - One of <code>'debug'</code>, <code>'info'</code>, <code>warn</code>, or <code>error</code>.</li>
+        <li><code>message</code> - The message associated with the log event.</li>
+        <li><code>error</code> - An error object so that you can print the stack trace, if desired.</li>
+      </ul>
+      <h4>@return {Proxy} - A proxy server instance.</h4>
+    </div>
+    <pre class="javascript code">
+var proxy = new require('hoxy').Proxy({
+  forever: true,
+  reverse: 'http://mysite.example.com'
+});</pre>
+  </div>
+</div>
 
 <div class="api-detail" id="proxy-intercept">
   <h3><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>) <span class="tldr">intercept requests or responses</span></a></h3>
@@ -114,7 +127,7 @@ var proxy = hoxy.start({
       </ul>
     </div>
     <pre class="javascript code">
-var proxy = hoxy.start({ port: 8765 });
+var proxy = new Proxy().listen(8765);
 
 // synchronous
 proxy.intercept('request', function(req, resp){
@@ -145,30 +158,6 @@ proxy.intercept({
     <p>
       Cause this proxy server to stop receiving requests. This will also finalize and/or clean up any resources or services the proxy is using internally.
     </p>
-  </div>
-</div>
-
-<div class="api-detail" id="proxy-log">
-  <h3><a href="#proxy-log">proxy.log(<span class="args">level, [handler]</span>) <span class="tldr">handle log events</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      Start logging events. Only events at or above the given <code>level</code> are captured.
-    </p>
-    <div class="params">
-      <h4>@param <code>level</code> {string}</h4>
-      <p>
-        Accepted values are <code>error</code>, <code>warn</code>, <code>info</code>, and <code>debug</code>.
-      </p>
-      <h4>@param <code>handler</code> {function(log)}</h4>
-      <p>
-        Optional. If not provided, log events are printed to stderr. If provided, gets called and passed an object with these values:
-      </p>
-      <ul>
-        <li><code>level</code> {string} - Which level this log event is.</li>
-        <li><code>message</code> {string} - The contents of the log event.</li>
-        <li><code>error</code> {Error} - Any error object associated with the log event. May be undefined. May exist for more than just <code>error</code> events.</li>
-      </ul>
-    </div>
   </div>
 </div>
 
@@ -499,7 +488,7 @@ proxy.intercept({
 <h2>Class RequestResponseCycle</h2>
 
 <p>
-  An instance of this is used as the context parameter (the <code>this</code> object) in all intercept handlers. It represents a single request/response cycle. Its purpose is to provide a number of methods not associated specifically to either the request or response.
+  An instance of this is the context (the <code>this</code> object) in all intercept handlers. It represents a single request/response cycle. Its purpose is to provide a number of methods not associated specifically to either the request or response.
 </p>
 
 <div class="api-detail" id="cycle-data">

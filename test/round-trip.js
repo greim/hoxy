@@ -72,7 +72,8 @@ module.exports = function roundTrip(opts,me){
       error: function(){}
     };
     opts = _.merge(defaults, opts);
-    var proxy = hoxy.start(opts.proxyOptions);
+    var proxy = new hoxy.Proxy(opts.proxyOptions);
+    proxy.listen(opts.proxyOptions.port);
     proxy.on('log',function(log){
       if (log.level === 'error'){
         opts.error(log.error, log.message);
