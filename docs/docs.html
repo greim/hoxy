@@ -113,9 +113,7 @@
       More verbose, but identical to the above.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept({
-        phase: 'request'
-      }, function(req, resp){
+      proxy.intercept({phase:'request'}, function(req, resp){
         console.log('request made to: '+req.url);
       });
     </pre>
@@ -140,7 +138,7 @@
       });
     </pre>
     <p>
-      Intercept all GET requests to example.com.
+      Intercept all GETs to a certain host.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -487,7 +485,7 @@
       Set a minimum latency and maximum transfer rate for this request. Useful for simulating slow internet connectivity.
     </p>
     <pre class="language-javascript code">
-      // Simulate upload speed of taking 100s to upload a megabyte.
+      // Simulate upload speed of 10,000 bytes per second
       proxy.intercept('request', function(req, resp){
         req.slow({rate:10000}); // bytes per second
       });
@@ -620,7 +618,7 @@
       Set a minimum latency and maximum transfer rate for this response. Useful for simulating slow internet connectivity.
     </p>
     <pre class="language-javascript code">
-      // Simulate download speed of taking 10s to download a megabyte.
+      // Simulate download speed of 100,000 bytes per second
       proxy.intercept('response', function(req, resp){
         resp.slow({rate:100000}); // bytes per second
       });
