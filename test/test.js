@@ -154,12 +154,6 @@ describe('Request', function(){
     req.port = 81;
     assert.strictEqual(req.fullUrl(), 'http://example.com:81/foo.html')
   })
-
-  it('should get and set data', function(){
-    var req = new Request()
-    req.data('foo', 'bar')
-    assert.strictEqual(req.data('foo'), 'bar')
-  })
 })
 
 describe('Response', function(){
@@ -184,12 +178,6 @@ describe('Response', function(){
     var resp = new Response()
     resp._setHttpSource(getResponseData())
     assert.strictEqual(resp.statusCode, 200)
-  })
-
-  it('should get and set data', function(){
-    var resp = new Response()
-    resp.data('foo', 'bar')
-    assert.strictEqual(resp.data('foo'), 'bar')
   })
 })
 
@@ -796,26 +784,16 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp){
-        req.data('foo1','bar1')
-        resp.data('foo2','bar2')
         this.data('foo3','bar3')
-        assert.strictEqual(req.data('foo1'), 'bar1')
-        assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
       },
       requestSentIntercept: function(req, resp){
-        assert.strictEqual(req.data('foo1'), 'bar1')
-        assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
       },
       responseIntercept: function(req, resp){
-        assert.strictEqual(req.data('foo1'), 'bar1')
-        assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
       },
       responseSentIntercept: function(req, resp){
-        assert.strictEqual(req.data('foo1'), 'bar1')
-        assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
         done()
       }

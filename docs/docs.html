@@ -220,7 +220,11 @@
           <td class="type">string</td>
           <td>no</td>
           <td>
-            Expose the request or response body (depending on the phase) as data of a certain type. If the content type is incompatible, this intercept action is skipped and a warning is logged. Accepted values:
+            Expose the request or response body (depending on the phase) as data of a certain type.
+            If the content type is incompatible, this intercept action is skipped and a warning is logged.
+            Hoxy normally streams request and response bodies through.
+            If <code>as</code> is present, however, hoxy will buffer the entire request or response body into memory.
+            Accepted values:
             <ul>
               <li><code>$</code> - A DOM object similar to jQuery. See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
               <li><code>json</code> - A JavaScript object containing JSON.</li>
@@ -247,6 +251,12 @@
         </tr>
       </thead>
       <body>
+        <tr>
+          <td>protocol</td>
+          <td class="type">string | regexp</td>
+          <td>no</td>
+          <td>Match the request protocol.</td>
+        </tr>
         <tr>
           <td>method</td>
           <td class="type">string | regexp</td>
@@ -276,6 +286,12 @@
           <td class="type">string | regexp</td>
           <td>no</td>
           <td>Match the request URL. Patterns like <code>/foo/*</code> are allowed. See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.</td>
+        </tr>
+        <tr>
+          <td>fullUrl</td>
+          <td class="type">string | regexp</td>
+          <td>no</td>
+          <td>Match the full request URL including protocol and hostname. Patterns like <code>/foo/*</code> are allowed. See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.</td>
         </tr>
         <tr>
           <td>contentType</td>
@@ -383,13 +399,16 @@
   <h3><a href="#request-json">request.json {object} <span class="tldr">json object of request body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON request body. Changes made to this object will be reflected in the request body the server receives, via <code>JSON.stringify()</code>. If you haven't intercepted the request as <code>json</code>, this will be undefined.
+      If you intercept the request as <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON request body.
+      Changes made to this object will be reflected in the request body the server receives, via <code>JSON.stringify()</code>.
+      If you haven't intercepted the request as <code>json</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         as: 'json',
-        line: 'PUT http://example.com/users/:id'
+        method: 'PUT',
+        fulUrl: 'http://example.com/users/:id'
       }, function(req, resp){
         // sign everyone up for promo emails
         // whenever they save their preferences
@@ -409,7 +428,8 @@
       proxy.intercept({
         phase: 'request',
         as: 'params',
-        line: 'POST http://example.com/register'
+        method: 'POST',
+        fullUrl: 'http://example.com/register'
       }, function(req, resp){
         // log someone's zip code when they register
         console.log(req.params['zip']);
@@ -443,13 +463,16 @@
   <h3><a href="#request-buffers">request.buffers {array} <span class="tldr">binary data of request body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>buffers</code>, this will be an array containing Node.js buffer objects. Changes made to this object will be reflected in the request body the server receives. If you haven't intercepted the request as <code>buffers</code>, this will be undefined.
+      If you intercept the request as <code>buffers</code>, this will be an array containing Node.js buffer objects.
+      Changes made to this object will be reflected in the request body the server receives.
+      If you haven't intercepted the request as <code>buffers</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         as: 'buffers',
-        line: 'POST http://example.com/images'
+        method: 'POST',
+        fullUrl: 'http://example.com/images'
       }, function(req, resp){
         // req.buffers contains uploaded image
       });
@@ -457,42 +480,24 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-data">
-  <h3><a href="#request-data">request.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      The same <code>Request</code> instance is shared across all intercept handlers for a given request/response cycle.
-      This method is a scratch pad for arbitrary data, for example in case you want to set some data in the <code>request</code> phase and access it in the <code>response</code> phase.
-    </p>
-    <div class="params">
-      <h4>@param <code>name</code> {string}</h4>
-      <p>
-        Name of the data to be stored.
-      </p>
-      <h4>@param <code>value</code> {*}</h4>
-      <p>
-        Optional.
-        If not provided, this method behaves as a getter.
-        If provided, behaves as a setter.
-      </p>
-      <h4>@return {*} - The value being read/written.</h4>
-    </div>
-  </div>
-</div>
-
 <div class="api-detail" id="request-slow">
   <h3><a href="#request-slow">request.slow(<span class="args">options</span>) <span class="tldr">simulate slow a connection</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Set a minimum latency and maximum transfer rate for this request. Useful for testing slow internet connectivity.
+      Set a minimum latency and maximum transfer rate for this request. Useful for simulating slow internet connectivity.
     </p>
-    <div class="params">
-      <h4>@param <code>options</code> {object}</h4>
-      <ul>
-        <li><code>rate</code> {number} - Optional. Maximum transfer rate measured in bytes per second. Specifically, this affects the hop from the proxy to the destination server. Note that this applies to the request body only, not the request headers. Defaults to infinity (AKA as fast as the native connection will allow).</li>
-        <li><code>latency</code> {number} - Optional. Time measured in milliseconds between when all <code>request</code> phase listeners complete, and when the request is sent to the destination server. Defaults to zero (AKA the latency of the actual request).</li>
-      </ul>
-    </div>
+    <pre class="language-javascript code">
+      // Simulate upload speed of taking 100s to upload a megabyte.
+      proxy.intercept('request', function(req, resp){
+        req.slow({rate:10000}); // bytes per second
+      });
+    </pre>
+    <pre class="language-javascript code">
+      // Simulate a 500-1000ms delay on every request.
+      proxy.intercept('request', function(req, resp){
+        req.slow({latency:randint(500, 1000)});
+      });
+    </pre>
   </div>
 </div>
 
@@ -542,7 +547,7 @@
       proxy.intercept({
         phase: 'response',
         as: '$',
-        line: 'GET http://example.com/page.html'
+        fullUrl: 'http://example.com/page.html'
       }, function(req, resp){
         // change the title of the page
         resp.$('title').text('Fake Title!');
@@ -561,7 +566,8 @@
       proxy.intercept({
         phase: 'response',
         as: 'json',
-        line: 'GET http://example.com/users/123'
+        method: 'GET',
+        fullUrl: 'http://example.com/users/123'
       }, function(req, resp){
         // arbitrarily manipulate the response json
         resp.json.foo = 'bar';
@@ -580,7 +586,7 @@
       proxy.intercept({
         phase: 'response',
         as: 'string',
-        line: 'GET http://example.com/page.html'
+        fullUrl: 'http://example.com/page.html'
       }, function(req, resp){
         // print page to log
         console.log(resp.string);
@@ -599,7 +605,7 @@
       proxy.intercept({
         phase: 'response',
         as: 'buffers',
-        line: 'GET http://example.com/image.jpg'
+        fullUrl: 'http://example.com/image.jpg'
       }, function(req, resp){
         // resp.buffers contains a jpg
       });
@@ -607,39 +613,24 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-data">
-  <h3><a href="#response-data">response.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      The same <code>Response</code> instance is shared across all intercept handlers for a given request/response cycle. This method is a scratch pad for arbitrary data, for example in case you want to set some data in one phase and access it in another.
-    </p>
-    <div class="params">
-      <h4>@param <code>name</code> {string}</h4>
-      <p>
-        Name of the data to be stored.
-      </p>
-      <h4>@param <code>value</code> {*}</h4>
-      <p>
-        Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
-      </p>
-      <h4>@return {*} - The value being read/written.</h4>
-    </div>
-  </div>
-</div>
-
 <div class="api-detail" id="response-slow">
   <h3><a href="#response-slow">response.slow(<span class="args">options</span>) <span class="tldr">simulate a slow connection</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Set a minimum latency and maximum transfer rate for this response. Useful for testing slow internet connectivity.
+      Set a minimum latency and maximum transfer rate for this response. Useful for simulating slow internet connectivity.
     </p>
-    <div class="params">
-      <h4>@param <code>options</code> {object}</h4>
-      <ul>
-        <li><code>rate</code> {number} - Optional. Maximum transfer rate measured in bytes per second. Specifically, this affects the hop from the proxy to client. Note that this applies to the response body only, not the response headers. Defaults to infinity (AKA as fast as the native connection will allow).</li>
-        <li><code>latency</code> {number} - Optional. Time measured in milliseconds between when all <code>response</code> phase listeners complete, and when the response is sent to the client. Defaults to zero (AKA the latency of the actual response).</li>
-      </ul>
-    </div>
+    <pre class="language-javascript code">
+      // Simulate download speed of taking 10s to download a megabyte.
+      proxy.intercept('response', function(req, resp){
+        resp.slow({rate:100000}); // bytes per second
+      });
+    </pre>
+    <pre class="language-javascript code">
+      // Simulate a 500-1000ms delay on every response.
+      proxy.intercept('response', function(req, resp){
+        resp.slow({latency:randint(500, 1000)});
+      });
+    </pre>
   </div>
 </div>
 
