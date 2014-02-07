@@ -208,10 +208,10 @@
           <td>
             Which phase to intercept. Accepted values:
             <ul>
-              <li><code>request</code> - When request has been sent to proxy.</li>
-              <li><code>sent</code> - When request has been sent to server.</li>
+              <li><code>request</code> - When proxy has received request.</li>
+              <li><code>request-sent</code> - When proxy has sent request.</li>
               <li><code>response</code> - When proxy has received response.</li>
-              <li><code>received</code> - When client has received response.</li>
+              <li><code>response-sent</code> - When proxy has sent response.</li>
             </ul>
           </td>
         </tr>
@@ -511,7 +511,7 @@
 <h2>Class Response</h2>
 
 <p>
-  An instance of this is passed as the second argument to every intercept handler. This object is unpopulated during the <code>request</code> and <code>sent</code> phases. Altering its values during the <code>request</code> phase suppresses the call to the destination server, with the understanding that you intended to replace the contents of the response. Altering its values during the <code>response</code> phase changes the nature of the response to the client. This object is read-only during the <code>sent</code> and <code>received</code> phases, where altering its values is not allowed.
+  An instance of this is passed as the second argument to every intercept handler. This object is unpopulated during the <code>request</code> and <code>request-sent</code> phases. Altering its values during the <code>request</code> phase suppresses the call to the destination server, with the understanding that you intended to replace the contents of the response. Altering its values during the <code>response</code> phase changes the nature of the response to the client. This object is read-only during the <code>request-sent</code> and <code>response-sent</code> phases, where altering its values is not allowed.
 </p>
 
 <div class="api-detail" id="response-statusCode">
@@ -662,18 +662,18 @@
       proxy.intercept('request', function(){
         this.data('request', Date.now());
       });
-      proxy.intercept('sent', function(){
-        this.data('sent', Date.now());
+      proxy.intercept('request-sent', function(){
+        this.data('request-sent', Date.now());
       });
       proxy.intercept('response', function(){
         this.data('response', Date.now());
       });
-      proxy.intercept('received', function(){
-        this.data('received', Date.now());
+      proxy.intercept('response-sent', function(){
+        this.data('response-sent', Date.now());
         console.log('Proxy started receiving request: ',  this.data('request'));
-        console.log('Proxy finished sending request: ',   this.data('sent'));
+        console.log('Proxy finished sending request: ',   this.data('request-sent'));
         console.log('Proxy started receiving response: ', this.data('response'));
-        console.log('Proxy finished sending response: ',  this.data('received'));
+        console.log('Proxy finished sending response: ',  this.data('response-sent'));
       });
     </pre>
     <div class="params">

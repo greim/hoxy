@@ -295,7 +295,7 @@ describe('Hoxy', function(){
       requestIntercept: function(){
         steps += '1'
       },
-      sentIntercept: function(){
+      requestSentIntercept: function(){
         steps += '2'
       },
       server: function(){
@@ -304,7 +304,7 @@ describe('Hoxy', function(){
       responseIntercept: function(){
         steps += '4'
       },
-      receivedIntercept: function(){
+      responseSentIntercept: function(){
         steps += '5'
       },
       client: function(){
@@ -326,7 +326,7 @@ describe('Hoxy', function(){
           itsDone()
         },0)
       },
-      sentIntercept: function(req, resp, itsDone){
+      requestSentIntercept: function(req, resp, itsDone){
         setTimeout(function(){
           steps += '2'
           itsDone()
@@ -338,7 +338,7 @@ describe('Hoxy', function(){
           itsDone()
         },0)
       },
-      receivedIntercept: function(req, resp, itsDone){
+      responseSentIntercept: function(req, resp, itsDone){
         setTimeout(function(){
           steps += '4'
           itsDone()
@@ -803,7 +803,7 @@ describe('Hoxy', function(){
         assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
       },
-      sentIntercept: function(req, resp){
+      requestSentIntercept: function(req, resp){
         assert.strictEqual(req.data('foo1'), 'bar1')
         assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
@@ -813,7 +813,7 @@ describe('Hoxy', function(){
         assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
       },
-      receivedIntercept: function(req, resp){
+      responseSentIntercept: function(req, resp){
         assert.strictEqual(req.data('foo1'), 'bar1')
         assert.strictEqual(resp.data('foo2'), 'bar2')
         assert.strictEqual(this.data('foo3'), 'bar3')
