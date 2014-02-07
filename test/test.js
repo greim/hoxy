@@ -832,7 +832,7 @@ describe('Hoxy', function(){
         done(err)
       },
       intercepts: [{
-        opts: {phase:'response',type:'$'},
+        opts: {phase:'response',as:'$'},
         callback: function(req, resp){
           //try{
           assert.ok(resp.$, '$ should exist')
@@ -858,7 +858,7 @@ describe('Hoxy', function(){
         done(err)
       },
       intercepts: [{
-        opts: {phase:'response',type:'json'},
+        opts: {phase:'response',as:'json'},
         callback: function(req, resp){
           assert.ok(resp.json, 'json should exist')
           assert.deepEqual(resp.json, {foo:'bar',baz:2})
