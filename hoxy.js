@@ -10,10 +10,14 @@ var Proxy = require('./lib/proxy');
 
 module.exports = {
   Proxy: Proxy,
-  forever: function(handler){
+  forever: function(handler, ctx){
     process.on('uncaughtException', function(err){
-      if (typeof handler === 'function'){
-        handler(err);
+      if (handler === undefined){
+        console.log(err.stack);
+      } else if (typeof handler === 'function'){
+        handler.call(ctx, err);
+      } else if (typeof handler.write === 'function'){
+        handler.write(err.stack);
       } else {
         console.log(err.stack);
       }
