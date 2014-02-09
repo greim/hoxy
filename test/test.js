@@ -6,6 +6,8 @@
 // MOCHA TESTS
 // http://visionmedia.github.com/mocha/
 
+var await = require('await')
+var fs = require('fs')
 var url = require('url')
 var assert = require('assert')
 var Request = require('../lib/request')
@@ -16,6 +18,8 @@ var roundTrip = require('./round-trip')
 
 // ---------------------------
 
+// return a writable stream that will
+// write a megabyte worth of data
 var getMegaSource = (function(){
   var hex = '0123456789abcdef'
   var kb = []
@@ -143,7 +147,7 @@ describe('Request', function(){
     assert.deepEqual(req._source, data)
   })
 
-  it('should get absolute URL', function(){
+  it('should get full URL', function(){
     var req = new Request()
     var data = getRequestData()
     req._setHttpSource(data)
@@ -571,7 +575,9 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        this.serve('./files', function(){
+        this.serve({
+          docroot: './files'
+        }, function(){
           next();
         })
       },
@@ -599,7 +605,9 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        this.serve('./files', function(){
+        this.serve({
+          docroot: './files'
+        }, function(){
           next();
         })
       },
@@ -608,13 +616,13 @@ describe('Hoxy', function(){
       },
       client: function(resp, body){
         assert.strictEqual(body, '')
-        assert.strictEqual(resp.statusCode, 404)
+        assert.strictEqual(resp.statusCode, 404, 'should have been 404 but was '+resp.statusCode)
         done()
       }
     })
   })
 
-  it('should ghost serve', function(done){
+  it('should serve with overlay strategy', function(done){
     roundTrip({
       request:{
         url: '/abc',
@@ -624,7 +632,10 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        this.ghost('./files', function(){
+        this.serve({
+          docroot:'./files',
+          strategy: 'overlay'
+        }, function(){
           next();
         })
       },
@@ -638,7 +649,7 @@ describe('Hoxy', function(){
     })
   })
 
-  it('should fallback silently with ghost serve', function(done){
+  it('should fallback silently with overlay strategy', function(done){
     var serverHit = false;
     roundTrip({
       request:{
@@ -653,7 +664,10 @@ describe('Hoxy', function(){
         done(err)
       },
       requestIntercept: function(req, resp, next){
-        this.ghost('./files', function(){
+        this.serve({
+          docroot:'./files',
+          strategy: 'overlay'
+        }, function(){
           next();
         })
       },
@@ -663,6 +677,85 @@ describe('Hoxy', function(){
       client: function(resp, body){
         assert.strictEqual(body, 'def')
         assert.ok(serverHit);
+        done()
+      }
+    })
+  })
+
+  it('should mirror with mirror strategy', function(done){
+    var serverHit = false;
+    roundTrip({
+      request:{
+        url: '/def',
+        method: 'GET'
+      },
+      response:{
+        statusCode: 200,
+        body: 'def'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        this.serve({
+          docroot:'./files',
+          strategy: 'mirror'
+        }, function(err){
+          var file = './files/def'
+          fs.exists(file, function(exists){
+            if (exists){
+              next(err)
+            } else {
+              next(new Error('did not create '+file))
+            }
+          });
+        })
+      },
+      server: function(){
+        serverHit = true;
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'def')
+        done()
+      }
+    })
+  })
+
+  it('should not re-mirror with mirror strategy', function(done){
+    var serverHit = false;
+    roundTrip({
+      request:{
+        url: '/abc',
+        method: 'GET'
+      },
+      response:{
+        statusCode: 200,
+        body: 'abc2'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        this.serve({
+          docroot:'./files',
+          strategy: 'mirror'
+        }, function(err){
+          var file = __dirname+'/files/def'
+          fs.exists(file, function(exists){
+            if (exists){
+              next(err)
+            } else {
+              next(new Error('did not create '+file))
+            }
+          });
+        })
+      },
+      server: function(){
+        serverHit = true;
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'abc')
+        assert.ok(!serverHit, 'should not have hit server');
         done()
       }
     })
@@ -851,4 +944,23 @@ describe('Hoxy', function(){
   })
 })
 
-
+after(function(done){
+  var files = [
+    './files/def'
+  ]
+  var fileProms = files.map(function(file){
+    return await('done')
+    .run(function(p){
+      fs.exists(file, function(ex){
+        if (ex){
+          fs.unlink(file, p.nodify('done'))
+        } else {
+          p.keep('done')
+        }
+      })
+    })
+  })
+  await.all(fileProms)
+  .onkeep(function(){done()})
+  .onfail(done)
+})

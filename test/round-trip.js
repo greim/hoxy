@@ -79,10 +79,6 @@ module.exports = function roundTrip(opts,me){
         opts.error(log.error, log.message);
       }
     });
-    proxy.intercept('request', opts.requestIntercept);
-    proxy.intercept('request-sent', opts.requestSentIntercept);
-    proxy.intercept('response', opts.responseIntercept);
-    proxy.intercept('response-sent', opts.responseSentIntercept);
     proxy.intercept('request', function(req){
       server = http.createServer(function(sReq, sResp){
         streams.collect(sReq)
@@ -101,6 +97,10 @@ module.exports = function roundTrip(opts,me){
         });
       }).listen(req.port);
     });
+    proxy.intercept('request', opts.requestIntercept);
+    proxy.intercept('request-sent', opts.requestSentIntercept);
+    proxy.intercept('response', opts.responseIntercept);
+    proxy.intercept('response-sent', opts.responseSentIntercept);
     try{
       opts.intercepts.forEach(function(intercept){
         proxy.intercept(intercept.opts, intercept.callback);

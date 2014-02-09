@@ -31,7 +31,8 @@
   <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>) <span class="tldr">Don't exit process on uncaught errors.</span></a></h3>
   <div class="api-detail-content">
     <p>
-      This is a convenience function. Cause uncaught errors to be printed to stderr.
+      This is a convenience function.
+      Cause uncaught errors to be printed to stderr.
     </p>
     <pre class="language-javascript code">
       hoxy.forever();
@@ -204,7 +205,8 @@
           <td class="type">string</td>
           <td>yes</td>
           <td>
-            Which phase to intercept. Accepted values:
+            Which phase to intercept.
+            Accepted values:
             <ul>
               <li><code>request</code> - When proxy has received request.</li>
               <li><code>request-sent</code> - When proxy has sent request.</li>
@@ -224,13 +226,16 @@
             If <code>as</code> is present, however, hoxy will buffer the entire request or response body into memory.
             Accepted values:
             <ul>
-              <li><code>$</code> - A DOM object similar to jQuery. See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
+              <li><code>$</code> - A DOM object similar to jQuery.
+                See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
               <li><code>json</code> - A JavaScript object containing JSON.</li>
               <li><code>string</code> - A plain string.</li>
               <li><code>buffers</code> - An array of buffers.</li>
               <li><code>params</code> - A JavaScript object containing name/value pairs.</li>
             </ul>
-            Note, hoxy attempts to load the data as the given type. You'll likely want to use filtering in tandem with some of these. E.g. use <code>$</code> in response phase with a text/html mime type.
+            Note, hoxy attempts to load the data as the given type.
+            You'll likely want to use filtering in tandem with some of these.
+            E.g. use <code>$</code> in response phase with a text/html mime type.
           </td>
         </tr>
       </body>
@@ -318,7 +323,8 @@
   <h3><a href="#proxy-close">proxy.close(<span class="args"></span>) <span class="tldr">stop the proxy server</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Cause the proxy to stop receiving requests. Finalizes and/or cleans up any resources the proxy uses internally.
+      Cause the proxy to stop receiving requests.
+      Finalizes and/or cleans up any resources the proxy uses internally.
     </p>
     <pre class="language-javascript code">
       proxy.close();
@@ -370,7 +376,8 @@
   <h3><a href="#request-method">request.method {string} <span class="tldr">http request method</span></a></h3>
   <div class="api-detail-content">
     <p>
-      The all-caps HTTP method used in the request to the destination server. Lowercase values are converted to uppercase internally.
+      The all-caps HTTP method used in the request to the destination server.
+      Lowercase values are converted to uppercase internally.
     </p>
   </div>
 </div>
@@ -379,7 +386,8 @@
   <h3><a href="#request-headers">request.headers {object} <span class="tldr">http request headers</span></a></h3>
   <div class="api-detail-content">
     <p>
-      The HTTP headers used in the request. Header names are all-lowercase, such as <code>cookie</code>.
+      The HTTP headers used in the request.
+      Header names are all-lowercase, such as <code>cookie</code>.
     </p>
   </div>
 </div>
@@ -420,7 +428,9 @@
   <h3><a href="#request-params">request.params {object} <span class="tldr">params of post/put body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>params</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the name/value form parameters of the request body (i.e., for a application/x-www-form-urlencoded POST request). Changes made to this object will be reflected in the request body the server receives, via Node's <code>querystring.stringify()</code>. If you haven't intercepted the request as <code>params</code>, this will be undefined.
+      If you intercept the request as <code>params</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the name/value form parameters of the request body (i.e., for a application/x-www-form-urlencoded POST request).
+      Changes made to this object will be reflected in the request body the server receives, via Node's <code>querystring.stringify()</code>.
+      If you haven't intercepted the request as <code>params</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -440,7 +450,9 @@
   <h3><a href="#request-string">request.string {string} <span class="tldr">request body as a string</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>string</code>, this will be a string containing the request body. Overwriting this object will change the request body the server receives. If you haven't intercepted the request as <code>string</code>, this will be undefined.
+      If you intercept the request as <code>string</code>, this will be a string containing the request body.
+      Overwriting this object will change the request body the server receives.
+      If you haven't intercepted the request as <code>string</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -482,7 +494,8 @@
   <h3><a href="#request-slow">request.slow(<span class="args">options</span>) <span class="tldr">simulate slow a connection</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Set a minimum latency and maximum transfer rate for this request. Useful for simulating slow internet connectivity.
+      Set a minimum latency and maximum transfer rate for this request.
+      Useful for simulating slow internet connectivity.
     </p>
     <pre class="language-javascript code">
       // Simulate upload speed of 10,000 bytes per second
@@ -514,7 +527,11 @@
 <h2>Class Response</h2>
 
 <p>
-  An instance of this is passed as the second argument to every intercept handler. This object is unpopulated during the <code>request</code> and <code>request-sent</code> phases. Altering its values during the <code>request</code> phase suppresses the call to the destination server, with the understanding that you intended to replace the contents of the response. Altering its values during the <code>response</code> phase changes the nature of the response to the client. This object is read-only during the <code>request-sent</code> and <code>response-sent</code> phases, where altering its values is not allowed.
+  An instance of this is passed as the second argument to every intercept handler.
+  This object is unpopulated during the <code>request</code> and <code>request-sent</code> phases.
+  Altering its values during the <code>request</code> phase suppresses the call to the destination server, with the understanding that you intended to replace the contents of the response.
+  Altering its values during the <code>response</code> phase changes the nature of the response to the client.
+  This object is read-only during the <code>request-sent</code> and <code>response-sent</code> phases, where altering its values is not allowed.
 </p>
 
 <div class="api-detail" id="response-statusCode">
@@ -530,7 +547,8 @@
   <h3><a href="#response-headers">response.headers {object} <span class="tldr">http response headers</span></a></h3>
   <div class="api-detail-content">
     <p>
-      The HTTP headers used in the response. Header names are all-lowercase, such as <code>content-type</code>.
+      The HTTP headers used in the response.
+      Header names are all-lowercase, such as <code>content-type</code>.
     </p>
   </div>
 </div>
@@ -539,7 +557,9 @@
   <h3><a href="#response-cheerio">response.$ {cheerio} <span class="tldr">dom of response body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>$</code>, this will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like interface into the content body. Changes made via this object will be reflected in the response body the client receives, via <code>$.html()</code>. If you haven't intercepted the response as <code>$</code>, this will be undefined.
+      If you intercept the response as <code>$</code>, this will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like interface into the content body.
+      Changes made via this object will be reflected in the response body the client receives, via <code>$.html()</code>.
+      If you haven't intercepted the response as <code>$</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -558,7 +578,9 @@
   <h3><a href="#response-json">response.json {object} <span class="tldr">json object of response body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON response body. Changes made to this object will be reflected in the response body the client receives, via <code>JSON.stringify()</code>. If you haven't intercepted the response as <code>json</code>, this will be undefined.
+      If you intercept the response as <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON response body.
+      Changes made to this object will be reflected in the response body the client receives, via <code>JSON.stringify()</code>.
+      If you haven't intercepted the response as <code>json</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -578,7 +600,9 @@
   <h3><a href="#response-string">response.string {string} <span class="tldr">response body as a string</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>string</code>, this will be a string containing the response body. Overwriting this object will change the response body the client receives. If you haven't intercepted the response as <code>string</code>, this will be undefined.
+      If you intercept the response as <code>string</code>, this will be a string containing the response body.
+      Overwriting this object will change the response body the client receives.
+      If you haven't intercepted the response as <code>string</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -597,7 +621,9 @@
   <h3><a href="#response-buffers">response.buffers {array} <span class="tldr">binary data of response body</span></a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>buffers</code>, this will be an array containing Node.js buffer objects. Changes made to this object will be reflected in the response body the client receives. If you haven't intercepted the response as <code>buffers</code>, this will be undefined.
+      If you intercept the response as <code>buffers</code>, this will be an array containing Node.js buffer objects.
+      Changes made to this object will be reflected in the response body the client receives.
+      If you haven't intercepted the response as <code>buffers</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -615,7 +641,8 @@
   <h3><a href="#response-slow">response.slow(<span class="args">options</span>) <span class="tldr">simulate a slow connection</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Set a minimum latency and maximum transfer rate for this response. Useful for simulating slow internet connectivity.
+      Set a minimum latency and maximum transfer rate for this response.
+      Useful for simulating slow internet connectivity.
     </p>
     <pre class="language-javascript code">
       // Simulate download speed of 100,000 bytes per second
@@ -635,10 +662,136 @@
 <h2>Class Cycle</h2>
 
 <p>
-  An instance of this is the context (the <code>this</code> object) in calls to intercept handlers.
-  It represents a single request/response cycle.
+  A Cycle represents a single request/response cycle.
+  The same instance is shared across the entire request/response cycle.
+  The instance is <code>this</code> in all intercept handler calls.
   It provides a number of methods not associated specifically to either the request or response.
 </p>
+
+<div class="api-detail" id="cycle-serve">
+  <h3><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>) <span class="tldr">Provision requests from the local filesystem.</span></a></h3>
+  <div class="api-detail-content">
+    <p>
+      Serve requests from the local disk.
+      Generally, the reason you'd do this is to then edit those files locally and test them as if they were live on the remote server.
+      This action populates the response object, having the standard set of phase-dependent effects.
+    </p>
+    <table>
+      <caption>Options</caption>
+      <thead>
+        <tr>
+          <th>name</th>
+          <th class="type">type</th>
+          <th>required</th>
+          <th>description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>docroot</td>
+          <td class="type">string</td>
+          <td>no</td>
+          <td>Which local directory to serve out of. Defaults to <code>"/"</code>.</td>
+        </tr>
+        <tr>
+          <td>path</td>
+          <td class="type">string</td>
+          <td>no</td>
+          <td>Which file to serve. Defaults to request URL. Rooted to <code>docroot</code> to obtain the full path of the file.</td>
+        </tr>
+        <tr>
+          <td>strategy</td>
+          <td class="type">string</td>
+          <td>no</td>
+          <td>What to do in the case of missing local files. Accepted values:
+            <ul>
+              <li>
+                <code>replace</code> - 
+                (Default.)
+                Replaces the remote docroot with the local one.
+                In other words, if a requested file doesn't exist locally, it populates the response with a 404, even if it would have been found remotely.
+              </li>
+              <li>
+                <code>overlay</code> -
+                Overlays the local docroot on top of the remote one.
+                In other words, if a requested file doesn't exist locally, it simply won't populate the response, allowing the proxy to "see through" to the one on the remote server.
+              </li>
+              <li>
+                <code>mirror</code> - 
+                Automatically mirror the remote docroot locally.
+                In other words, if a requested file doesn't exist locally, it's copied to the local docroot from the remote one, and will be found locally on subsequent requests.
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      <code>callback</code> is called after the response has been populated.
+      If an error occurred, the error is passed to the callback, otherwise no arguments are passed.
+      Note, a 404 response is NOT considered an error in this case.
+      There are at least four use cases worth mentioning.
+    </p>
+    <p>
+      Use case #1: Manually replace one file.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        fullUrl: 'http://example.com/js/main.js'
+      }, function(req, resp, done){
+        this.serve({
+          path: '/Users/bk123/test/main.js',
+          strategy: 'replace'
+        }, done);
+      });
+    </pre>
+    <p>
+      Use case #2: Automatically replace one file.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        fullUrl: 'http://example.com/js/main.js'
+      }, function(req, resp, done){
+        this.serve({
+          path: '/Users/bk123/test/main.js',
+          strategy: 'mirror'
+        }, done);
+      });
+    </pre>
+    <p>
+      Use case #3: Manually recreate a subset of the remote docroot locally.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        host: 'example.com',
+        mimeType: /javascript/i
+      }, function(req, resp, done){
+        this.serve({
+          docroot: '/Users/bk123/test',
+          strategy: 'overlay'
+        }, done);
+      });
+    </pre>
+    <p>
+      Use case #4: Automatically mirror a subset of the remote docroot locally.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        host: 'example.com',
+        mimeType: /javascript/i
+      }, function(req, resp, done){
+        this.serve({
+          docroot: '/Users/bk123/test',
+          strategy: 'mirror'
+        }, done);
+      });
+    </pre>
+  </div>
+</div>
 
 <div class="api-detail" id="cycle-data">
   <h3><a href="#cycle-data">this.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
@@ -672,7 +825,9 @@
       </p>
       <h4>@param <code>value</code> {*}</h4>
       <p>
-        Optional. If not provided, this method behaves as a getter. If provided, behaves as a setter.
+        Optional.
+        If not provided, this method behaves as a getter.
+        If provided, behaves as a setter.
       </p>
       <h4>@return {*} - The value being read/written.</h4>
     </div>
@@ -680,13 +835,26 @@
 </div>
 
 <div class="api-detail" id="cycle-serve">
-  <h3><a href="#cycle-serve">this.serve(<span class="args">docroot, [url], callback</span>) <span class="tldr">provision response from local disk</span></a></h3>
+  <h3><a href="#cycle-serve">this.serve(<span class="args">options</span>) <span class="tldr">Provision response from local disk.</span></a></h3>
   <div class="api-detail-content">
     <p>
-      Serve static files from the local filesystem by replacing the docroot of the destination server with a local docroot. This method only differs from <code>this.ghost()</code> in how it behaves when a file isn't found in the local docroot. If a file is found in the local docroot, that file is used to populate/overwrite the response. If a file is not found in the local docroot, the response is populated/overwritten with a 404, even if the file exists on the destination server.
+      Serve static files from the local filesystem.
     </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        hostname: 'example.com',
+        mimeType: /javascript/i
+      }, function(req, resp){
+        this.serve({
+          docroot: '/Users/mk123/test'
+        }, done);
+      });
+    </pre>
     <p>
-      Because this method populates the response, the standard rules apply for what that entails in the various phases. For example, if it populates the response during the request phase, it will prevent the destination server from being contacted. If in the response phase, it will overwrite the response.
+      Because this method populates the response, the standard rules apply for what that entails in the various phases.
+      For example, if it populates the response during the request phase, it will prevent the destination server from being contacted.
+      If in the response phase, it will overwrite the response.
     </p>
     <div class="params">
       <h4>@param <code>docroot</code> {string}</h4>
@@ -695,37 +863,15 @@
       </p>
       <h4>@param <code>url</code> {string}</h4>
       <p>
-        Optional. The URL to be served. If not provided, the request URL is used. Note that this URL is rooted to the docroot, not the filesystem root.
+        Optional.
+        The URL to be served.
+        If not provided, the request URL is used.
+        Note that this URL is rooted to the docroot, not the filesystem root.
       </p>
       <h4>@param <code>callback</code> {function([err])}</h4>
       <p>
-        Called when finished. If an error occurred, the <code>err</code> parameter will be present.
-      </p>
-    </div>
-  </div>
-</div>
-
-<div class="api-detail" id="cycle-ghost">
-<h3><a href="#cycle-ghost">this.ghost(<span class="args">docroot, [url], callback</span>) <span class="tldr">provision response from local disk</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      Serve static files from the local filesystem by overlaying a local docroot over the docroot of the destination server. This method only differs from <code>this.serve()</code> in how it behaves when a file isn't found in the local docroot. If a file is found in the local docroot, the response is populated using that file. If a file is not found in the local docroot, the response remains unaffected.
-    </p>
-    <p>
-      Because this method populates the response, the standard rules apply for what that entails in the various phases. For example, if it populates the response during the request phase, it will prevent the destination server from being contacted. If in the response phase, it will overwrite the response.
-    </p>
-    <div class="params">
-      <h4>@param <code>docroot</code> {string}</h4>
-      <p>
-        Path on the local filesystem to serve out of.
-      </p>
-      <h4>@param <code>url</code> {string}</h4>
-      <p>
-        Optional. The URL to be served. If not provided, the request URL is used. Note that this URL is rooted to the docroot, not the filesystem root.
-      </p>
-      <h4>@param <code>callback</code> {function([err])}</h4>
-      <p>
-        Called when finished. If an error occurred, the <code>err</code> parameter will be present.
+        Called when finished.
+        If an error occurred, the <code>err</code> parameter will be present.
       </p>
     </div>
   </div>
