@@ -3,42 +3,36 @@
 <head>
 <title>Hoxy API Documentation</title>
 <meta charset="utf8"/>
-<link href='http://fonts.googleapis.com/css?family=Antic+Slab' rel='stylesheet' type='text/css'>
 <link href='styles.css' rel='stylesheet' type='text/css'>
-<link href='api.css' rel='stylesheet' type='text/css'>
 <script src="jquery.js"></script>
-<script type="text/javascript" src="jquery.syntaxhighlighter.js"></script>
-<script type="text/javascript">$.SyntaxHighlighter.init({themes:['google']});</script>
 </head>
 <body>
 <div id="outer">
 <div id="inner">
 
-<h1>API Documentation</h1>
-
 <h2>Main Module</h2>
 
-<div class="api-detail" id="hoxy">
-  <h3><a href="#hoxy">hoxy <span class="tldr">Main module.</span></a></h3>
+<div class="api-detail" id="hoxy-proxy">
+  <h3><a href="#hoxy-proxy">hoxy.Proxy</a></h3>
   <div class="api-detail-content">
-    <pre class="language-javascript code">
-      var hoxy = require('hoxy');
-    </pre>
+    <p>
+      New proxy constructor.
+      More info below.
+    </p>
   </div>
 </div>
 
 <div class="api-detail" id="hoxy-forever">
-  <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>) <span class="tldr">Don't exit process on uncaught errors.</span></a></h3>
+  <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      This is a convenience function.
-      Cause uncaught errors to be printed to stderr.
+      Prevents process dying on uncaught errors.
     </p>
     <pre class="language-javascript code">
       hoxy.forever();
     </pre>
     <p>
-      Or, call callback on uncaught errors.
+      Optionally, call callback on uncaught errors.
     </p>
     <pre class="language-javascript code">
       hoxy.forever(function(err){
@@ -50,33 +44,52 @@
 
 <h2>Class Proxy</h2>
 
-<div class="api-detail" id="hoxy-start">
-  <h3><a href="#hoxy-start">new hoxy.Proxy(<span class="args">options</span>) <span class="tldr">Construct a new proxy.</span></a></h3>
+<p>
+  Represents a proxy server.
+</p>
+
+<div class="api-detail" id="new-proxy">
+  <h3><a href="#new-proxy">new Proxy(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Start a proxy server listening on port 8080.
+      Constructs a new proxy with given options.
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy().listen(8080);
+      var proxy = new hoxy.Proxy();
     </pre>
     <p>
-      Start a new reverse proxy on port 8080.
+      Create a reverse proxy.
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
       var proxy = new hoxy.Proxy({
         reverse: 'http://example.com'
-      }).listen(8080);
+      });
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail" id="proxy-listen">
+  <h3><a href="#proxy-listen">proxy.listen(<span class="args">port</span>)</a></h3>
+  <div class="api-detail-content">
+    <p>
+      Starts proxy listening on port.
+      Returns itself.
+    </p>
+    <pre class="language-javascript code">
+      var hoxy = require('hoxy');
+      var proxy = new hoxy.Proxy().listen(8080);
     </pre>
   </div>
 </div>
 
 <div class="api-detail" id="hoxy-log">
-  <h3><a href="#hoxy-log">proxy.log(<span class="args">levels, handler</span>) <span class="tldr">Logging helper.</span></a></h3>
+  <h3><a href="#hoxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Print logging events to <code>stderr</code>.
+      Deals with various logging events.
+      This example listens for <code>error</code>, <code>warn</code>, and <code>debug</code> logging events, and prints them to <code>stderr</code>.
     </p>
     <pre class="language-javascript code">
       proxy.log('error warn debug');
@@ -96,14 +109,42 @@
         console.log(event.level + ': ' + event.message);
       });
     </pre>
+    <table>
+      <caption>Logging events</caption>
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>description</th>
+        </tr>
+      </thead>
+      <tobdy>
+        <tr>
+          <td><code>error</code></td>
+          <td>When something bad happens that we wish wouldn't have happened.</td>
+        </tr>
+        <tr>
+          <td><code>warn</code></td>
+          <td>When something iffy happened that we can probably tolerate.</td>
+        </tr>
+        <tr>
+          <td><code>info</code></td>
+          <td>When something noteworthy happened that normal people want to know about.</td>
+        </tr>
+        <tr>
+          <td><code>debug</code></td>
+          <td>When something boring happened that only developers would want to know about.</td>
+        </tr>
+      </tobdy>
+    </table>
   </div>
 </div>
 
 <div class="api-detail" id="proxy-intercept">
-  <h3><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>) <span class="tldr">Intercept requests or responses.</span></a></h3>
+  <h3><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Intercept all requests.
+      Intercepts and operates on requests and responses.
+      This example intercepts all requests.
     </p>
     <pre class="language-javascript code">
       proxy.intercept('request', function(req, resp){
@@ -119,7 +160,7 @@
       });
     </pre>
     <p>
-      Intercepts with arity of three behave asynchronously.
+      Intercept handlers with arity of three behave asynchronously.
     </p>
     <pre class="language-javascript code">
       // make everything slow
@@ -128,12 +169,15 @@
       });
     </pre>
     <p>
-      Admit you screwed up.
+      Admit that you screwed up.
     </p>
     <pre class="language-javascript code">
+      // sync
       proxy.intercept('request', function(req, resp){
         throw new Error('I screwed up.');
       });
+
+      // async
       proxy.intercept('request', function(req, resp, done){
         done(new Error('I screwed up.'));
       });
@@ -159,7 +203,8 @@
         mimeType: 'text/html',
         as: '$'
       }, function(req, resp){
-        resp.$('title').text('all your titles are belong to us');
+        resp.$('title')
+        .text('all your titles are belong to us');
       });
     </pre>
     <p>
@@ -186,9 +231,6 @@
         console.log(req.json.email_address);
       });
     </pre>
-    <p>
-      All possible options.
-    </p>
     <table>
       <caption>General options</caption>
       <thead>
@@ -199,9 +241,9 @@
           <th>description</th>
         </tr>
       </thead>
-      <body>
+      <tbody>
         <tr>
-          <td>phase</td>
+          <td><code>phase</code></td>
           <td class="type">string</td>
           <td>yes</td>
           <td>
@@ -216,35 +258,33 @@
           </td>
         </tr>
         <tr>
-          <td>as</td>
+          <td><code>as</code></td>
           <td class="type">string</td>
           <td>no</td>
           <td>
             Expose the request or response body (depending on the phase) as data of a certain type.
-            If the content type is incompatible, this intercept action is skipped and a warning is logged.
+            If there's an error parsing the body into this form, the intercept action is skipped and a warning is logged.
             Hoxy normally streams request and response bodies through.
-            If <code>as</code> is present, however, hoxy will buffer the entire request or response body into memory.
+            If <code>as</code> is present, hoxy buffers the request or response body into memory.
             Accepted values:
             <ul>
               <li><code>$</code> - A DOM object similar to jQuery.
                 See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
-              <li><code>json</code> - A JavaScript object containing JSON.</li>
+              <li><code>json</code> - A JS object containing JSON.</li>
               <li><code>string</code> - A plain string.</li>
               <li><code>buffers</code> - An array of buffers.</li>
-              <li><code>params</code> - A JavaScript object containing name/value pairs.</li>
+              <li><code>params</code> - A JS object containing name/value pairs.</li>
             </ul>
-            Note, hoxy attempts to load the data as the given type.
-            You'll likely want to use filtering in tandem with some of these.
-            E.g. use <code>$</code> in response phase with a text/html mime type.
+            Use filtering in tandem with these.
+            E.g. use <code>$</code> with <code>mimeType: 'text/html'</code>.
           </td>
         </tr>
-      </body>
-    </table>
-    <p>
-      Note that all non-undefined filtering/matching options are logically ANDed together.
-    </p>
-    <table>
-      <caption>Filtering options</caption>
+      </tbody>
+      <thead>
+        <tr>
+          <th class="caption" colspan="4">Filtering options (multiple filters are logically ANDed together)</th>
+        </tr>
+      </thead>
       <thead>
         <tr>
           <th>name</th>
@@ -255,62 +295,62 @@
       </thead>
       <body>
         <tr>
-          <td>protocol</td>
-          <td class="type">string | regexp</td>
+          <td><code>protocol</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match the request protocol.</td>
         </tr>
         <tr>
-          <td>method</td>
-          <td class="type">string | regexp</td>
+          <td><code>method</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match the all-uppercase HTTP request method.</td>
         </tr>
         <tr>
-          <td>host</td>
-          <td class="type">string | regexp</td>
+          <td><code>host</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the host, including the :port, if present.</td>
+          <td>Match the value of the host header.</td>
         </tr>
         <tr>
-          <td>hostname</td>
-          <td class="type">string | regexp</td>
+          <td><code>hostname</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match the host, not including :port.</td>
         </tr>
         <tr>
-          <td>port</td>
-          <td class="type">number | string | regexp</td>
+          <td><code>port</code></td>
+          <td class="type">number, string, regexp</td>
           <td>no</td>
           <td>Match the port number.</td>
         </tr>
         <tr>
-          <td>url</td>
-          <td class="type">string | regexp</td>
+          <td><code>url</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match the request URL. Patterns like <code>/foo/*</code> are allowed. See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.</td>
         </tr>
         <tr>
-          <td>fullUrl</td>
-          <td class="type">string | regexp</td>
+          <td><code>fullUrl</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match the full request URL including protocol and hostname. Patterns like <code>/foo/*</code> are allowed. See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.</td>
         </tr>
         <tr>
-          <td>contentType</td>
-          <td class="type">string | regexp</td>
+          <td><code>contentType</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match the full content-type header of the request or response (depending on the phase).</td>
         </tr>
         <tr>
-          <td>mimeType</td>
-          <td class="type">string | regexp</td>
+          <td><code>mimeType</code></td>
+          <td class="type">string, regexp</td>
           <td>no</td>
           <td>Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase).</td>
         </tr>
         <tr>
-          <td>filter</td>
-          <td class="type">function(req, resp)</td>
+          <td><code>filter</code></td>
+          <td class="type">function</td>
           <td>no</td>
           <td>A function that receives <code>req</code> and <code>resp</code> args, returning <code>true</code> or <code>false</code> depending on whether the intercept should be called. Non-async.</td>
         </tr>
@@ -320,10 +360,10 @@
 </div>
 
 <div class="api-detail" id="proxy-close">
-  <h3><a href="#proxy-close">proxy.close(<span class="args"></span>) <span class="tldr">stop the proxy server</span></a></h3>
+  <h3><a href="#proxy-close">proxy.close(<span class="args"></span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Cause the proxy to stop receiving requests.
+      Stops proxy receiving requests.
       Finalizes and/or cleans up any resources the proxy uses internally.
     </p>
     <pre class="language-javascript code">
@@ -335,16 +375,16 @@
 <h2>Class Request</h2>
 
 <p>
+  Represents a request.
   An instance of this is passed as the first argument to every intercept handler.
-  Altering its values during the <code>request</code> phase changes the nature of the request.
-  This object becomes read-only during all other phases, so altering its values during those phases isn't allowed.
+  Altering its values changes the nature of the request.
 </p>
 
 <div class="api-detail" id="request-protocol">
-  <h3><a href="#request-protocol">request.protocol {string} <span class="tldr">protocol used by this request</span></a></h3>
+  <h3><a href="#request-protocol">request.protocol {string}</a></h3>
   <div class="api-detail-content">
     <p>
-      The protocol used to contact the destination server.
+      Protocol of the request.
       Includes a colon but not slashes, like <code>http:</code> Setting this to <code>https:</code> requires providing keys and running the proxy server in encrypted mode.
     </p>
     <p>
@@ -355,45 +395,45 @@
 </div>
 
 <div class="api-detail" id="request-hostname">
-  <h3><a href="#request-hostname">request.hostname {string} <span class="tldr">name of destination server</span></a></h3>
+  <h3><a href="#request-hostname">request.hostname {string}</a></h3>
   <div class="api-detail-content">
     <p>
-      The name of the destination server, sans port.
+      Destination server hostname, sans port.
     </p>
   </div>
 </div>
 
 <div class="api-detail" id="request-port">
-  <h3><a href="#request-port">request.port {number} <span class="tldr">port being connected to</span></a></h3>
+  <h3><a href="#request-port">request.port {number}</a></h3>
   <div class="api-detail-content">
     <p>
-      The port on which the destination server is contacted.
+      Destination server port.
     </p>
   </div>
 </div>
 
 <div class="api-detail" id="request-method">
-  <h3><a href="#request-method">request.method {string} <span class="tldr">http request method</span></a></h3>
+  <h3><a href="#request-method">request.method {string}</a></h3>
   <div class="api-detail-content">
     <p>
-      The all-caps HTTP method used in the request to the destination server.
+      All-caps HTTP method used.
       Lowercase values are converted to uppercase internally.
     </p>
   </div>
 </div>
 
 <div class="api-detail" id="request-headers">
-  <h3><a href="#request-headers">request.headers {object} <span class="tldr">http request headers</span></a></h3>
+  <h3><a href="#request-headers">request.headers {object}</a></h3>
   <div class="api-detail-content">
     <p>
-      The HTTP headers used in the request.
-      Header names are all-lowercase, such as <code>cookie</code>.
+      HTTP request headers.
+      Header names are all-lowercase, e.g. <code>accept-encoding</code>.
     </p>
   </div>
 </div>
 
 <div class="api-detail" id="request-url">
-  <h3><a href="#request-url">request.url {string} <span class="tldr">url of requested resource</span></a></h3>
+  <h3><a href="#request-url">request.url {string}</a></h3>
   <div class="api-detail-content">
     <p>
       Root-relative request URL, including query string, like <code>/foo/bar?baz=qux</code>
@@ -402,12 +442,12 @@
 </div>
 
 <div class="api-detail" id="request-json">
-  <h3><a href="#request-json">request.json {object} <span class="tldr">json object of request body</span></a></h3>
+  <h3><a href="#request-json">request.json {object}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON request body.
+      Request body parsed as JSON.
+      Only present if you intercept the request as <code>json</code>.
       Changes made to this object will be reflected in the request body the server receives, via <code>JSON.stringify()</code>.
-      If you haven't intercepted the request as <code>json</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -425,12 +465,14 @@
 </div>
 
 <div class="api-detail" id="request-params">
-  <h3><a href="#request-params">request.params {object} <span class="tldr">params of post/put body</span></a></h3>
+  <h3><a href="#request-params">request.params {object}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>params</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the name/value form parameters of the request body (i.e., for a application/x-www-form-urlencoded POST request).
+      Request body parsed as form-url-encoded params.
+      Key/value POJO.
+      Will not contain URL questring data.
+      Only present if you intercept the request as <code>params</code>.
       Changes made to this object will be reflected in the request body the server receives, via Node's <code>querystring.stringify()</code>.
-      If you haven't intercepted the request as <code>params</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -447,12 +489,12 @@
 </div>
 
 <div class="api-detail" id="request-string">
-  <h3><a href="#request-string">request.string {string} <span class="tldr">request body as a string</span></a></h3>
+  <h3><a href="#request-string">request.string {string}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>string</code>, this will be a string containing the request body.
+      Request body string.
+      Only present if you intercept the request as <code>string</code>.
       Overwriting this object will change the request body the server receives.
-      If you haven't intercepted the request as <code>string</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -470,12 +512,13 @@
 </div>
 
 <div class="api-detail" id="request-buffers">
-  <h3><a href="#request-buffers">request.buffers {array} <span class="tldr">binary data of request body</span></a></h3>
+  <h3><a href="#request-buffers">request.buffers {array}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the request as <code>buffers</code>, this will be an array containing Node.js buffer objects.
+      Request body binary buffer array.
+      Contains nodejs Buffer objects.
+      Only present if you intercept the request as <code>buffers</code>.
       Changes made to this object will be reflected in the request body the server receives.
-      If you haven't intercepted the request as <code>buffers</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -491,11 +534,11 @@
 </div>
 
 <div class="api-detail" id="request-slow">
-  <h3><a href="#request-slow">request.slow(<span class="args">options</span>) <span class="tldr">simulate slow a connection</span></a></h3>
+  <h3><a href="#request-slow">request.slow(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Set a minimum latency and maximum transfer rate for this request.
-      Useful for simulating slow internet connectivity.
+      Simulates slowness during request phase.
+      Sets a minimum latency and/or maximum transfer rate.
     </p>
     <pre class="language-javascript code">
       // Simulate upload speed of 10,000 bytes per second
@@ -513,53 +556,56 @@
 </div>
 
 <div class="api-detail" id="request-fullUrl">
-  <h3><a href="#request-fullUrl">request.fullUrl(<span class="args"></span>) <span class="tldr">absolute url convenience function</span></a></h3>
+  <h3><a href="#request-fullUrl">request.fullUrl(<span class="args"></span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Convenience method to assemble and return the absolute URL represented by this request.
+      Gets the absolute URL of this request.
     </p>
-    <div class="params">
-      <h4>@return {string} - An absolute URL starting with <code>http://</code></h4>
-    </div>
+    <pre class="language-javascript code">
+      // Log every request through the proxy.
+      proxy.intercept('request', function(req, resp){
+        console.log(req.fullUrl());
+      });
+    </pre>
   </div>
 </div>
 
 <h2>Class Response</h2>
 
 <p>
+  Represents a response.
   An instance of this is passed as the second argument to every intercept handler.
   This object is unpopulated during the <code>request</code> and <code>request-sent</code> phases.
-  Altering its values during the <code>request</code> phase suppresses the call to the destination server, with the understanding that you intended to replace the contents of the response.
-  Altering its values during the <code>response</code> phase changes the nature of the response to the client.
-  This object is read-only during the <code>request-sent</code> and <code>response-sent</code> phases, where altering its values is not allowed.
+  Altering its values changes the response to the client.
 </p>
 
 <div class="api-detail" id="response-statusCode">
-  <h3><a href="#response-statusCode">response.statusCode {number} <span class="tldr">http response code</span></a></h3>
+  <h3><a href="#response-statusCode">response.statusCode {number}</a></h3>
   <div class="api-detail-content">
     <p>
-      The HTTP response status code sent to the client.
+      HTTP status code being sent to the client.
     </p>
   </div>
 </div>
 
 <div class="api-detail" id="response-headers">
-  <h3><a href="#response-headers">response.headers {object} <span class="tldr">http response headers</span></a></h3>
+  <h3><a href="#response-headers">response.headers {object}</a></h3>
   <div class="api-detail-content">
     <p>
-      The HTTP headers used in the response.
+      HTTP response headers.
       Header names are all-lowercase, such as <code>content-type</code>.
     </p>
   </div>
 </div>
 
 <div class="api-detail" id="response-cheerio">
-  <h3><a href="#response-cheerio">response.$ {cheerio} <span class="tldr">dom of response body</span></a></h3>
+  <h3><a href="#response-cheerio">response.$ {cheerio}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>$</code>, this will be a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like interface into the content body.
-      Changes made via this object will be reflected in the response body the client receives, via <code>$.html()</code>.
-      If you haven't intercepted the response as <code>$</code>, this will be undefined.
+      Response body parsed as DOM.
+      Only present if you intercept the response as <code>$</code>.
+      This object is a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like API.
+      Changes made to this DOM will be reflected in the response body the client receives.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -575,12 +621,12 @@
 </div>
 
 <div class="api-detail" id="response-json">
-  <h3><a href="#response-json">response.json {object} <span class="tldr">json object of response body</span></a></h3>
+  <h3><a href="#response-json">response.json {object}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>json</code>, this will be a <abbr title="plain old javascript object">POJO</abbr> containing the JSON response body.
-      Changes made to this object will be reflected in the response body the client receives, via <code>JSON.stringify()</code>.
-      If you haven't intercepted the response as <code>json</code>, this will be undefined.
+      Response body parsed as JSON.
+      Only present if you intercept the response as <code>json</code>.
+      Changes made to this object will be reflected in the response body the client receives.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -597,12 +643,12 @@
 </div>
 
 <div class="api-detail" id="response-string">
-  <h3><a href="#response-string">response.string {string} <span class="tldr">response body as a string</span></a></h3>
+  <h3><a href="#response-string">response.string {string}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>string</code>, this will be a string containing the response body.
+      Response body string.
+      Only present if you intercept the response as <code>string</code>.
       Overwriting this object will change the response body the client receives.
-      If you haven't intercepted the response as <code>string</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -618,12 +664,12 @@
 </div>
 
 <div class="api-detail" id="response-buffers">
-  <h3><a href="#response-buffers">response.buffers {array} <span class="tldr">binary data of response body</span></a></h3>
+  <h3><a href="#response-buffers">response.buffers {array}</a></h3>
   <div class="api-detail-content">
     <p>
-      If you intercept the response as <code>buffers</code>, this will be an array containing Node.js buffer objects.
+      Response body binary buffer array.
+      Only present if you intercept the response as <code>buffers</code>.
       Changes made to this object will be reflected in the response body the client receives.
-      If you haven't intercepted the response as <code>buffers</code>, this will be undefined.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -638,11 +684,11 @@
 </div>
 
 <div class="api-detail" id="response-slow">
-  <h3><a href="#response-slow">response.slow(<span class="args">options</span>) <span class="tldr">simulate a slow connection</span></a></h3>
+  <h3><a href="#response-slow">response.slow(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Set a minimum latency and maximum transfer rate for this response.
-      Useful for simulating slow internet connectivity.
+      Simulates a slow response.
+      Set a minimum latency and/or maximum transfer rate.
     </p>
     <pre class="language-javascript code">
       // Simulate download speed of 100,000 bytes per second
@@ -662,20 +708,32 @@
 <h2>Class Cycle</h2>
 
 <p>
-  A Cycle represents a single request/response cycle.
-  The same instance is shared across the entire request/response cycle.
-  The instance is <code>this</code> in all intercept handler calls.
+  Represents a single request/response cycle.
+  An instance is <code>this</code> in all intercept handler calls, and the <em>same</em> instance is shared across the entire request/response cycle.
   It provides a number of methods not associated specifically to either the request or response.
 </p>
 
 <div class="api-detail" id="cycle-serve">
-  <h3><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>) <span class="tldr">Provision requests from the local filesystem.</span></a></h3>
+  <h3><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Serve requests from the local disk.
-      Generally, the reason you'd do this is to then edit those files locally and test them as if they were live on the remote server.
-      This action populates the response object, having the standard set of phase-dependent effects.
+      Provisions responses from the local filesystem.
+      Generally, the reason you'd do this is to then edit those files and test them as if they were live on the remote server.
+      This action populates the response object.
+      Example.
     </p>
+    <pre class="language-javascript code">
+      // inject my own version of main.js
+      // in order to debug a problem
+      proxy.intercept({
+        phase: 'request',
+        fullUrl: 'http://example.com/main.js'
+      }, function(req, resp, done){
+        this.serve({
+          path: '/Users/gr123/test/main.js'
+        }, done);
+      });
+    </pre>
     <table>
       <caption>Options</caption>
       <thead>
@@ -691,13 +749,13 @@
           <td>docroot</td>
           <td class="type">string</td>
           <td>no</td>
-          <td>Which local directory to serve out of. Defaults to <code>"/"</code>.</td>
+          <td>Which local directory to serve out of. Defaults to filesystem root <code>"/"</code>.</td>
         </tr>
         <tr>
           <td>path</td>
           <td class="type">string</td>
           <td>no</td>
-          <td>Which file to serve. Defaults to request URL. Rooted to <code>docroot</code> to obtain the full path of the file.</td>
+          <td>Which file to serve. Defaults to request URL. Normally this would be used in mutual exclusion with <code>docroot</code>. Strictly speaking, <code>path</code> is always rooted to <code>docroot</code>, which defaults to <code>"/"</code>.</td>
         </tr>
         <tr>
           <td>strategy</td>
@@ -794,11 +852,11 @@
 </div>
 
 <div class="api-detail" id="cycle-data">
-  <h3><a href="#cycle-data">this.data(<span class="args">name, [value]</span>) <span class="tldr">store arbitrary data</span></a></h3>
+  <h3><a href="#cycle-data">this.data(<span class="args">name, [value]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      The same <code>Cycle</code> instance is shared across all intercept handlers for a given request/response cycle.
-      This method is a scratch pad for arbitrary data, in case for example you want to set some data in one phase and access it in another.
+      Stores and retrieves data on a cycle instance.
+      This is useful since the same instance is shared across all intercept handlers for a given request/response cycle, allowing you to share related data across disparate scopes.
     </p>
     <pre class="language-javascript code">
       proxy.intercept('request', function(){
@@ -811,107 +869,224 @@
         this.data('response', Date.now());
       });
       proxy.intercept('response-sent', function(){
-        this.data('response-sent', Date.now());
-        console.log('Proxy started receiving request: ',  this.data('request'));
-        console.log('Proxy finished sending request: ',   this.data('request-sent'));
-        console.log('Proxy started receiving response: ', this.data('response'));
-        console.log('Proxy finished sending response: ',  this.data('response-sent'));
-      });
-    </pre>
-    <div class="params">
-      <h4>@param <code>name</code> {string}</h4>
-      <p>
-        Name of the data to be stored.
-      </p>
-      <h4>@param <code>value</code> {*}</h4>
-      <p>
-        Optional.
-        If not provided, this method behaves as a getter.
-        If provided, behaves as a setter.
-      </p>
-      <h4>@return {*} - The value being read/written.</h4>
-    </div>
-  </div>
-</div>
-
-<div class="api-detail" id="cycle-serve">
-  <h3><a href="#cycle-serve">this.serve(<span class="args">options</span>) <span class="tldr">Provision response from local disk.</span></a></h3>
-  <div class="api-detail-content">
-    <p>
-      Serve static files from the local filesystem.
-    </p>
-    <pre class="language-javascript code">
-      proxy.intercept({
-        phase: 'request',
-        hostname: 'example.com',
-        mimeType: /javascript/i
-      }, function(req, resp){
-        this.serve({
-          docroot: '/Users/mk123/test'
-        }, done);
+        var reqReceived = this.data('request');
+        var reqSent = this.data('request-sent');
+        var respReceived = this.data('response');
+        var respSent = Date.now();
+        // print some profiling data
       });
     </pre>
     <p>
-      Because this method populates the response, the standard rules apply for what that entails in the various phases.
-      For example, if it populates the response during the request phase, it will prevent the destination server from being contacted.
-      If in the response phase, it will overwrite the response.
+      With two params it's a setter, with one param it's a getter.
     </p>
-    <div class="params">
-      <h4>@param <code>docroot</code> {string}</h4>
-      <p>
-        Path on the local filesystem to serve out of.
-      </p>
-      <h4>@param <code>url</code> {string}</h4>
-      <p>
-        Optional.
-        The URL to be served.
-        If not provided, the request URL is used.
-        Note that this URL is rooted to the docroot, not the filesystem root.
-      </p>
-      <h4>@param <code>callback</code> {function([err])}</h4>
-      <p>
-        Called when finished.
-        If an error occurred, the <code>err</code> parameter will be present.
-      </p>
-    </div>
   </div>
 </div>
 
+<h2>Appendix</h2>
 
-</div>
+<h3>Phase lifecycle</h3>
+
+<p>
+  Intercept handlers are called in the order of their <code>phase</code>.
+  Intercept handlers of the same <code>phase</code> are called in the order they're declared.
+  <code>request</code> and <code>response</code> objects are either read-only or readable/writable, depending on <code>phase</code>.
+  Attempts to write a read-only thing will fail silently, generating an <code>error</code> log event.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" colspan="2">Readability / writability matrix</th>
+      <th colspan="2">Object</th>
+    </tr>
+    <tr>
+      <th><code>request</code></th>
+      <th><code>response</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="100">Phase</th>
+      <th><code>request</code></th>
+      <td>writable</td>
+      <td>writable</td>
+    </tr>
+    <tr>
+      <th><code>request-sent</code></th>
+      <td>read-only</td>
+      <td>read-only</td>
+    </tr>
+    <tr>
+      <th><code>response</code></th>
+      <td>read-only</td>
+      <td>writable</td>
+    </tr>
+    <tr>
+      <th><code>response-sent</code></th>
+      <td>read-only</td>
+      <td>read-only</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Response population</h3>
+
+<p>
+  Responses are populated when Hoxy sends the request to the destination server during the normal request/response lifecycle.
+  If you modify any aspect of the response before this happens, hoxy treats the <em>entire</em> response as populated, and skips the call to the destination server.
+  If you modify any aspect of the response after this happens, it changes just that aspect of the response from the server.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp){
+    // The response is now populated so the
+    // server call is skipped. Status code will
+    // default to 200.
+    response.string = 'Hello';
+  });
+</pre>
+
+<pre class="language-javascript code">
+  proxy.intercept('response', function(req, resp){
+    // Overwrite the response body
+    response.string = 'Hello';
+  });
+</pre>
+
+<h3>Change accumulation</h3>
+
+<p>
+  Changes to requests and responses are cumulative across all intercepts.
+  Among other things, this affects loading content <code>as</code> a certain type, and filtering.
+</p>
+
+<p>
+  Change accumulation example.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp){
+    req.headers['cache-control'] = undefined;
+  });
+
+  proxy.intercept('request', function(req, resp){
+    console.log(req.headers['cache-control']); // undefined
+  });
+</pre>
+
+<p>
+  Change accumulation affects filtering.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp){
+    req.hostname = 'example.com';
+  });
+
+  proxy.intercept({
+    phase: 'request',
+    hostname: 'other.com'
+  }, function(req, resp){
+    // never called!
+  });
+</pre>
+
+<p>
+  Change accumulation affecting <code>as</code> parameters.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept({
+    phase: 'response',
+    mimeTyle: 'application/json',
+    as: 'json'
+  }, function(req, resp){ ... });
+
+  proxy.intercept({
+    phase: 'response',
+    mimeTyle: 'application/json'
+  }, function(req, resp){
+    console.log(typeof resp.json); // 'object'
+  });
+
+  proxy.intercept({
+    phase: 'response',
+    mimeTyle: 'application/json',
+    as: 'string'
+  }, function(req, resp){ ... });
+
+  proxy.intercept({
+    phase: 'response',
+    mimeTyle: 'application/json'
+  }, function(req, resp){
+    console.log(typeof resp.json); // 'undefined'
+    console.log(typeof resp.string); // 'string'
+  });
+</pre>
+
+<ul id="nav"></ul>
 </div>
 
 <script>
-function expand(hash){
-  var $el = $(hash);
-  if ($el.length) {
-    var $content = $el.find('.api-detail-content');
-    $content.slideDown(200);
-  }
-}
-if (location.hash) {
-  expand(location.hash);
-}
-$(window).on('hashchange', function(){
-  if (location.hash) {
-    expand(location.hash);
-  }
-});
-$('h3 a[href]').on('click', function(ev){
-  ev.preventDefault();
-  var hash = this.href.substring(this.href.indexOf('#'));
-  var $el = $(hash);
-  var $content = $el.find('.api-detail-content');
-  if ($content.is(':visible')) {
-    $content.slideUp(200);
-  } else {
-    $content.slideDown(200);
-  }
+
+(function(docEl, body){
+  window.onresize = function scale(){
+    docEl.style.fontSize = (body.clientWidth / 100) + 'px';
+    return scale;
+  }();
+})(document.documentElement, document.body);
+
+$('pre').each(function(){
+  var text = $(this).text();
+  var lines = text.split('\n');
+
+  // remove \r
+  lines = lines.map(function(line){
+    return line.replace(/\r/g, '');
+  });
+
+  // remove empty first and last lines
+  lines = lines.filter(function(line, idx){
+    if (idx === 0 || idx === lines.length-1){
+      return /\S/.test(line);
+    } else {
+      return true;
+    }
+  });
+
+  // find minimum length of leading whitespace
+  var minimum = lines.reduce(function(smallest, line){
+    if (!/\S/.test(line)){
+      return smallest;
+    }
+    var leading = line.replace(/^(\s+).*/,'$1');
+    return Math.min(smallest, leading.length);
+  }, Infinity);
+
+  // chop off that minimum length
+  lines = lines.map(function(line){
+    return line.substring(minimum);
+  });
+  $(this).text(lines.join('\n'));
 });
 
-function ts(){return this.line;}
+var $nav = $('#nav');
+var $headings = $('h2,h3');
+$headings.each(function(){
+  var $heading = $(this);
+  var tldr = $heading.next('.api-detail-content').find('*').eq(0).text() || $heading.next('p').text();
+  tldr = tldr.split('\n').filter(function(line){return /\S/.test(line);})[0] || '';
+  var $trigger = $('<a href="#">'+$heading.text()+'<span class="tldr">'+tldr+'</span></a>');
+  $('<li class="item-'+this.nodeName.toLowerCase()+'"></li>')
+  .append($trigger)
+  .appendTo($nav);
 
-$('pre.language-javascript.code').syntaxHighlight();
+  $trigger.on('click', function(ev){
+    ev.preventDefault();
+    var headingPos = $heading.offset().top;
+    $('html').animate({scrollTop: (headingPos-30)+'px'}, 200);
+  });
+});
 
 </script>
 
