@@ -1,53 +1,54 @@
 body{
-    font-size:1.75rem;
+    font-size:18px;
     margin:0;
     padding:0;
     background-color:#f6f6f6;
-    color:#000;
+    color:#444;
     font-family:helvetica,sans-serif;
     line-height:1.6;
-}
-h1{
-    font-size:1rem;
+    padding-bottom:2000px;
+    text-shadow:0 1px 0 #fff;
 }
 #inner{
-    width:75rem;
-    padding: 2rem 4rem;
+    padding: 20px 40px;
     box-sizing:border-box;
+    margin-left:300px;
+    margin-right:auto;
+    max-width:1000px;
 }
 h1,h2,h3,h4,h5,h6{
     line-height:1.3;
+    color:rgba(0,0,0,0.35);
+    font-weight:normal;
 }
 h1,h2,h3,h4,h5,h6,p,ol,ul,pre{
-    margin-top:2rem;
-    margin-bottom:2rem;
+    margin-top:10px;
+    margin-bottom:10px;
 }
 pre{
+    overflow:auto;
 }
 ul,ol{
     margin-left:0;
-    padding-left:3rem;
+    padding-left:2em;
 }
 pre.code{
     font-size:.9em;
     line-height:1.3;
-    padding: 1.5rem 2rem;
+    padding: 15px 20px;
     color:#666;
     border:1px solid #eee;
-    border-left-width:1rem;
-    background-color:rgba(255,255,255,0.5);
+    border-left-width:10px;
 }
 .api-detail{
     background:#fff;
-    padding:.5rem 2.5rem;
-    margin:2rem 0;
-    box-shadow:0 0 .25rem .25rem rgba(0,0,0,0.1);
-    border-radius:.25rem;
+    padding:15px 25px;
+    margin:20px 0;
+    box-shadow:0 0 1px 1px rgba(0,0,0,0.1);
+    border-radius:2px;
 }
 h2{
-    font-size:3.5rem;
-    font-weight:normal;
-    color:rgba(0,0,0,0.5);
+    font-size:30px;
 }
 .api-detail h3 a[href]{
     color:inherit;
@@ -64,7 +65,7 @@ th,td,caption{
     border:1px solid #ddd;
     vertical-align: top;
     text-align: left;
-    padding:.5rem 1rem;
+    padding:5px 10px;
     font-weight:normal;
 }
 caption{
@@ -86,8 +87,8 @@ table ol{
     margin-bottom:0;
 }
 table li{
-    margin-top:1rem;
-    margin-bottom:1rem;
+    margin-top:.5em;
+    margin-bottom:.5em;
 }
 #nav{
     line-height:1.3;
@@ -95,18 +96,18 @@ table li{
     color:#eee;
     position: fixed;
     top:0;
-    right:0;
+    left:0;
     bottom:0;
-    width:25rem;
-    border-left:1rem solid #444;
+    width:300px;
+    border-right:1px solid #444;
     box-sizing:border-box;
     margin:0;
     padding:0;
     list-style:none;
-    overflow:auto;
-    box-shadow:0 0 1rem rgba(0,0,0,0.5);
+    overflow:hidden;
+    box-shadow:0 0 10px rgba(0,0,0,0.5);
     text-shadow:0 -1px 0 rgba(0,0,0,0.5);
-    font-size:.8em;
+    font-size:.9em;
 }
 #nav li{
     border-bottom:1px solid #444;
@@ -114,12 +115,16 @@ table li{
 #nav li a{
     box-shadow:0 1px 0 rgba(255,255,255,0.1) inset;
     display:block;
-    padding:.6rem 1rem;
+    padding:6px 10px;
     color:inherit;
     text-decoration: inherit;
 }
+#nav li:last-child a{
+    padding-bottom:100px;
+}
 #nav li.item-h3 a{
     background:#666;
+    border-left: 10px solid rgba(0,0,0,0.1);
 }
 #nav .tldr{
     overflow:hidden;
@@ -131,5 +136,5 @@ table li{
 }
 code{
     padding:0 .2em;
-    opacity:.5;
+    opacity:.65;
 }

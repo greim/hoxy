@@ -4,16 +4,23 @@
 <title>Hoxy API Documentation</title>
 <meta charset="utf8"/>
 <link href='styles.css' rel='stylesheet' type='text/css'>
+<link href='prism.css' rel='stylesheet' type='text/css'>
 <script src="jquery.js"></script>
+<script src="de-indent.js"></script>
+<script src="prism.js"></script>
 </head>
 <body>
 <div id="outer">
 <div id="inner">
 
-<h2>Main Module</h2>
+<h2 id="main-module">Main Module</h2>
 
-<div class="api-detail" id="hoxy-proxy">
-  <h3><a href="#hoxy-proxy">hoxy.Proxy</a></h3>
+<p>
+  <code>var hoxy = require('hoxy');</code>
+</p>
+
+<div class="api-detail">
+  <h3 id="hoxy-proxy"><a href="#hoxy-proxy">hoxy.Proxy</a></h3>
   <div class="api-detail-content">
     <p>
       New proxy constructor.
@@ -22,8 +29,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="hoxy-forever">
-  <h3><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="hoxy-forever"><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Prevents process dying on uncaught errors.
@@ -42,14 +49,14 @@
   </div>
 </div>
 
-<h2>Class Proxy</h2>
+<h2 id="class-proxy">Class Proxy</h2>
 
 <p>
   Represents a proxy server.
 </p>
 
-<div class="api-detail" id="new-proxy">
-  <h3><a href="#new-proxy">new Proxy(<span class="args">options</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="new-proxy"><a href="#new-proxy">new Proxy(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Constructs a new proxy with given options.
@@ -70,8 +77,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="proxy-listen">
-  <h3><a href="#proxy-listen">proxy.listen(<span class="args">port</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="proxy-listen"><a href="#proxy-listen">proxy.listen(<span class="args">port</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Starts proxy listening on port.
@@ -84,8 +91,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="hoxy-log">
-  <h3><a href="#hoxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="hoxy-log"><a href="#hoxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Deals with various logging events.
@@ -120,27 +127,35 @@
       <tobdy>
         <tr>
           <td><code>error</code></td>
-          <td>When something bad happens that we wish wouldn't have happened.</td>
+          <td>
+            When something bad happens that we wish wouldn't have happened.
+          </td>
         </tr>
         <tr>
           <td><code>warn</code></td>
-          <td>When something iffy happened that we can probably tolerate.</td>
+          <td>
+            When something iffy happened that we can probably tolerate.
+          </td>
         </tr>
         <tr>
           <td><code>info</code></td>
-          <td>When something noteworthy happened that normal people want to know about.</td>
+          <td>
+            When something noteworthy happened that normal people want to know about.
+          </td>
         </tr>
         <tr>
           <td><code>debug</code></td>
-          <td>When something boring happened that only developers would want to know about.</td>
+          <td>
+            When something boring happened that only developers would want to know about.
+          </td>
         </tr>
       </tobdy>
     </table>
   </div>
 </div>
 
-<div class="api-detail" id="proxy-intercept">
-  <h3><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="proxy-intercept"><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Intercepts and operates on requests and responses.
@@ -298,69 +313,94 @@
           <td><code>protocol</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the request protocol.</td>
+          <td>
+            Match the request protocol.
+          </td>
         </tr>
         <tr>
           <td><code>method</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the all-uppercase HTTP request method.</td>
+          <td>
+            Match the all-uppercase HTTP request method.
+          </td>
         </tr>
         <tr>
           <td><code>host</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the value of the host header.</td>
+          <td>
+            Match the value of the host header.
+          </td>
         </tr>
         <tr>
           <td><code>hostname</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the host, not including :port.</td>
+          <td>
+            Match the host, not including :port.
+          </td>
         </tr>
         <tr>
           <td><code>port</code></td>
           <td class="type">number, string, regexp</td>
           <td>no</td>
-          <td>Match the port number.</td>
+          <td>
+            Match the port number.
+          </td>
         </tr>
         <tr>
           <td><code>url</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the request URL. Patterns like <code>/foo/*</code> are allowed. See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.</td>
+          <td>
+            Match the request URL.
+            Patterns like <code>/foo/*</code> are allowed.
+            See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.
+          </td>
         </tr>
         <tr>
           <td><code>fullUrl</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the full request URL including protocol and hostname. Patterns like <code>/foo/*</code> are allowed. See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.</td>
+          <td>
+            Match the full request URL including protocol and hostname.
+            Patterns like <code>/foo/*</code> are allowed.
+            See <a href="https://github.com/bjoerge/route-pattern">route-pattern</a>.
+          </td>
         </tr>
         <tr>
           <td><code>contentType</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match the full content-type header of the request or response (depending on the phase).</td>
+          <td>
+            Match the full content-type header of the request or response (depending on the phase).
+          </td>
         </tr>
         <tr>
           <td><code>mimeType</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
-          <td>Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase).</td>
+          <td>
+            Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase).
+          </td>
         </tr>
         <tr>
           <td><code>filter</code></td>
           <td class="type">function</td>
           <td>no</td>
-          <td>A function that receives <code>req</code> and <code>resp</code> args, returning <code>true</code> or <code>false</code> depending on whether the intercept should be called. Non-async.</td>
+          <td>
+            A function that receives <code>req</code> and <code>resp</code> args, returning <code>true</code> or <code>false</code> depending on whether the intercept should be called.
+            Non-async.
+          </td>
         </tr>
       </body>
     </table>
   </div>
 </div>
 
-<div class="api-detail" id="proxy-close">
-  <h3><a href="#proxy-close">proxy.close(<span class="args"></span>)</a></h3>
+<div class="api-detail">
+  <h3 id="proxy-close"><a href="#proxy-close">proxy.close(<span class="args"></span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Stops proxy receiving requests.
@@ -372,7 +412,7 @@
   </div>
 </div>
 
-<h2>Class Request</h2>
+<h2 id="class-request">Class Request</h2>
 
 <p>
   Represents a request.
@@ -380,8 +420,8 @@
   Altering its values changes the nature of the request.
 </p>
 
-<div class="api-detail" id="request-protocol">
-  <h3><a href="#request-protocol">request.protocol {string}</a></h3>
+<div class="api-detail">
+  <h3 id="request-protocol"><a href="#request-protocol">request.protocol {string}</a></h3>
   <div class="api-detail-content">
     <p>
       Protocol of the request.
@@ -394,8 +434,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-hostname">
-  <h3><a href="#request-hostname">request.hostname {string}</a></h3>
+<div class="api-detail">
+  <h3 id="request-hostname"><a href="#request-hostname">request.hostname {string}</a></h3>
   <div class="api-detail-content">
     <p>
       Destination server hostname, sans port.
@@ -403,8 +443,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-port">
-  <h3><a href="#request-port">request.port {number}</a></h3>
+<div class="api-detail">
+  <h3 id="request-port"><a href="#request-port">request.port {number}</a></h3>
   <div class="api-detail-content">
     <p>
       Destination server port.
@@ -412,8 +452,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-method">
-  <h3><a href="#request-method">request.method {string}</a></h3>
+<div class="api-detail">
+  <h3 id="request-method"><a href="#request-method">request.method {string}</a></h3>
   <div class="api-detail-content">
     <p>
       All-caps HTTP method used.
@@ -422,8 +462,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-headers">
-  <h3><a href="#request-headers">request.headers {object}</a></h3>
+<div class="api-detail">
+  <h3 id="request-headers"><a href="#request-headers">request.headers {object}</a></h3>
   <div class="api-detail-content">
     <p>
       HTTP request headers.
@@ -432,8 +472,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-url">
-  <h3><a href="#request-url">request.url {string}</a></h3>
+<div class="api-detail">
+  <h3 id="request-url"><a href="#request-url">request.url {string}</a></h3>
   <div class="api-detail-content">
     <p>
       Root-relative request URL, including query string, like <code>/foo/bar?baz=qux</code>
@@ -441,8 +481,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-json">
-  <h3><a href="#request-json">request.json {object}</a></h3>
+<div class="api-detail">
+  <h3 id="request-json"><a href="#request-json">request.json {object}</a></h3>
   <div class="api-detail-content">
     <p>
       Request body parsed as JSON.
@@ -464,8 +504,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-params">
-  <h3><a href="#request-params">request.params {object}</a></h3>
+<div class="api-detail">
+  <h3 id="request-params"><a href="#request-params">request.params {object}</a></h3>
   <div class="api-detail-content">
     <p>
       Request body parsed as form-url-encoded params.
@@ -488,8 +528,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-string">
-  <h3><a href="#request-string">request.string {string}</a></h3>
+<div class="api-detail">
+  <h3 id="request-string"><a href="#request-string">request.string {string}</a></h3>
   <div class="api-detail-content">
     <p>
       Request body string.
@@ -511,8 +551,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-buffers">
-  <h3><a href="#request-buffers">request.buffers {array}</a></h3>
+<div class="api-detail">
+  <h3 id="request-buffers"><a href="#request-buffers">request.buffers {array}</a></h3>
   <div class="api-detail-content">
     <p>
       Request body binary buffer array.
@@ -533,8 +573,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-slow">
-  <h3><a href="#request-slow">request.slow(<span class="args">options</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="request-slow"><a href="#request-slow">request.slow(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Simulates slowness during request phase.
@@ -555,8 +595,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="request-fullUrl">
-  <h3><a href="#request-fullUrl">request.fullUrl(<span class="args"></span>)</a></h3>
+<div class="api-detail">
+  <h3 id="request-fullUrl"><a href="#request-fullUrl">request.fullUrl(<span class="args"></span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Gets the absolute URL of this request.
@@ -570,7 +610,7 @@
   </div>
 </div>
 
-<h2>Class Response</h2>
+<h2 id="class-response">Class Response</h2>
 
 <p>
   Represents a response.
@@ -579,8 +619,8 @@
   Altering its values changes the response to the client.
 </p>
 
-<div class="api-detail" id="response-statusCode">
-  <h3><a href="#response-statusCode">response.statusCode {number}</a></h3>
+<div class="api-detail">
+  <h3 id="response-statusCode"><a href="#response-statusCode">response.statusCode {number}</a></h3>
   <div class="api-detail-content">
     <p>
       HTTP status code being sent to the client.
@@ -588,8 +628,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-headers">
-  <h3><a href="#response-headers">response.headers {object}</a></h3>
+<div class="api-detail">
+  <h3 id="response-headers"><a href="#response-headers">response.headers {object}</a></h3>
   <div class="api-detail-content">
     <p>
       HTTP response headers.
@@ -598,8 +638,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-cheerio">
-  <h3><a href="#response-cheerio">response.$ {cheerio}</a></h3>
+<div class="api-detail">
+  <h3 id="response-cheerio"><a href="#response-cheerio">response.$ {cheerio}</a></h3>
   <div class="api-detail-content">
     <p>
       Response body parsed as DOM.
@@ -620,8 +660,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-json">
-  <h3><a href="#response-json">response.json {object}</a></h3>
+<div class="api-detail">
+  <h3 id="response-json"><a href="#response-json">response.json {object}</a></h3>
   <div class="api-detail-content">
     <p>
       Response body parsed as JSON.
@@ -642,8 +682,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-string">
-  <h3><a href="#response-string">response.string {string}</a></h3>
+<div class="api-detail">
+  <h3 id="response-string"><a href="#response-string">response.string {string}</a></h3>
   <div class="api-detail-content">
     <p>
       Response body string.
@@ -663,8 +703,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-buffers">
-  <h3><a href="#response-buffers">response.buffers {array}</a></h3>
+<div class="api-detail">
+  <h3 id="response-buffers"><a href="#response-buffers">response.buffers {array}</a></h3>
   <div class="api-detail-content">
     <p>
       Response body binary buffer array.
@@ -683,8 +723,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="response-slow">
-  <h3><a href="#response-slow">response.slow(<span class="args">options</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="response-slow"><a href="#response-slow">response.slow(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Simulates a slow response.
@@ -705,7 +745,7 @@
   </div>
 </div>
 
-<h2>Class Cycle</h2>
+<h2 id="class-cycle">Class Cycle</h2>
 
 <p>
   Represents a single request/response cycle.
@@ -713,8 +753,8 @@
   It provides a number of methods not associated specifically to either the request or response.
 </p>
 
-<div class="api-detail" id="cycle-serve">
-  <h3><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="cycle-serve"><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Provisions responses from the local filesystem.
@@ -851,8 +891,8 @@
   </div>
 </div>
 
-<div class="api-detail" id="cycle-data">
-  <h3><a href="#cycle-data">this.data(<span class="args">name, [value]</span>)</a></h3>
+<div class="api-detail">
+  <h3 id="cycle-data"><a href="#cycle-data">this.data(<span class="args">name, [value]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Stores and retrieves data on a cycle instance.
@@ -882,9 +922,9 @@
   </div>
 </div>
 
-<h2>Appendix</h2>
+<h2 id="appendix">Appendix</h2>
 
-<h3>Phase lifecycle</h3>
+<h3 id="phase-lifecycle">Phase lifecycle</h3>
 
 <p>
   Intercept handlers are called in the order of their <code>phase</code>.
@@ -929,7 +969,7 @@
   </tbody>
 </table>
 
-<h3>Response population</h3>
+<h3 id="response-population">Response population</h3>
 
 <p>
   Responses are populated when Hoxy sends the request to the destination server during the normal request/response lifecycle.
@@ -953,7 +993,7 @@
   });
 </pre>
 
-<h3>Change accumulation</h3>
+<h3 id="change-accumulation">Change accumulation</h3>
 
 <p>
   Changes to requests and responses are cumulative across all intercepts.
@@ -995,7 +1035,7 @@
   Change accumulation affecting <code>as</code> parameters.
 </p>
 
-<pre class="language-javascript code">
+<pre class="language-javascript code"><code>
   proxy.intercept({
     phase: 'response',
     mimeTyle: 'application/json',
@@ -1022,7 +1062,7 @@
     console.log(typeof resp.json); // 'undefined'
     console.log(typeof resp.string); // 'string'
   });
-</pre>
+</code></pre>
 
 <ul id="nav"></ul>
 </div>
@@ -1036,59 +1076,63 @@
   }();
 })(document.documentElement, document.body);
 
-$('pre').each(function(){
-  var text = $(this).text();
-  var lines = text.split('\n');
+$('pre').deIndent();
 
-  // remove \r
-  lines = lines.map(function(line){
-    return line.replace(/\r/g, '');
-  });
+Prism.highlightAll();
 
-  // remove empty first and last lines
-  lines = lines.filter(function(line, idx){
-    if (idx === 0 || idx === lines.length-1){
-      return /\S/.test(line);
-    } else {
-      return true;
-    }
-  });
-
-  // find minimum length of leading whitespace
-  var minimum = lines.reduce(function(smallest, line){
-    if (!/\S/.test(line)){
-      return smallest;
-    }
-    var leading = line.replace(/^(\s+).*/,'$1');
-    return Math.min(smallest, leading.length);
-  }, Infinity);
-
-  // chop off that minimum length
-  lines = lines.map(function(line){
-    return line.substring(minimum);
-  });
-  $(this).text(lines.join('\n'));
-});
-
+var $w = $(window);
 var $nav = $('#nav');
 var $headings = $('h2,h3');
+var moving = false;
 $headings.each(function(){
   var $heading = $(this);
   var tldr = $heading.next('.api-detail-content').find('*').eq(0).text() || $heading.next('p').text();
   tldr = tldr.split('\n').filter(function(line){return /\S/.test(line);})[0] || '';
-  var $trigger = $('<a href="#">'+$heading.text()+'<span class="tldr">'+tldr+'</span></a>');
+  var $trigger = $('<a href="#'+$heading.attr('id')+'">'+$heading.text()+'<span class="tldr">'+tldr+'</span></a>');
   $('<li class="item-'+this.nodeName.toLowerCase()+'"></li>')
   .append($trigger)
   .appendTo($nav);
+});
 
-  $trigger.on('click', function(ev){
+var oldTop;
+$w.on('scroll', function(ev){
+  var scrollTop = document.documentElement.scrollTop;
+  if (oldTop === undefined) oldTop = scrollTop;
+  var diff = scrollTop - oldTop;
+  oldTop = scrollTop;
+  if (diff && !moving){
+    var navTop = $nav.scrollTop();
+    $nav.scrollTop(navTop + diff);
+  }
+});
+
+$('html').on('click', '[href^="#"]', function(ev){
+  var hash = this.getAttribute('href');
+  var id = hash.substring(1);
+  var $el = $(hash);
+  if ($el.length > 0){
     ev.preventDefault();
-    var headingPos = $heading.offset().top;
-    $('html').animate({scrollTop: (headingPos-30)+'px'}, 200);
-  });
+    $el.attr('id','');
+    location.hash = hash;
+    var top = $el.offset().top;
+    moving = true;
+    $('html').animate({scrollTop: (top-30)+'px'}, 200, function(){
+      $el.attr('id',id);
+      setTimeout(function(){
+        moving = false;
+      }, 100);
+    });
+  }
 });
 
 </script>
 
 </body>
 </html>
+
+
+
+
+
+
+
