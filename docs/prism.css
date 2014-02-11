@@ -7,8 +7,6 @@
 code[class*="language-"],
 pre[class*="language-"] {
 	color: black;
-	text-shadow: 0 1px white;
-	font-family: Consolas, Monaco, 'Andale Mono', monospace;
 	direction: ltr;
 	text-align: left;
 	white-space: pre;
@@ -47,14 +45,12 @@ code[class*="language-"]::selection, code[class*="language-"] ::selection {
 
 /* Code blocks */
 pre[class*="language-"] {
-	padding: 1em;
-	margin: .5em 0;
+	padding: 1em 1.2em;
 	overflow: auto;
 }
 
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-    background-color:rgba(255,255,255,0.5);
 }
 
 /* Inline code */

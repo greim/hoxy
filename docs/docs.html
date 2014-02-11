@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-<title>Hoxy API Documentation</title>
+<title>Hoxy Documentation</title>
 <meta charset="utf8"/>
 <link href='styles.css' rel='stylesheet' type='text/css'>
 <link href='prism.css' rel='stylesheet' type='text/css'>
@@ -13,10 +13,95 @@
 <div id="outer">
 <div id="inner">
 
-<h2 id="main-module">Main Module</h2>
+<h1 id="introduction">Introduction</h1>
 
 <p>
-  <code>var hoxy = require('hoxy');</code>
+  Hoxy is a web debugging proxy API.
+  You can use it to debug your production app directly, or as the basis for other development and debugging tools.
+  Creating a proxy server is easy.
+</p>
+
+<pre class="language-javascript code">
+  var hoxy = require('hoxy');
+  var proxy = new hoxy.Proxy().listen(8080);
+  proxy.intercept('request', function(req, resp){
+    console.log('request made to: ' + req.fullUrl());
+  });
+</pre>
+
+<p>
+  After running the above code, you can configure your web client to proxy through <code>localhost:8080</code>.
+  All information flowing through the proxy is exposed as JavaScript variables, which you can inspect and manipulate.
+  A few examples of the types of things Hoxy makes easy:
+</p>
+
+<ul>
+  <li>Inspecting and logging web traffic.</li>
+  <li>Altering the DOM of web pages.</li>
+  <li>Altering JSON requests and responses.</li>
+  <li>Testing JavaScript changes in production.</li>
+  <li>Simulating latency or slow connections.</li>
+  <li>Tampering with HTTP headers.</li>
+</ul>
+
+<h2 id="how-it-works">How it works</h2>
+
+<p>
+  Hoxy functions as a normal proxy.
+  You intercept traffic during different phases, such as the request or the response.
+  When you intercept during the request phase, the <code>request</code> object contains data sent to the proxy by the client, but not yet sent to the destination server.
+  During this time, the <code>response</code> object is available, but unpopulated.
+</p>
+
+<p>
+  When you intercept during the response phase, the <code>response</code> object contains data sent to the proxy by the server, but not yet sent to the client.
+  During this time, the <code>request</code> object is available, but read-only.
+  The <a href="#phase-lifecycle">phase lifecycle section</a> contains a complete description of the request/response lifecycle, but here's a simplified illustration.
+</p>
+
+<pre class="code">
+  -----------------------
+  server:       3
+  -------------/-\-------
+  hoxy:       2   4
+  -----------/-----\-----
+  client:   1       5
+  -----------------------
+</pre>
+
+<ol>
+  <li>Client sends request.</li>
+  <li>Hoxy intercepts the request.</li>
+  <li>Server receives request and sends response.</li>
+  <li>Hoxy intercepts the response.</li>
+  <li>Client receives response.</li>
+</ol>
+
+<h2 id="reverse">Reverse proxy mode</h2>
+
+<p>
+  Hoxy can <a href="#new-proxy">optionally run as a reverse proxy</a>.
+  This means that instead of configuring your client to proxy through <code>localhost:8080</code>, you point your client directly at <code>localhost:8080</code>.
+  You provide a host and a port when you create the proxy, so that it knows which server to forward the request to.
+  This might be useful if having to configure clients' proxy settings is undesirable.
+</p>
+
+<h2 id="installation-guide" data-tldr="Hoxy is available on npm.">Installation guide</h2>
+
+<pre class="code">
+  npm install hoxy
+</pre>
+
+<pre class="language-javascript code">
+  var hoxy = require('hoxy');
+</pre>
+
+<h1 id="api-documentaiton" data-tldr="Objects, methods, and properties.">API documentaiton</h1>
+
+<h2 id="main-module">Main module</h2>
+
+<p>
+  The entry point for all hoxy functionality.
 </p>
 
 <div class="api-detail">
@@ -922,9 +1007,9 @@
   </div>
 </div>
 
-<h2 id="appendix">Appendix</h2>
+<h1 id="appendix" data-tldr="Extensive info on various topics.">Appendix</h1>
 
-<h3 id="phase-lifecycle">Phase lifecycle</h3>
+<h2 id="phase-lifecycle" data-tldr="How phases work.">Phase lifecycle</h2>
 
 <p>
   Intercept handlers are called in the order of their <code>phase</code>.
@@ -969,7 +1054,7 @@
   </tbody>
 </table>
 
-<h3 id="response-population">Response population</h3>
+<h2 id="response-population" data-tldr="Suppressing server calls.">Response population</h2>
 
 <p>
   Responses are populated when Hoxy sends the request to the destination server during the normal request/response lifecycle.
@@ -993,7 +1078,7 @@
   });
 </pre>
 
-<h3 id="change-accumulation">Change accumulation</h3>
+<h2 id="change-accumulation" data-tldr="Behavior over sequential handlers.">Change accumulation</h2>
 
 <p>
   Changes to requests and responses are cumulative across all intercepts.
@@ -1082,11 +1167,17 @@ Prism.highlightAll();
 
 var $w = $(window);
 var $nav = $('#nav');
-var $headings = $('h2,h3');
+var $headings = $('h1,h2,h3');
 var moving = false;
 $headings.each(function(){
   var $heading = $(this);
-  var tldr = $heading.next('.api-detail-content').find('*').eq(0).text() || $heading.next('p').text();
+  var tldr = $heading.data('tldr');
+  if (!tldr){
+    tldr = $heading.next('.api-detail-content').find('*').eq(0).text();
+  }
+  if (!tldr){
+    tldr = $heading.next('p').text();
+  }
   tldr = tldr.split('\n').filter(function(line){return /\S/.test(line);})[0] || '';
   var $trigger = $('<a href="#'+$heading.attr('id')+'">'+$heading.text()+'<span class="tldr">'+tldr+'</span></a>');
   $('<li class="item-'+this.nodeName.toLowerCase()+'"></li>')
