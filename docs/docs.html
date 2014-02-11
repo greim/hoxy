@@ -1094,17 +1094,30 @@ $headings.each(function(){
   .appendTo($nav);
 });
 
-var oldTop;
-$w.on('scroll', function(ev){
-  var scrollTop = document.documentElement.scrollTop;
-  if (oldTop === undefined) oldTop = scrollTop;
-  var diff = scrollTop - oldTop;
-  oldTop = scrollTop;
-  if (diff && !moving){
-    var navTop = $nav.scrollTop();
-    $nav.scrollTop(navTop + diff);
-  }
-});
+(function(){
+  var oldTop;
+  var sDist;
+
+  $w.on('resize', function resize(){
+    var height = document.documentElement.offsetHeight;
+    var wHeight = document.documentElement.clientHeight;
+    sDist = height - wHeight;
+    return resize;
+  }());
+
+  $w.on('scroll', function(ev){
+    var scrollTop = document.documentElement.scrollTop;
+    if (scrollTop < 0) scrollTop = 0;
+    if (scrollTop > sDist) scrollTop = sDist;
+    if (oldTop === undefined) oldTop = scrollTop;
+    var diff = scrollTop - oldTop;
+    oldTop = scrollTop;
+    if (diff && !moving){
+      var navTop = $nav.scrollTop();
+      $nav.scrollTop(navTop + diff);
+    }
+  });
+})();
 
 $('html').on('click', '[href^="#"]', function(ev){
   var hash = this.getAttribute('href');
