@@ -20,7 +20,7 @@ Extensive documentation can be found here.
 
 # Note: 1.x versus 0.x
 
-If you're looking for the old command line version of hoxy, the latest and final version is tagged as 0.2.3 in this repository.
+If you're looking for the old command line version of hoxy, the latest and final version is tagged as 0.2.3 in this repository and still available via npm.
 
 1.x is a ground-up rewrite and re-envisioning of the project.
 0.x was a command line utility, whereas 1.x is a programming API.
