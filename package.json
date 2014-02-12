@@ -1,35 +1,23 @@
 {
   "name": "hoxy",
-  "preferGlobal": "true",
-  "version": "0.2.3",
+  "version": "1.0.0-alpha",
   "author": "Greg Reimer <gregreimer@gmail.com>",
-  "description": "Web-hacking proxy",
-  "bin": {
-    "hoxy": "./bin/hoxy"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/greim/hoxy.git"
-  },
+  "description": "The web-hacking proxy",
+  "main": "./hoxy",
   "keywords": [
-    "web",
-    "traffic",
+    "develop",
+    "test",
     "debug",
     "proxy",
-    "request",
-    "response",
-    "http"
+    "web"
   ],
   "dependencies" : {
-    "tav": "0.1.x",
-    "await": "0.1.x",
-    "js-beautify": "0.2.x",
-    "cheerio": "0.10.x",
-    "PrettyCSS": "0.3.x",
-    "html": "0.0.x"
+    "route-pattern": "0.0.x",
+    "slugs": "0.1.x",
+    "node-static": "0.7.x",
+    "lodash-node": "2.3.x",
+    "await": "0.2.x",
+    "cheerio": "0.12.x"
   },
-  "license": "MIT",
-  "engines": {
-    "node": ">=0.6"
-  }
+  "license": "MIT"
 }
