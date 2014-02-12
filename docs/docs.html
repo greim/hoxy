@@ -3,6 +3,8 @@
 <head>
 <title>Hoxy Documentation</title>
 <meta charset="utf8"/>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,700italic,700,300' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
 <link href='styles.css' rel='stylesheet' type='text/css'>
 <link href='prism.css' rel='stylesheet' type='text/css'>
 <script src="jquery.js"></script>
@@ -13,15 +15,15 @@
 <div id="outer">
 <div id="inner">
 
-<h1 id="introduction">Introduction</h1>
+<h1 id="introduction">Hoxy introduction</h1>
 
 <p>
-  Hoxy is a web debugging proxy API.
+  Hoxy is a web debugging proxy API for node.
   You can use it to debug your production app directly, or as the basis for other development and debugging tools.
-  Creating a proxy server is easy.
 </p>
 
 <pre class="language-javascript code">
+  // Create a proxy server and log all requests.
   var hoxy = require('hoxy');
   var proxy = new hoxy.Proxy().listen(8080);
   proxy.intercept('request', function(req, resp){
@@ -31,8 +33,8 @@
 
 <p>
   After running the above code, you can configure your web client to proxy through <code>localhost:8080</code>.
-  All information flowing through the proxy is exposed as JavaScript variables, which you can inspect and manipulate.
-  A few examples of the types of things Hoxy makes easy:
+  All information flowing through the proxy is exposed as JavaScript variables.
+  Use cases include:
 </p>
 
 <ul>
@@ -47,15 +49,18 @@
 <h2 id="how-it-works">How it works</h2>
 
 <p>
-  Hoxy functions as a normal proxy.
-  You intercept traffic during different phases, such as the request or the response.
-  When you intercept during the request phase, the <code>request</code> object contains data sent to the proxy by the client, but not yet sent to the destination server.
-  During this time, the <code>response</code> object is available, but unpopulated.
+  Hoxy functions as a normal proxy,
+  standing between the client and the server.
+  You <a href="#proxy-intercept">intercept</a> traffic during different <em>phases</em>, such as the request or the response.
+  When you intercept in the request phase, the <code>request</code> object contains data sent to the proxy by the client, but hasn't yet been sent to the server.
+  During this time, you can inspect or alter any <code>request</code> data.
+  The <code>response</code> object is also available, but unpopulated.
 </p>
 
 <p>
-  When you intercept during the response phase, the <code>response</code> object contains data sent to the proxy by the server, but not yet sent to the client.
-  During this time, the <code>request</code> object is available, but read-only.
+  When you intercept in the response phase, the <code>response</code> object contains data sent to the proxy by the server, but not yet sent to the client.
+  During this time you can inspect or alter any <code>response</code> data.
+  The <code>request</code> object is still available, but read-only.
   The <a href="#phase-lifecycle">phase lifecycle section</a> contains a complete description of the request/response lifecycle, but here's a simplified illustration.
 </p>
 
@@ -71,9 +76,9 @@
 
 <ol>
   <li>Client sends request.</li>
-  <li>Hoxy intercepts the request.</li>
+  <li>Hoxy intercepts request.</li>
   <li>Server receives request and sends response.</li>
-  <li>Hoxy intercepts the response.</li>
+  <li>Hoxy intercepts response.</li>
   <li>Client receives response.</li>
 </ol>
 
@@ -86,7 +91,7 @@
   This might be useful if having to configure clients' proxy settings is undesirable.
 </p>
 
-<h2 id="installation-guide" data-tldr="Hoxy is available on npm.">Installation guide</h2>
+<h2 id="installation" data-tldr="Available on npm.">Installation</h2>
 
 <pre class="code">
   npm install hoxy
@@ -261,6 +266,7 @@
     </pre>
     <p>
       Intercept handlers with arity of three behave asynchronously.
+      In this case, you must call <code>done()</code> to pass control to the next intercept handler.
     </p>
     <pre class="language-javascript code">
       // make everything slow
@@ -348,6 +354,7 @@
           <td>yes</td>
           <td>
             Which phase to intercept.
+            See <a href="#phase-lifecycle">phase lifecycle</a> for more info.
             Accepted values:
             <ul>
               <li><code>request</code> - When proxy has received request.</li>
@@ -372,8 +379,8 @@
                 See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
               <li><code>json</code> - A JS object containing JSON.</li>
               <li><code>string</code> - A plain string.</li>
-              <li><code>buffers</code> - An array of buffers.</li>
-              <li><code>params</code> - A JS object containing name/value pairs.</li>
+              <li><code>buffers</code> - An array of buffers containing the entity body in its raw binary form.</li>
+              <li><code>params</code> - A JS object containing name/value pairs parsed from the <code>application/x-www-form-urlencoded</code> entity body.</li>
             </ul>
             Use filtering in tandem with these.
             E.g. use <code>$</code> with <code>mimeType: 'text/html'</code>.
@@ -382,7 +389,7 @@
       </tbody>
       <thead>
         <tr>
-          <th class="caption" colspan="4">Filtering options (multiple filters are logically ANDed together)</th>
+          <th class="caption" colspan="4">Filtering options (logically ANDed together)</th>
         </tr>
       </thead>
       <thead>
@@ -506,7 +513,7 @@
 </p>
 
 <div class="api-detail">
-  <h3 id="request-protocol"><a href="#request-protocol">request.protocol {string}</a></h3>
+  <h3 id="request-protocol"><a href="#request-protocol">request.protocol</a></h3>
   <div class="api-detail-content">
     <p>
       Protocol of the request.
@@ -520,7 +527,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-hostname"><a href="#request-hostname">request.hostname {string}</a></h3>
+  <h3 id="request-hostname"><a href="#request-hostname">request.hostname</a></h3>
   <div class="api-detail-content">
     <p>
       Destination server hostname, sans port.
@@ -529,7 +536,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-port"><a href="#request-port">request.port {number}</a></h3>
+  <h3 id="request-port"><a href="#request-port">request.port</a></h3>
   <div class="api-detail-content">
     <p>
       Destination server port.
@@ -538,7 +545,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-method"><a href="#request-method">request.method {string}</a></h3>
+  <h3 id="request-method"><a href="#request-method">request.method</a></h3>
   <div class="api-detail-content">
     <p>
       All-caps HTTP method used.
@@ -548,7 +555,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-headers"><a href="#request-headers">request.headers {object}</a></h3>
+  <h3 id="request-headers"><a href="#request-headers">request.headers</a></h3>
   <div class="api-detail-content">
     <p>
       HTTP request headers.
@@ -558,7 +565,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-url"><a href="#request-url">request.url {string}</a></h3>
+  <h3 id="request-url"><a href="#request-url">request.url</a></h3>
   <div class="api-detail-content">
     <p>
       Root-relative request URL, including query string, like <code>/foo/bar?baz=qux</code>
@@ -567,7 +574,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-json"><a href="#request-json">request.json {object}</a></h3>
+  <h3 id="request-json"><a href="#request-json">request.json</a></h3>
   <div class="api-detail-content">
     <p>
       Request body parsed as JSON.
@@ -590,7 +597,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-params"><a href="#request-params">request.params {object}</a></h3>
+  <h3 id="request-params"><a href="#request-params">request.params</a></h3>
   <div class="api-detail-content">
     <p>
       Request body parsed as form-url-encoded params.
@@ -614,7 +621,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-string"><a href="#request-string">request.string {string}</a></h3>
+  <h3 id="request-string"><a href="#request-string">request.string</a></h3>
   <div class="api-detail-content">
     <p>
       Request body string.
@@ -637,7 +644,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-buffers"><a href="#request-buffers">request.buffers {array}</a></h3>
+  <h3 id="request-buffers"><a href="#request-buffers">request.buffers</a></h3>
   <div class="api-detail-content">
     <p>
       Request body binary buffer array.
@@ -705,7 +712,7 @@
 </p>
 
 <div class="api-detail">
-  <h3 id="response-statusCode"><a href="#response-statusCode">response.statusCode {number}</a></h3>
+  <h3 id="response-statusCode"><a href="#response-statusCode">response.statusCode</a></h3>
   <div class="api-detail-content">
     <p>
       HTTP status code being sent to the client.
@@ -714,7 +721,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="response-headers"><a href="#response-headers">response.headers {object}</a></h3>
+  <h3 id="response-headers"><a href="#response-headers">response.headers</a></h3>
   <div class="api-detail-content">
     <p>
       HTTP response headers.
@@ -724,7 +731,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="response-cheerio"><a href="#response-cheerio">response.$ {cheerio}</a></h3>
+  <h3 id="response-cheerio"><a href="#response-cheerio">response.$</a></h3>
   <div class="api-detail-content">
     <p>
       Response body parsed as DOM.
@@ -746,7 +753,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="response-json"><a href="#response-json">response.json {object}</a></h3>
+  <h3 id="response-json"><a href="#response-json">response.json</a></h3>
   <div class="api-detail-content">
     <p>
       Response body parsed as JSON.
@@ -768,7 +775,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="response-string"><a href="#response-string">response.string {string}</a></h3>
+  <h3 id="response-string"><a href="#response-string">response.string</a></h3>
   <div class="api-detail-content">
     <p>
       Response body string.
@@ -789,7 +796,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="response-buffers"><a href="#response-buffers">response.buffers {array}</a></h3>
+  <h3 id="response-buffers"><a href="#response-buffers">response.buffers</a></h3>
   <div class="api-detail-content">
     <p>
       Response body binary buffer array.
@@ -830,12 +837,12 @@
   </div>
 </div>
 
-<h2 id="class-cycle">Class Cycle</h2>
+<h2 id="class-cycle">Class Cycle (this)</h2>
 
 <p>
   Represents a single request/response cycle.
-  An instance is <code>this</code> in all intercept handler calls, and the <em>same</em> instance is shared across the entire request/response cycle.
-  It provides a number of methods not associated specifically to either the request or response.
+  An instance is <code>this</code> in all intercept handler calls, and the <em>same</em> instance is shared across an entire request/response cycle.
+  It provides a small number of methods not associated specifically to either the request or response.
 </p>
 
 <div class="api-detail">
@@ -843,13 +850,22 @@
   <div class="api-detail-content">
     <p>
       Provisions responses from the local filesystem.
-      Generally, the reason you'd do this is to then edit those files and test them as if they were live on the remote server.
-      This action populates the response object.
+      Generally, the reason you'd do this is to be able to edit those files locally and test them as if they were live on the remote server.
+      This action populates the response object; see <a href="#response-population">response population</a> for more info.
       Example.
     </p>
     <pre class="language-javascript code">
-      // inject my own version of main.js
-      // in order to debug a problem
+      proxy.intercept({
+        phase: 'request',
+        fullUrl: 'http://example.com/main.js'
+      }, function(req, resp, done){
+        this.serve('/Users/gr123/test/main.js', done);
+      });
+    </pre>
+    <p>
+      Or the more verbose-but-identical...
+    </p>
+    <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
@@ -1120,116 +1136,49 @@
   Change accumulation affecting <code>as</code> parameters.
 </p>
 
-<pre class="language-javascript code"><code>
+<pre class="language-javascript code">
   proxy.intercept({
     phase: 'response',
-    mimeTyle: 'application/json',
+    mimeType: 'application/json',
     as: 'json'
   }, function(req, resp){ ... });
 
   proxy.intercept({
     phase: 'response',
-    mimeTyle: 'application/json'
+    mimeType: 'application/json'
   }, function(req, resp){
     console.log(typeof resp.json); // 'object'
   });
 
   proxy.intercept({
     phase: 'response',
-    mimeTyle: 'application/json',
+    mimeType: 'application/json',
     as: 'string'
   }, function(req, resp){ ... });
 
   proxy.intercept({
     phase: 'response',
-    mimeTyle: 'application/json'
+    mimeType: 'application/json'
   }, function(req, resp){
     console.log(typeof resp.json); // 'undefined'
     console.log(typeof resp.string); // 'string'
   });
-</code></pre>
+</pre>
+
+<h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>
+
+<ul>
+  <li>Copyright 2014 by <a href="https://github.com/greim">Greg Reimer</a></li>
+  <li>MIT License</li>
+  <li><a href="https://github.com/greim/hoxy">Project on GitHub</a></li>
+</ul>
 
 <ul id="nav"></ul>
 </div>
 
-<script>
+<a href="https://github.com/greim/hoxy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
 
-(function(docEl, body){
-  window.onresize = function scale(){
-    docEl.style.fontSize = (body.clientWidth / 100) + 'px';
-    return scale;
-  }();
-})(document.documentElement, document.body);
-
-$('pre').deIndent();
-
-Prism.highlightAll();
-
-var $w = $(window);
-var $nav = $('#nav');
-var $headings = $('h1,h2,h3');
-var moving = false;
-$headings.each(function(){
-  var $heading = $(this);
-  var tldr = $heading.data('tldr');
-  if (!tldr){
-    tldr = $heading.next('.api-detail-content').find('*').eq(0).text();
-  }
-  if (!tldr){
-    tldr = $heading.next('p').text();
-  }
-  tldr = tldr.split('\n').filter(function(line){return /\S/.test(line);})[0] || '';
-  var $trigger = $('<a href="#'+$heading.attr('id')+'">'+$heading.text()+'<span class="tldr">'+tldr+'</span></a>');
-  $('<li class="item-'+this.nodeName.toLowerCase()+'"></li>')
-  .append($trigger)
-  .appendTo($nav);
-});
-
-(function(){
-  var oldTop;
-  var sDist;
-
-  $w.on('resize', function resize(){
-    var height = document.documentElement.offsetHeight;
-    var wHeight = document.documentElement.clientHeight;
-    sDist = height - wHeight;
-    return resize;
-  }());
-
-  $w.on('scroll', function(ev){
-    var scrollTop = document.documentElement.scrollTop;
-    if (scrollTop < 0) scrollTop = 0;
-    if (scrollTop > sDist) scrollTop = sDist;
-    if (oldTop === undefined) oldTop = scrollTop;
-    var diff = scrollTop - oldTop;
-    oldTop = scrollTop;
-    if (diff && !moving){
-      var navTop = $nav.scrollTop();
-      $nav.scrollTop(navTop + diff);
-    }
-  });
-})();
-
-$('html').on('click', '[href^="#"]', function(ev){
-  var hash = this.getAttribute('href');
-  var id = hash.substring(1);
-  var $el = $(hash);
-  if ($el.length > 0){
-    ev.preventDefault();
-    $el.attr('id','');
-    location.hash = hash;
-    var top = $el.offset().top;
-    moving = true;
-    $('html').animate({scrollTop: (top-30)+'px'}, 200, function(){
-      $el.attr('id',id);
-      setTimeout(function(){
-        moving = false;
-      }, 100);
-    });
-  }
-});
-
-</script>
+<script src="docs.js"></script>
 
 </body>
 </html>
