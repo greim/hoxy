@@ -171,7 +171,7 @@
   <h3 id="proxy-listen"><a href="#proxy-listen">proxy.listen(<span class="args">port</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Starts proxy listening on port.
+      Starts proxy listening on <code>port</code>.
       Returns itself.
     </p>
     <pre class="language-javascript code">
@@ -186,20 +186,20 @@
   <div class="api-detail-content">
     <p>
       Deals with various logging events.
-      This example listens for <code>error</code>, <code>warn</code>, and <code>debug</code> logging events, and prints them to <code>stderr</code>.
+      This first example listens for <code>error</code>, <code>warn</code>, and <code>debug</code> logging events, and prints them to <code>stderr</code>.
     </p>
     <pre class="language-javascript code">
       proxy.log('error warn debug');
     </pre>
     <p>
-      Print logging events to various writable streams.
+      Or, print logging events to various writable streams.
     </p>
     <pre class="language-javascript code">
       proxy.log('error warn debug', process.stderr);
       proxy.log('info', process.stdout);
     </pre>
     <p>
-      Explicitly handle logging events.
+      Or, explicitly handle logging events.
     </p>
     <pre class="language-javascript code">
       proxy.log('error warn', function(event){
@@ -207,7 +207,7 @@
       });
     </pre>
     <table>
-      <caption>Logging events</caption>
+      <caption>Description of logging events</caption>
       <thead>
         <tr>
           <th>name</th>
@@ -248,8 +248,8 @@
   <h3 id="proxy-intercept"><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Intercepts and operates on requests and responses.
-      This example intercepts all requests.
+      Entry point for intercepting and operating on requests and responses.
+      This first example intercepts all requests.
     </p>
     <pre class="language-javascript code">
       proxy.intercept('request', function(req, resp){
@@ -257,7 +257,7 @@
       });
     </pre>
     <p>
-      More verbose, but identical to the above.
+      This is more verbose, but identical to the above.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({phase:'request'}, function(req, resp){
@@ -265,7 +265,7 @@
       });
     </pre>
     <p>
-      Intercept handlers with arity of three behave asynchronously.
+      Intercept callbacks with arity of three are treated as asynchronous.
       In this case, you must call <code>done()</code> to pass control to the next intercept handler.
     </p>
     <pre class="language-javascript code">
@@ -289,7 +289,7 @@
       });
     </pre>
     <p>
-      Intercept all GETs to a certain host.
+      Intercept all <code>GET</code>s to <code>example.com</code>.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -1027,6 +1027,59 @@
 
 <h2 id="phase-lifecycle" data-tldr="How phases work.">Phase lifecycle</h2>
 
+<table>
+  <caption>Full description of phases</caption>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>phase</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>
+        <code>request</code>
+      </td>
+      <td>
+        The proxy has received the request headers, but the request body (if there is one) hasn't started streaming in yet.
+        Or, if you've intercepted a request <code>as:'json'</code> (for example) then the request body will have been fully buffered into memory and be available as <code>request.json</code> (for example).
+        See <a href="#proxy-intercept">intercepts</a> for more info.
+      </td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>
+        <code>request-sent</code>
+      </td>
+      <td>
+        The proxy has finished sending the entire request, including the request body if present, to the server.
+      </td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>
+        <code>response</code>
+      </td>
+      <td>
+        The proxy has received the response headers, but the response body hasn't started streaming in yet.
+        Or, if you've intercepted a response <code>as:'$'</code> (for example) then the response body will have been fully buffered into memory and be available as <code>response.$</code> (for example).
+        See <a href="#proxy-intercept">intercepts</a> for more info.
+      </td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td style="white-space:nowrap">
+        <code>response-sent</code>
+      </td>
+      <td>
+        The proxy has finished sending the entire response, including the response body, to the client.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
 <p>
   Intercept handlers are called in the order of their <code>phase</code>.
   Intercept handlers of the same <code>phase</code> are called in the order they're declared.
@@ -1047,7 +1100,7 @@
   </thead>
   <tbody>
     <tr>
-      <th rowspan="100">Phase</th>
+      <th rowspan="4">Phase</th>
       <th><code>request</code></th>
       <td>writable</td>
       <td>writable</td>
@@ -1073,9 +1126,9 @@
 <h2 id="response-population" data-tldr="Suppressing server calls.">Response population</h2>
 
 <p>
-  Responses are populated when Hoxy sends the request to the destination server during the normal request/response lifecycle.
-  If you modify any aspect of the response before this happens, hoxy treats the <em>entire</em> response as populated, and skips the call to the destination server.
-  If you modify any aspect of the response after this happens, it changes just that aspect of the response from the server.
+  Hoxy normally populates responses by sending the request to the destination server during the normal request/response lifecycle.
+  Alternatively, if you modify any aspect of the response before this happens (i.e. during the <code>request</code> phase) hoxy treats the <em>entire</em> response as populated, and skips the call to the destination server.
+  If you modify any aspect of the response after this happens, it changes that aspect of the response from the server.
 </p>
 
 <pre class="language-javascript code">
