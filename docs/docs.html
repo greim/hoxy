@@ -182,7 +182,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="hoxy-log"><a href="#hoxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
+  <h3 id="proxy-log"><a href="#proxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Deals with various logging events.
@@ -1031,7 +1031,7 @@
   Intercept handlers are called in the order of their <code>phase</code>.
   Intercept handlers of the same <code>phase</code> are called in the order they're declared.
   <code>request</code> and <code>response</code> objects are either read-only or readable/writable, depending on <code>phase</code>.
-  Attempts to write a read-only thing will fail silently, generating an <code>error</code> log event.
+  Attempts to write a read-only thing will fail silently, generating an <a href="#proxy-log"><code>error</code> log event</a>.
 </p>
 
 <table>
