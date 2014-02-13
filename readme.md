@@ -1,4 +1,4 @@
-# Hoxy 1.x
+# Hoxy
 
 **Description**: A web debugging proxy API for node.
 
