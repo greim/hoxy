@@ -15,9 +15,6 @@ var getMegaSource = require('./lib/megabyte-stream')
 
 describe('Round trips', function(){
 
-  // TODO: add a test case where if there's an unrecoverable error,
-  // such as the connection dying, the proxy returns a 5xx error.
-
   it('should round trip synchronously', function(done){
     var steps = ''
     roundTrip({
@@ -81,6 +78,126 @@ describe('Round trips', function(){
           assert.strictEqual(steps, '1234')
           done()
         },10)
+      }
+    })
+  })
+
+  it('should handle a synchronous request intercept error gracefully', function(done){
+    var error = false,
+      reqInt = false,
+      respInt = false,
+      server = false
+    roundTrip({
+      error: function(err, mess){
+        error = true
+      },
+      requestIntercept: function(req, resp){
+        reqInt = true
+        throw new Error('fake error')
+      },
+      responseIntercept: function(req, resp){
+        respInt = true
+      },
+      server: function(){
+        server = true
+      },
+      client: function(){
+        assert.ok(error, 'error should have occurred')
+        assert.ok(reqInt, 'request intercept should have occurred')
+        assert.ok(server, 'server hit should have occurred')
+        assert.ok(respInt, 'response intercept should have occurred')
+        done()
+      }
+    })
+  })
+
+  it('should handle a synchronous response intercept error gracefully', function(done){
+    var error = false,
+      reqInt = false,
+      respInt = false,
+      server = false
+    roundTrip({
+      error: function(err, mess){
+        error = true
+      },
+      requestIntercept: function(req, resp){
+        reqInt = true
+      },
+      responseIntercept: function(req, resp){
+        respInt = true
+        throw new Error('fake error')
+      },
+      server: function(){
+        server = true
+      },
+      client: function(a,b){
+        assert.ok(error, 'error should have occurred')
+        assert.ok(reqInt, 'request intercept should have occurred')
+        assert.ok(server, 'server hit should have occurred')
+        assert.ok(respInt, 'response intercept should have occurred')
+        done()
+      }
+    })
+  })
+
+  it('should handle an asynchronous request intercept error gracefully', function(done){
+    var error = false,
+      reqInt = false,
+      respInt = false,
+      server = false
+    roundTrip({
+      error: function(err, mess){
+        error = true
+      },
+      requestIntercept: function(req, resp, next){
+        reqInt = true
+        setTimeout(function(){
+          next(new Error('fake error'))
+        },0);
+      },
+      responseIntercept: function(req, resp){
+        respInt = true
+      },
+      server: function(){
+        server = true
+      },
+      client: function(){
+        assert.ok(error, 'error should have occurred')
+        assert.ok(reqInt, 'request intercept should have occurred')
+        assert.ok(server, 'server hit should have occurred')
+        assert.ok(respInt, 'response intercept should have occurred')
+        done()
+      }
+    })
+  })
+
+  it('should handle an asynchronous response intercept error gracefully', function(done){
+    var error = false,
+      reqInt = false,
+      respInt = false,
+      server = false
+    roundTrip({
+      error: function(err, mess){
+        error = true
+      },
+      requestIntercept: function(req, resp){
+        reqInt = true
+      },
+      responseIntercept: function(req, resp, next){
+        respInt = true
+        setTimeout(function(){
+          next(new Error('fake error'))
+        },0);
+      },
+      server: function(){
+        server = true
+      },
+      client: function(a,b){
+        assert.ok(error, 'error should have occurred')
+        assert.ok(reqInt, 'request intercept should have occurred')
+        assert.ok(server, 'server hit should have occurred')
+        assert.ok(respInt, 'response intercept should have occurred')
+        done()
       }
     })
   })
@@ -204,13 +321,30 @@ describe('Round trips', function(){
     })
   })
 
-  it('should skip the server hit if the response is populated', function(done){
+  it('should skip the server hit if the response statusCode is populated', function(done){
     roundTrip({
       error: function(err, mess){
         done(err)
       },
       requestIntercept: function(req, resp){
         resp.statusCode = 404
+      },
+      server: function(){
+        done(new Error('server hit was not skipped'))
+      },
+      client: function(){
+        done()
+      }
+    })
+  })
+
+  it('should skip the server hit if the response body is populated', function(done){
+    roundTrip({
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp){
+        resp.string = '12345'
       },
       server: function(){
         done(new Error('server hit was not skipped'))
