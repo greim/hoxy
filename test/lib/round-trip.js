@@ -3,9 +3,9 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var hoxy = require('../hoxy');
-var chunker = require('../lib/chunker');
-var streams = require('../lib/streams');
+var hoxy = require('../../hoxy');
+var chunker = require('../../lib/chunker');
+var streams = require('../../lib/streams');
 var _ = require('lodash-node');
 var await = require('await');
 var http = require('http');
