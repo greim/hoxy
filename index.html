@@ -46,6 +46,21 @@
   <li>Tampering with HTTP headers.</li>
 </ul>
 
+<h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
+
+<p>
+  Hoxy is available as <a href="https://www.npmjs.org/package/hoxy"><code>hoxy</code> on npm</a>.
+  You can also <a href="https://github.com/greim/hoxy">check out the source on github</a>.
+</p>
+
+<pre class="code">
+  npm install hoxy
+</pre>
+
+<pre class="language-javascript code">
+  var hoxy = require('hoxy');
+</pre>
+
 <h2 id="how-it-works">How it works</h2>
 
 <p>
@@ -90,16 +105,6 @@
   You provide a host and a port when you create the proxy, so that it knows which server to forward the request to.
   This might be useful if having to configure clients' proxy settings is undesirable.
 </p>
-
-<h2 id="installation" data-tldr="Available on npm.">Installation</h2>
-
-<pre class="code">
-  npm install hoxy
-</pre>
-
-<pre class="language-javascript code">
-  var hoxy = require('hoxy');
-</pre>
 
 <h1 id="api-documentaiton" data-tldr="Objects, methods, and properties.">API documentaiton</h1>
 
