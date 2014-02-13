@@ -10,24 +10,9 @@ var await = require('await')
 var fs = require('fs')
 var assert = require('assert')
 var streams = require('../lib/streams')
+var getMegaSource = require('./lib/megabyte-stream')
 
 // ---------------------------
-
-// return a writable stream that will
-// write a megabyte worth of data
-var getMegaSource = (function(){
-  var hex = '0123456789abcdef'
-  var kb = []
-  for (var i=0; i<64; i++)
-    kb.push(hex)
-  kb = kb.join('')
-  return function(){
-    var result = []
-    for (var i=0; i<1000; i++)
-      result.push(new Buffer(kb, 'utf8'))
-    return streams.from(result)
-  }
-})()
 
 describe('streams', function(){
 

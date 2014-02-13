@@ -11,24 +11,9 @@ var fs = require('fs')
 var assert = require('assert')
 var streams = require('../lib/streams')
 var roundTrip = require('./lib/round-trip')
+var getMegaSource = require('./lib/megabyte-stream')
 
 // ---------------------------
-
-// return a writable stream that will
-// write a megabyte worth of data
-var getMegaSource = (function(){
-  var hex = '0123456789abcdef'
-  var kb = []
-  for (var i=0; i<64; i++)
-    kb.push(hex)
-  kb = kb.join('')
-  return function(){
-    var result = []
-    for (var i=0; i<1000; i++)
-      result.push(new Buffer(kb, 'utf8'))
-    return streams.from(result)
-  }
-})()
 
 describe('Hoxy', function(){
 
@@ -699,10 +684,11 @@ describe('Hoxy', function(){
 })
 
 var files = [
-  './files/def'
+  __dirname+'/files/def'
 ]
 function removeFiles(done){
   var fileProms = files.map(function(file){
+    console.log('removing '+file)
     return await('done')
     .run(function(p){
       fs.exists(file, function(ex){
