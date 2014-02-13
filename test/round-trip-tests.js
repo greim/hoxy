@@ -10,7 +10,7 @@ var await = require('await')
 var fs = require('fs')
 var assert = require('assert')
 var streams = require('../lib/streams')
-var roundTrip = require('./round-trip')
+var roundTrip = require('./lib/round-trip')
 
 // ---------------------------
 
