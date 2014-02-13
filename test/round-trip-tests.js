@@ -688,7 +688,6 @@ var files = [
 ]
 function removeFiles(done){
   var fileProms = files.map(function(file){
-    console.log('removing '+file)
     return await('done')
     .run(function(p){
       fs.exists(file, function(ex){
