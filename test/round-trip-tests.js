@@ -15,6 +15,9 @@ var getMegaSource = require('./lib/megabyte-stream')
 
 describe('Round trips', function(){
 
+  // TODO: add a test case where if there's an unrecoverable error,
+  // such as the connection dying, the proxy returns a 5xx error.
+
   it('should round trip synchronously', function(done){
     var steps = ''
     roundTrip({
