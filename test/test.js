@@ -576,7 +576,7 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         this.serve({
-          docroot: './files'
+          docroot: __dirname+'/files'
         }, function(){
           next();
         })
@@ -606,7 +606,7 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         this.serve({
-          docroot: './files'
+          docroot: __dirname+'/files'
         }, function(){
           next();
         })
@@ -633,7 +633,7 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         this.serve({
-          docroot:'./files',
+          docroot:__dirname+'/files',
           strategy: 'overlay'
         }, function(){
           next();
@@ -665,7 +665,7 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         this.serve({
-          docroot:'./files',
+          docroot:__dirname+'/files',
           strategy: 'overlay'
         }, function(){
           next();
@@ -698,10 +698,10 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         this.serve({
-          docroot:'./files',
+          docroot:__dirname+'/files',
           strategy: 'mirror'
         }, function(err){
-          var file = './files/def'
+          var file = __dirname+'/files/def'
           fs.exists(file, function(exists){
             if (exists){
               next(err)
@@ -737,7 +737,7 @@ describe('Hoxy', function(){
       },
       requestIntercept: function(req, resp, next){
         this.serve({
-          docroot:'./files',
+          docroot:__dirname+'/files',
           strategy: 'mirror'
         }, function(err){
           var file = __dirname+'/files/def'
@@ -944,10 +944,10 @@ describe('Hoxy', function(){
   })
 })
 
-after(function(done){
-  var files = [
-    './files/def'
-  ]
+var files = [
+  './files/def'
+]
+function removeFiles(done){
   var fileProms = files.map(function(file){
     return await('done')
     .run(function(p){
@@ -963,4 +963,6 @@ after(function(done){
   await.all(fileProms)
   .onkeep(function(){done()})
   .onfail(done)
-})
+}
+before(removeFiles)
+after(removeFiles)
