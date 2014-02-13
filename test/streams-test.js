@@ -14,7 +14,7 @@ var getMegaSource = require('./lib/megabyte-stream')
 
 // ---------------------------
 
-describe('streams', function(){
+describe('Streams', function(){
 
   var buffs = []
   function pad(n,len){

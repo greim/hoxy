@@ -11,7 +11,7 @@ var serializer = require('../lib/serializer')
 
 // ---------------------------
 
-describe('serializer', function(){
+describe('Serializer', function(){
 
   it('should work', function(done){
     var callCount = 0,
