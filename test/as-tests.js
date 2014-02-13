@@ -1,0 +1,331 @@
+/*
+ * Copyright (c) 2013 by Greg Reimer <gregreimer@gmail.com>
+ * MIT License. See mit-license.txt for more info.
+ */
+
+// MOCHA TESTS
+// http://visionmedia.github.com/mocha/
+
+var await = require('await')
+var assert = require('assert')
+var querystring = require('querystring')
+var streams = require('../lib/streams')
+var roundTrip = require('./lib/round-trip')
+
+// ---------------------------
+
+describe('Load data as type', function(){
+
+  it('should load request bodies', function(done){
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp, next){
+        req._load(function(err){
+          assert.strictEqual(req.string, 'abcdefg')
+          next()
+        })
+      },
+      server: function(req, body){
+        assert.strictEqual(body, 'abcdefg')
+        done()
+      }
+    })
+  })
+
+  it('should load response bodies', function(done){
+    roundTrip({
+      response: {
+        status: 200,
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      responseIntercept: function(req, resp, next){
+        resp._load(function(err){
+          assert.strictEqual(resp.string, 'abcdefg')
+          next()
+        })
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'abcdefg')
+        done()
+      }
+    })
+  })
+
+  it('should set request bodies', function(done){
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      requestIntercept: function(req, resp){
+        req.string = 'foobarbaz'
+      },
+      server: function(req, body){
+        assert.strictEqual(body, 'foobarbaz')
+        done()
+      }
+    })
+  })
+
+  it('should set response bodies', function(done){
+    roundTrip({
+      response: {
+        status: 200,
+        body: 'abcdefg'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      responseIntercept: function(req, resp){
+        resp.string = 'foobarbaz'
+      },
+      client: function(resp, body){
+        assert.strictEqual(body, 'foobarbaz')
+        done()
+      }
+    })
+  })
+
+  it('should have undefined values for things', function(done){
+    roundTrip({
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request'},
+        callback: function(req, resp){
+          assert.strictEqual(req.buffers, undefined)
+          assert.strictEqual(req.string, undefined)
+          assert.strictEqual(req.$, undefined)
+          assert.strictEqual(req.json, undefined)
+          assert.strictEqual(req.params, undefined)
+          assert.strictEqual(resp.buffers, undefined)
+          assert.strictEqual(resp.string, undefined)
+          assert.strictEqual(resp.$, undefined)
+          assert.strictEqual(resp.json, undefined)
+          assert.strictEqual(resp.params, undefined)
+          done()
+        }
+      }]
+    })
+  })
+
+  it('should intercept request buffers', function(done){
+    var aBody = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>';
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: aBody
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'buffers'},
+        callback: function(req, resp){
+          assert.ok(req.buffers, 'req.buffers should exist')
+          assert.strictEqual(req.buffers.join(''), aBody)
+          req.buffers = [new Buffer('abcdef')]
+        }
+      }],
+      server: function(req, body){
+        assert.strictEqual(body, 'abcdef')
+        done()
+      }
+    })
+  })
+
+  it('should intercept request string', function(done){
+    var aBody = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>';
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: aBody
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'string'},
+        callback: function(req, resp){
+          assert.ok(req.string, 'req.string should exist')
+          assert.strictEqual(req.string, aBody)
+          req.string = 'abcdef'
+        }
+      }],
+      server: function(req, body){
+        assert.strictEqual(body, 'abcdef')
+        done()
+      }
+    })
+  })
+
+  it('should intercept request params', function(done){
+    var aBody = 'foo=bar&foo%20bar=qux';
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: aBody
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'params'},
+        callback: function(req, resp){
+          assert.ok(req.params, 'req.params should exist')
+          assert.strictEqual(req.params.foo, 'bar')
+          assert.strictEqual(req.params['foo bar'], 'qux')
+          req.params = {a:'b'}
+        }
+      }],
+      server: function(req, body){
+        assert.strictEqual(body, querystring.stringify({a:'b'}))
+        done()
+      }
+    })
+  })
+
+  it('should intercept request JSON', function(done){
+    var aObj = {a:1,b:2}
+    var aBody = JSON.stringify(aObj)
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: aBody
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'json'},
+        callback: function(req, resp){
+          assert.ok(req.json, 'req.json should exist')
+          assert.strictEqual(req.json.a, 1)
+          assert.strictEqual(req.json.b, 2)
+          req.json.a = 0
+        }
+      }],
+      server: function(req, body){
+        assert.strictEqual(body, JSON.stringify({a:0,b:2}))
+        done()
+      }
+    })
+  })
+
+  it('should intercept response buffers', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'buffers'},
+        callback: function(req, resp){
+          //try{
+          assert.ok(resp.buffers, 'resp.buffers should exist')
+          resp.buffers = [new Buffer('abcdef')]
+        }
+      }],
+      client: function(resp, body){
+        assert.strictEqual(body, 'abcdef')
+        done()
+      }
+    })
+  })
+
+  it('should intercept response string', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'string'},
+        callback: function(req, resp){
+          //try{
+          assert.ok(resp.string, 'resp.string should exist')
+          resp.string = 'abcdef'
+        }
+      }],
+      client: function(resp, body){
+        assert.strictEqual(body, 'abcdef')
+        done()
+      }
+    })
+  })
+
+  it('should intercept response DOM', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'$'},
+        callback: function(req, resp){
+          //try{
+          assert.ok(resp.$, '$ should exist')
+          assert.strictEqual(resp.$('title').text(), 'foo')
+          resp.$('title').text('bar')
+          //}catch(err){console.log(err)}
+        }
+      }],
+      client: function(resp, body){
+        assert.strictEqual(body, '<!doctype html><html><head><title>bar</title></head><body><div id="content"></div></body></html>')
+        done()
+      }
+    })
+  })
+
+  it('should intercept response JSON', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: JSON.stringify({foo:'bar',baz:2})
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'json'},
+        callback: function(req, resp){
+          assert.ok(resp.json, 'json should exist')
+          assert.deepEqual(resp.json, {foo:'bar',baz:2})
+          resp.json.qux = {};
+        }
+      }],
+      client: function(resp, body){
+        assert.deepEqual(JSON.parse(body), {foo:'bar',baz:2,qux:{}})
+        done()
+      }
+    })
+  })
+})
