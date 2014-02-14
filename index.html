@@ -169,6 +169,15 @@
         reverse: 'http://example.com'
       });
     </pre>
+    <p>
+      Make your proxy use <code>$HTTP_PROXY</code>.
+    </p>
+    <pre class="language-javascript code">
+      var hoxy = require('hoxy');
+      var proxy = new hoxy.Proxy({
+        upstreamProxy: process.env.HTTP_PROXY
+      });
+    </pre>
   </div>
 </div>
 
