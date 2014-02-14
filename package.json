@@ -1,8 +1,8 @@
 {
   "name": "hoxy",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0",
   "author": "Greg Reimer <gregreimer@gmail.com>",
-  "description": "The web-hacking proxy",
+  "description": "Web-hacking proxy API for node",
   "main": "./hoxy",
   "keywords": [
     "develop",
@@ -13,7 +13,6 @@
   ],
   "dependencies": {
     "route-pattern": "0.0.x",
-    "slugs": "0.1.x",
     "node-static": "0.7.x",
     "lodash-node": "2.3.x",
     "await": "0.2.x",
