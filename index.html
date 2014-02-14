@@ -44,6 +44,7 @@
   <li>Testing JavaScript changes in production.</li>
   <li>Simulating latency or slow connections.</li>
   <li>Tampering with HTTP headers.</li>
+  <li>Causing mayhem, chaos, and confusion.</li>
 </ul>
 
 <h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
@@ -217,8 +218,7 @@
     </pre>
     <p>
       Intercept callbacks with arity of three are treated as asynchronous.
-      In this case, you must call <code>done()</code> to pass control to the next intercept handler.
-      (Think Express middleware.)
+      In this case, call <code>done()</code> to pass control to the next intercept handler.
     </p>
     <pre class="language-javascript code">
       // make everything slow
@@ -575,7 +575,7 @@
   <h3 id="request-headers"><a href="#request-headers">request.headers</a></h3>
   <div class="api-detail-content">
     <p>
-      HTTP request headers.
+      HTTP request header name/value JS object.
       These are all-lowercase, e.g. <code>accept-encoding</code>.
     </p>
   </div>
@@ -596,7 +596,7 @@
     <p>
       Request body parsed as JSON.
       This is only present if you intercept the request <code>as:'json'</code>.
-      Changes made to this object will be passed along to the server.
+      Changes made to this object will be seen by the server.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -621,7 +621,7 @@
       This will be a key/value <a href="https://www.google.com/search?q=POJO">POJO</a>.
       Parameters from the URL querystring will not be included in this object.
       This object will only present if you intercept the request <code>as:'params'</code>.
-      Changes made to this object will be passed along to the server.
+      Changes made to this object will be seen by the server.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -642,7 +642,7 @@
     <p>
       Request body string.
       This is only present if you intercept the request <code>as:'string'</code>.
-      Assigning to this object will change the request body received by the server.
+      Overwriting this will overwrite the request body sent to the server.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -665,7 +665,7 @@
     <p>
       Request body binary <a href="http://nodejs.org/api/buffer.html">buffer</a> array.
       This is only present if you intercept the request <code>as:'buffers'</code>.
-      Changes made to this object will be passed along to the server.
+      Changes made to this object will be seen by the server.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -741,7 +741,7 @@
   <h3 id="response-headers"><a href="#response-headers">response.headers</a></h3>
   <div class="api-detail-content">
     <p>
-      HTTP response headers.
+      HTTP response header name/value JS object.
       Header names are all-lowercase, such as <code>'content-type'</code>.
     </p>
   </div>
@@ -754,7 +754,7 @@
       Response body parsed as DOM.
       This object is only present if you intercept the response <code>as:'$'</code>.
       This is a <a href="https://github.com/MatthewMueller/cheerio">cheerio</a> object, which provides a jQuery-like API.
-      Changes made to it will be passed along to the client.
+      Changes made to it will be seen by the client.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -775,7 +775,7 @@
     <p>
       Response body parsed as JSON.
       This is only present if you intercept the response <code>as:'json'</code>.
-      Changes to this object will be sent to the client.
+      Changes to this object will be seen by the client.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -797,7 +797,7 @@
     <p>
       Response body string.
       This is only present if you intercept the response <code>as:'string'</code>.
-      Overwriting this object will change the response body the client receives.
+      Overwriting this will overwrite the response body sent to the client.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -818,7 +818,7 @@
     <p>
       Response body binary buffer array.
       This is only present if you intercept the response <code>as:'buffers'</code>.
-      Changes made to this object will be passed along to the client.
+      Changes made to this object will be seen by the client.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -890,7 +890,9 @@
       }, function(req, resp, done){
         this.serve({
           path: '/Users/gr123/test/main.js'
-        }, done);
+        }, function(err){
+          done(err);
+        });
       });
     </pre>
     <table>
@@ -942,7 +944,7 @@
               <li>
                 <code>overlay</code> -
                 Overlays the local docroot on top of the remote one.
-                In other words, if a requested file doesn't exist locally, it simply won't populate the response, allowing the proxy to "see through" to the one on the remote server.
+                In other words, if a requested file doesn't exist locally, it becomes a no-op, allowing the proxy to "see through" to the one on the remote server.
               </li>
               <li>
                 <code>mirror</code> - 
@@ -958,7 +960,7 @@
       <code>callback</code> is called after the response has been populated.
       If an error occurred, the error is passed to the callback, otherwise no arguments are passed.
       Note that a 404 response is <em>not</em> considered an error in this case.
-      There are at least two use cases worth mentioning.
+      There are at least three use cases worth mentioning.
     </p>
     <p>
       Use case #1: Serve a specific file.
@@ -982,7 +984,24 @@
       }, function(req, resp, done){
         this.serve({
           docroot: '/Users/bk123/test',
-          strategy: 'overlay' // or 'mirror' to save time
+          strategy: 'overlay'
+        }, done);
+      });
+    </pre>
+    <p>
+      Use case #3: Serve out of a local docroot.
+      But automatically copy the remote files to the local docroot the first time they're requested.
+      This is nice if you're one of those "lazy" programmers.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        host: 'example.com',
+        mimeType: /javascript/i
+      }, function(req, resp, done){
+        this.serve({
+          docroot: '/Users/bk123/test',
+          strategy: 'mirror'
         }, done);
       });
     </pre>
@@ -1120,22 +1139,28 @@
 <p>
   Hoxy normally populates responses by sending the request to the destination server during the normal request/response lifecycle.
   Alternatively, if you modify any aspect of the response before this happens (i.e. during the <code>request</code> phase) hoxy treats the <em>entire</em> response as populated, and skips the call to the destination server.
-  If you modify any aspect of the response after this happens, it changes that aspect of the response from the server.
+  If you modify any aspect of the response after this happens  (i.e. during the <code>response</code> phase) it overwrites just that aspect of the response from the server.
 </p>
 
 <pre class="language-javascript code">
   proxy.intercept('request', function(req, resp){
+    response.string = 'Hello';
     // The response is now populated so the
     // server call is skipped. Status code will
     // default to 200.
-    response.string = 'Hello';
   });
 </pre>
 
 <pre class="language-javascript code">
   proxy.intercept('response', function(req, resp){
-    // Overwrite the response body
     response.string = 'Hello';
+    // The response was already populated,
+    // we just overwrite its body. Status
+    // code remains the same.
+    response.statusCode = 444;
+    // Oops, no. We just overwrote the status
+    // code. I wonder how the browser will
+    // react to this unexpected turn of events.
   });
 </pre>
 
