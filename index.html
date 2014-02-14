@@ -196,70 +196,6 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="proxy-log"><a href="#proxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
-  <div class="api-detail-content">
-    <p>
-      Deals with various logging events.
-      This first example listens for <code>error</code>, <code>warn</code>, and <code>debug</code> logging events, and prints them to <code>stderr</code>.
-    </p>
-    <pre class="language-javascript code">
-      proxy.log('error warn debug');
-    </pre>
-    <p>
-      Or, print logging events to various writable streams.
-    </p>
-    <pre class="language-javascript code">
-      proxy.log('error warn debug', process.stderr);
-      proxy.log('info', process.stdout);
-    </pre>
-    <p>
-      Or, explicitly handle logging events.
-    </p>
-    <pre class="language-javascript code">
-      proxy.log('error warn', function(event){
-        console.error(event.level + ': ' + event.message);
-        if (event.error) console.error(event.error.stack);
-      });
-    </pre>
-    <table>
-      <caption>Description of logging events</caption>
-      <thead>
-        <tr>
-          <th>name</th>
-          <th>description</th>
-        </tr>
-      </thead>
-      <tobdy>
-        <tr>
-          <td><code>error</code></td>
-          <td>
-            When something bad happens that we wish wouldn't have happened.
-          </td>
-        </tr>
-        <tr>
-          <td><code>warn</code></td>
-          <td>
-            When something iffy happened that we can probably tolerate.
-          </td>
-        </tr>
-        <tr>
-          <td><code>info</code></td>
-          <td>
-            When something noteworthy happened that normal people care about.
-          </td>
-        </tr>
-        <tr>
-          <td><code>debug</code></td>
-          <td>
-            When something boring happened that developers care about.
-          </td>
-        </tr>
-      </tobdy>
-    </table>
-  </div>
-</div>
-
-<div class="api-detail">
   <h3 id="proxy-intercept"><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
   <div class="api-detail-content">
     <p>
@@ -503,6 +439,70 @@
           </td>
         </tr>
       </body>
+    </table>
+  </div>
+</div>
+
+<div class="api-detail">
+  <h3 id="proxy-log"><a href="#proxy-log">proxy.log(<span class="args">levels, [handler]</span>)</a></h3>
+  <div class="api-detail-content">
+    <p>
+      Deals with various logging events.
+      This first example listens for <code>error</code>, <code>warn</code>, and <code>debug</code> logging events, and prints them to <code>stderr</code>.
+    </p>
+    <pre class="language-javascript code">
+      proxy.log('error warn debug');
+    </pre>
+    <p>
+      Or, print logging events to various writable streams.
+    </p>
+    <pre class="language-javascript code">
+      proxy.log('error warn debug', process.stderr);
+      proxy.log('info', process.stdout);
+    </pre>
+    <p>
+      Or, explicitly handle logging events.
+    </p>
+    <pre class="language-javascript code">
+      proxy.log('error warn', function(event){
+        console.error(event.level + ': ' + event.message);
+        if (event.error) console.error(event.error.stack);
+      });
+    </pre>
+    <table>
+      <caption>Description of logging events</caption>
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>description</th>
+        </tr>
+      </thead>
+      <tobdy>
+        <tr>
+          <td><code>error</code></td>
+          <td>
+            When something bad happens that we wish wouldn't have happened.
+          </td>
+        </tr>
+        <tr>
+          <td><code>warn</code></td>
+          <td>
+            When something iffy happened that we can probably tolerate.
+          </td>
+        </tr>
+        <tr>
+          <td><code>info</code></td>
+          <td>
+            When something noteworthy happened that normal people care about.
+          </td>
+        </tr>
+        <tr>
+          <td><code>debug</code></td>
+          <td>
+            When something boring happened that developers care about.
+          </td>
+        </tr>
+      </tobdy>
     </table>
   </div>
 </div>
