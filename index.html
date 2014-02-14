@@ -418,7 +418,7 @@
           <td class="type">string, regexp</td>
           <td>no</td>
           <td>
-            Match the full content-type header of the request or response (depending on the phase).
+            Match the full <code>content-type</code> header of the request or response (depending on the phase).
           </td>
         </tr>
         <tr>
@@ -426,7 +426,7 @@
           <td class="type">string, regexp</td>
           <td>no</td>
           <td>
-            Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase).
+            Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase). I.e., if the entire header is <code>"text/html; charset=utf-8"</code>, just match the <code>"text/html"</code> part.
           </td>
         </tr>
         <tr>
