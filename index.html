@@ -128,12 +128,13 @@
   <div class="api-detail-content">
     <p>
       Prevents process dying on uncaught errors.
+      In this example, errors are printed to stderr.
     </p>
     <pre class="language-javascript code">
       hoxy.forever();
     </pre>
     <p>
-      Optionally, call callback on uncaught errors.
+      Alternatively, call callback on uncaught errors.
     </p>
     <pre class="language-javascript code">
       hoxy.forever(function(err){
@@ -154,6 +155,7 @@
   <div class="api-detail-content">
     <p>
       Constructs a new proxy with given options.
+      In this example, no options are provided.
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
