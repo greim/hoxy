@@ -23,9 +23,10 @@
 </p>
 
 <pre class="language-javascript code">
-  // Create a proxy server and log all requests.
   var hoxy = require('hoxy');
+
   var proxy = new hoxy.Proxy().listen(8080);
+
   proxy.intercept('request', function(req, resp){
     console.log('request made to: ' + req.fullUrl());
   });
@@ -52,6 +53,7 @@
 <p>
   Hoxy is available as <a href="https://www.npmjs.org/package/hoxy"><code>hoxy</code> on npm</a>.
   You can also <a href="https://github.com/greim/hoxy">check out the source on github</a>.
+  Hoxy depends on node version 0.10.x or higher.
 </p>
 
 <pre class="code">
@@ -67,14 +69,14 @@
 <p>
   Hoxy functions as a normal proxy,
   standing between the client and the server.
-  You <a href="#proxy-intercept">intercept</a> traffic during different <em>phases</em>, such as the request or the response.
-  When you intercept in the request phase, the <code>request</code> object contains data sent to the proxy by the client, but hasn't yet been sent to the server.
+  You <a href="#proxy-intercept">intercept</a> traffic during different phases, such as the request or the response.
+  When you intercept in the request phase, the <code>request</code> object contains data sent to the proxy by the client, but which hasn't yet been sent to the server.
   During this time, you can inspect or alter any <code>request</code> data.
   The <code>response</code> object is also available, but unpopulated.
 </p>
 
 <p>
-  When you intercept in the response phase, the <code>response</code> object contains data sent to the proxy by the server, but not yet sent to the client.
+  When you intercept in the response phase, the <code>response</code> object contains data sent to the proxy by the server, but which hasn't yet been sent to the client.
   During this time you can inspect or alter any <code>response</code> data.
   The <code>request</code> object is still available, but read-only.
   The <a href="#phase-lifecycle">phase lifecycle section</a> contains a complete description of the request/response lifecycle, but here's a simplified illustration.
@@ -97,15 +99,6 @@
   <li>Hoxy intercepts response.</li>
   <li>Client receives response.</li>
 </ol>
-
-<h2 id="reverse">Reverse proxy mode</h2>
-
-<p>
-  Hoxy can <a href="#new-proxy">optionally run as a reverse proxy</a>.
-  This means that instead of configuring your client to proxy through <code>localhost:8080</code>, you point your client directly at <code>localhost:8080</code>.
-  You provide a host and a port when you create the proxy, so that it knows which server to forward the request to.
-  This might be useful if having to configure clients' proxy settings is undesirable.
-</p>
 
 <h1 id="api-documentaiton" data-tldr="Objects, methods, and properties.">API documentaiton</h1>
 
@@ -163,6 +156,7 @@
     </pre>
     <p>
       Create a reverse proxy.
+      Now, instead of configuring your client to proxy through <code>localhost:8080</code>, point your client directly at <code>localhost:8080</code>.
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
@@ -1066,6 +1060,8 @@
       </td>
       <td>
         The proxy has finished sending the entire request, including the request body if present, to the server.
+        Everything is read-only during this phase.
+        The main reason for its existence is to be able to measure the time it takes to upload the <code>request</code> by comparing it with the previous phase.
       </td>
     </tr>
     <tr>
@@ -1086,6 +1082,8 @@
       </td>
       <td>
         The proxy has finished sending the entire response, including the response body, to the client.
+        Everything is read-only during this phase.
+        The main reason for its existence is to be able to measure the time it takes to download the <code>response</code> by comparing it with the previous phase.
       </td>
     </tr>
   </tbody>
