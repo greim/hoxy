@@ -6,9 +6,14 @@
   "main": "./hoxy",
   "keywords": [
     "develop",
+    "development",
     "test",
+    "testing",
     "debug",
+    "debugging",
     "proxy",
+    "charles",
+    "fiddler",
     "web"
   ],
   "dependencies": {
