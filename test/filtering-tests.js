@@ -20,10 +20,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', method: 'GET' },
@@ -40,10 +37,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', method: /GET/ },
@@ -60,10 +54,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', host: 'localhost:8181' },
@@ -80,10 +71,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'response', host: /bazqux/ },
@@ -100,10 +88,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', hostname: 'x' },
@@ -120,10 +105,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', hostname: /bazqux/ },
@@ -140,10 +122,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', port: '8181' },
@@ -160,10 +139,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', port: /81/ },
@@ -180,10 +156,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', port: 8181 },
@@ -200,10 +173,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', url: '/foobaz' },
@@ -220,10 +190,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', url: /^\/x/ },
@@ -240,10 +207,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', url: '/x/:foo' },
@@ -260,10 +224,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', fullUrl: '' },
@@ -280,10 +241,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', fullUrl: /^xyz/ },
@@ -300,10 +258,7 @@ describe('Round trips', function(){
       request: {
         url: '/foobar',
         method: 'POST',
-        body: 'abc',
-        headers: {
-          'x-foo': 'bar'
-        }
+        body: 'abc'
       },
       intercepts: [{
         opts: { phase:'request', fullUrl: 'http://localhost:8282/x/:id' },
@@ -311,6 +266,104 @@ describe('Round trips', function(){
       },{
         opts: { phase:'response', fullUrl: 'http://localhost:8282/:id' },
         callback: function(){ done() }
+      }]
+    })
+  })
+
+  it('should filter based on string matches on contentType', function(done){
+    roundTrip({
+      request: {
+        url: '/foobar',
+        method: 'POST',
+        body: 'abc',
+        headers: {
+          'content-type': 'text/plain; charset=utf-8'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'request', contentType: 'text/plain' },
+        callback: function(){ done(new Error('should not have called intercept')) }
+      },{
+        opts: { phase:'request', contentType: 'text/plain; charset=utf-8' },
+        callback: function(){ done() }
+      }]
+    })
+  })
+
+  it('should filter based on regex matches on contentType', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: 'abc',
+        headers: {
+          'content-type': 'text/plain; charset=utf-8'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'response', contentType: /ascii/ },
+        callback: function(){ done(new Error('should not have called intercept')) }
+      },{
+        opts: { phase:'response', contentType: /utf\-8/ },
+        callback: function(){ done() }
+      }]
+    })
+  })
+
+  it('should filter based on string matches on mimeType', function(done){
+    roundTrip({
+      request: {
+        url: '/foobar',
+        method: 'POST',
+        body: 'abc',
+        headers: {
+          'content-type': 'text/plain; charset=utf-8'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'request', mimeType: 'text/xml' },
+        callback: function(){ done(new Error('should not have called intercept')) }
+      },{
+        opts: { phase:'request', mimeType: 'text/plain' },
+        callback: function(){ done() }
+      }]
+    })
+  })
+
+  it('should filter based on regex matches on mimeType', function(done){
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: 'abc',
+        headers: {
+          'content-type': 'text/plain; charset=utf-8'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'response', mimeType: /ascii/ },
+        callback: function(){ done(new Error('should not have called intercept')) }
+      },{
+        opts: { phase:'response', mimeType: /text/ },
+        callback: function(){ done() }
+      }]
+    })
+  })
+
+  it('should filter based on filtering function', function(done){
+    var shouldBeUndefined = new Error('this error should have been overwritten')
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: 'abc',
+        headers: {
+          'content-type': 'text/plain; charset=utf-8'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'request', filter: function(){return false} },
+        callback: function(){ done(new Error('should not have called intercept')) }
+      },{
+        opts: { phase:'response', filter: function(){shouldBeUndefined=undefined;return true} },
+        callback: function(){ done(shouldBeUndefined) }
       }]
     })
   })
