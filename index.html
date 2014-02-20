@@ -51,7 +51,7 @@
 <h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
 
 <p>
-  Hoxy is available as <a href="https://www.npmjs.org/package/hoxy"><code>hoxy</code> on npm</a>.
+  Hoxy is available as <a href="https://www.npmjs.org/package/hoxy">"hoxy" on npm</a>.
   You can also <a href="https://github.com/greim/hoxy">check out the source on github</a>.
   Hoxy depends on node version 0.10.x or higher.
 </p>
@@ -67,18 +67,16 @@
 <h2 id="how-it-works">How it works</h2>
 
 <p>
-  Hoxy functions as a normal proxy,
+  Hoxy functions as a normal proxy
   standing between the client and the server.
   You <a href="#proxy-intercept">intercept</a> traffic during different phases, such as the request or the response.
   When you intercept in the request phase, the <code>request</code> object contains data sent to the proxy by the client, but which hasn't yet been sent to the server.
-  During this time, you can inspect or alter any <code>request</code> data.
-  The <code>response</code> object is also available, but unpopulated.
+  The <code>response</code> object is unpopulated.
 </p>
 
 <p>
-  When you intercept in the response phase, the <code>response</code> object contains data sent to the proxy by the server, but which hasn't yet been sent to the client.
-  During this time you can inspect or alter any <code>response</code> data.
-  The <code>request</code> object is still available, but read-only.
+  When you intercept in the response phase, the <code>request</code> object is now read-only.
+  The <code>response</code> object contains data sent to the proxy by the server, but which hasn't yet been sent to the client.
   The <a href="#phase-lifecycle">phase lifecycle section</a> contains a complete description of the request/response lifecycle, but here's a simplified illustration.
 </p>
 
@@ -238,11 +236,13 @@
 
       // async
       proxy.intercept('request', function(req, resp, done){
-        done(new Error('I screwed up.'));
+        setTimeout(function(){
+          done(new Error('I screwed up.'));
+        }, 1000);
       });
     </pre>
     <p>
-      Intercept all <code>GET</code>s to <code>example.com</code>.
+      Intercept all <code>GET</code> requests to <code>example.com</code>.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -254,7 +254,7 @@
       });
     </pre>
     <p>
-      Intercept <code>text/html</code> responses, exposing the response body as the <code>$</code> variable.
+      Intercept all <code>text/html</code> responses, exposing the response body as the <code>$</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -279,15 +279,17 @@
       });
     </pre>
     <p>
-      Intercept <code>application/json</code> responses, exposing the request body as the <code>json</code> variable.
+      Intercept responses from the users JSON endpoint, exposing the response body as the <code>json</code> variable.
+      Use a <a href="https://github.com/bjoerge/route-pattern">URL pattern</a> to match the endpoint URL instead of a regex.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
-        phase: 'request',
+        phase: 'response',
+        fullUrl: 'http://example.com/api/users/:id',
         mimeType: 'application/json',
         as: 'json'
       }, function(req, resp){
-        console.log(req.json.email_address);
+        console.log(resp.json.email_address);
       });
     </pre>
     <table>
@@ -310,10 +312,10 @@
             See <a href="#phase-lifecycle">phase lifecycle</a> for more info.
             Accepted values:
             <ul>
-              <li><code>request</code> - When proxy has received request.</li>
-              <li><code>request-sent</code> - When proxy has sent request.</li>
-              <li><code>response</code> - When proxy has received response.</li>
-              <li><code>response-sent</code> - When proxy has sent response.</li>
+              <li><code>'request'</code> - Proxy has received request.</li>
+              <li><code>'request-sent'</code> - Proxy has sent request.</li>
+              <li><code>'response'</code> - Proxy has received response.</li>
+              <li><code>'response-sent'</code> - Proxy has sent response.</li>
             </ul>
           </td>
         </tr>
@@ -328,15 +330,15 @@
             If <code>as</code> is present, hoxy buffers the request or response body into memory.
             Accepted values:
             <ul>
-              <li><code>$</code> - A DOM object similar to jQuery.
+              <li><code>'$'</code> - A DOM object similar to jQuery.
                 See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
-              <li><code>json</code> - A JS object containing JSON.</li>
-              <li><code>string</code> - A plain string.</li>
-              <li><code>buffers</code> - An array of buffers containing the entity body in its raw binary form.</li>
-              <li><code>params</code> - A JS object containing name/value pairs parsed from the <code>application/x-www-form-urlencoded</code> entity body.</li>
+              <li><code>'json'</code> - A JS object containing JSON.</li>
+              <li><code>'string'</code> - A plain string.</li>
+              <li><code>'buffers'</code> - An array of buffers containing the entity body in its raw binary form.</li>
+              <li><code>'params'</code> - A JS object containing name/value pairs parsed from the <code>application/x-www-form-urlencoded</code> entity body.</li>
             </ul>
             Use filtering in tandem with these.
-            E.g. use <code>$</code> with <code>mimeType: 'text/html'</code>.
+            E.g. use <code>'json'</code> with <code>mimeType:'application/json'</code>.
           </td>
         </tr>
       </tbody>
@@ -602,12 +604,10 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
-        as: 'json',
         method: 'PUT',
-        fulUrl: 'http://example.com/users/:id'
+        fulUrl: 'http://example.com/users/:id',
+        as: 'json'
       }, function(req, resp){
-        // sign everyone up for promo emails
-        // whenever they save their preferences
         req.json.prefs.subscriptions = 'all';
       });
     </pre>
@@ -620,7 +620,6 @@
     <p>
       Request body parsed as form-url-encoded params.
       This will be a key/value <a href="https://www.google.com/search?q=POJO">POJO</a>.
-      Parameters from the URL querystring will not be included in this object.
       This object will only present if you intercept the request <code>as:'params'</code>.
       Changes made to this object will be seen by the server.
     </p>
@@ -634,6 +633,9 @@
         console.log(req.params.email);
       });
     </pre>
+    <p>
+      Note, parameters from the URL querystring are <em>not</em> included in this object.
+    </p>
   </div>
 </div>
 
@@ -648,13 +650,10 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
-        as: 'string',
-        url: /\.html$/
+        fulUrl: 'http://example.com/users/:id',
+        as: 'string'
       }, function(req, resp){
-        // save all pages
-        fs.writeFile(req.url, req.string, function(err){
-          if (err) console.error('oops!');
-        });
+        console.log(req.string);
       });
     </pre>
   </div>
@@ -671,9 +670,9 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
-        as: 'buffers',
         method: 'POST',
-        fullUrl: 'http://example.com/images'
+        fullUrl: 'http://example.com/images',
+        as: 'buffers'
       }, function(req, resp){
         // req.buffers contains uploaded image
       });
@@ -760,8 +759,8 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
-        as: '$',
-        fullUrl: 'http://example.com/page.html'
+        fullUrl: 'http://example.com/page.html',
+        as: '$'
       }, function(req, resp){
         // change the title of the page
         resp.$('title').text('Fake Title!');
@@ -781,9 +780,9 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
-        as: 'json',
         method: 'GET',
-        fullUrl: 'http://example.com/users/123'
+        fullUrl: 'http://example.com/users/123',
+        as: 'json'
       }, function(req, resp){
         // arbitrarily manipulate the response json
         resp.json.foo = 'bar';
@@ -803,8 +802,8 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
-        as: 'string',
-        fullUrl: 'http://example.com/page.html'
+        fullUrl: 'http://example.com/page.html',
+        as: 'string'
       }, function(req, resp){
         // print page to log
         console.log(resp.string);
@@ -824,8 +823,8 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
-        as: 'buffers',
-        fullUrl: 'http://example.com/image.jpg'
+        fullUrl: 'http://example.com/image.jpg',
+        as: 'buffers'
       }, function(req, resp){
         // resp.buffers contains a jpg
       });
@@ -1118,23 +1117,23 @@
     <tr>
       <th rowspan="4">Phase</th>
       <th><code>request</code></th>
-      <td>writable</td>
-      <td>writable</td>
+      <td><span style="color:#000">writable</span></td>
+      <td><span style="color:#000">writable</span></td>
     </tr>
     <tr>
       <th><code>request-sent</code></th>
-      <td>read-only</td>
-      <td>read-only</td>
+      <td><span style="color:#bbb">read-only</span></td>
+      <td><span style="color:#bbb">read-only</span></td>
     </tr>
     <tr>
       <th><code>response</code></th>
-      <td>read-only</td>
-      <td>writable</td>
+      <td><span style="color:#bbb">read-only</span></td>
+      <td><span style="color:#000">writable</span></td>
     </tr>
     <tr>
       <th><code>response-sent</code></th>
-      <td>read-only</td>
-      <td>read-only</td>
+      <td><span style="color:#bbb">read-only</span></td>
+      <td><span style="color:#bbb">read-only</span></td>
     </tr>
   </tbody>
 </table>
