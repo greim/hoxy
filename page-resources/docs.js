@@ -42,7 +42,7 @@ $headings.each(function(){
   }());
 
   $w.on('scroll', function(ev){
-    var scrollTop = document.documentElement.scrollTop;
+    var scrollTop = $w.scrollTop();
     if (scrollTop < 0) scrollTop = 0;
     if (scrollTop > sDist) scrollTop = sDist;
     if (oldTop === undefined) oldTop = scrollTop;
@@ -65,7 +65,7 @@ $('html').on('click', '[href^="#"]', function(ev){
     location.hash = hash;
     var top = $el.offset().top;
     moving = true;
-    $('html').animate({scrollTop: (top-30)+'px'}, 200, function(){
+    $('html,body').animate({scrollTop: (top-30)+'px'}, 200, function(){
       $el.attr('id',id);
       setTimeout(function(){
         moving = false;

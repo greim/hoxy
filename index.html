@@ -719,6 +719,28 @@
   </div>
 </div>
 
+<div class="api-detail">
+  <h3 data-tldr="Copy the request body to any writable stream." id="request-tee"><a href="#request-tee">request.tee(<span class="args">writable</span>)</a></h3>
+  <div class="api-detail-content">
+    <p>
+      Whatever request body gets sent to the server, <code>tee()</code> pipes an identical copy to your writable stream.
+      Your stream is held in memory, and only gets written to if and when the request is sent to the server.
+      In other words, your stream sees whatever the server sees.
+      If <a href="#response-population">the server sees nothing</a>, your stream sees nothing.
+      You can <code>tee()</code> as many times as you want.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'request',
+        method: /post|put/i,
+        mimeType: 'application/json'
+      }, function(req, resp){
+        req.tee(fs.createWriteStream('./uploaded.json'));
+      });
+    </pre>
+  </div>
+</div>
+
 <h2 id="class-response">Class Response</h2>
 
 <p>
@@ -850,6 +872,26 @@
       // Simulate a 500-1000ms delay on every response.
       proxy.intercept('response', function(req, resp){
         resp.slow({latency:randint(500, 1000)});
+      });
+    </pre>
+  </div>
+</div>
+
+<div class="api-detail">
+  <h3 data-tldr="Copy the response body to any writable stream." id="response-tee"><a href="#response-tee">response.tee(<span class="args">writable</span>)</a></h3>
+  <div class="api-detail-content">
+    <p>
+      Whatever response body gets sent to the client, <code>tee()</code> pipes an identical copy to your writable stream.
+      Your stream is held in memory, and only gets written to when the response is sent to the client.
+      In other words, your stream sees whatever the client sees.
+      You can <code>tee()</code> as many times as you want.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept({
+        phase: 'response',
+        mimeType: 'image/gif'
+      }, function(req, resp){
+        resp.tee(fs.createWriteStream('./image.gif'));
       });
     </pre>
   </div>
