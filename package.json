@@ -1,14 +1,19 @@
 {
   "name": "hoxy",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
   "main": "./hoxy",
   "keywords": [
     "develop",
+    "development",
     "test",
+    "testing",
     "debug",
+    "debugging",
     "proxy",
+    "charles",
+    "fiddler",
     "web"
   ],
   "dependencies": {
