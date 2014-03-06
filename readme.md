@@ -24,6 +24,7 @@ proxy.listen(8080);
 
 # Release notes:
 
+* **1.0.3** Fixed issue #21 causing breakage on windows, due to use of unix domain sockets.
 * **1.0.2** Added `tee()` method to requests and responses, and accompanying tests.
 * **1.0.1** Fixed bug with URL pattern matching, added filtering tests.
 * **1.0.0** Initial release of Hoxy 1.0 rewrite.

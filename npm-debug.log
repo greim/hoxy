@@ -1,0 +1,201 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/Cellar/node/0.10.21/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'publish' ]
+2 info using npm@1.3.11
+3 info using node@v0.10.21
+4 verbose publish [ '.' ]
+5 verbose cache add [ '.', null ]
+6 verbose cache add name=undefined spec="." args=[".",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: '.',
+7 verbose parsed url   path: '.',
+7 verbose parsed url   href: '.' }
+8 silly lockFile 3a52ce78- .
+9 verbose lock . /Users/greim/.npm/3a52ce78-.lock
+10 verbose tar pack [ '/var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz',
+10 verbose tar pack   '.' ]
+11 verbose tarball /var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+12 verbose folder .
+13 silly lockFile 1f1177db-tar tar://.
+14 verbose lock tar://. /Users/greim/.npm/1f1177db-tar.lock
+15 silly lockFile 28a229b7-07689-0-9522313771303743-tmp-tgz tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+16 verbose lock tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz /Users/greim/.npm/28a229b7-07689-0-9522313771303743-tmp-tgz.lock
+17 silly lockFile 1f1177db-tar tar://.
+18 silly lockFile 1f1177db-tar tar://.
+19 silly lockFile 28a229b7-07689-0-9522313771303743-tmp-tgz tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+20 silly lockFile 28a229b7-07689-0-9522313771303743-tmp-tgz tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+21 verbose tar unpack /var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+22 silly lockFile d6c5a5ce-07689-0-9522313771303743-package tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+23 verbose lock tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package /Users/greim/.npm/d6c5a5ce-07689-0-9522313771303743-package.lock
+24 silly lockFile 28a229b7-07689-0-9522313771303743-tmp-tgz tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+25 verbose lock tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz /Users/greim/.npm/28a229b7-07689-0-9522313771303743-tmp-tgz.lock
+26 silly gunzTarPerm modes [ '755', '644' ]
+27 silly gunzTarPerm extractEntry package.json
+28 silly gunzTarPerm extractEntry .npmignore
+29 silly gunzTarPerm extractEntry hoxy.js
+30 silly gunzTarPerm extractEntry lib/base.js
+31 silly gunzTarPerm extractEntry lib/cycle.js
+32 silly gunzTarPerm extractEntry lib/dom-reader.js
+33 silly gunzTarPerm extractEntry lib/eventer.js
+34 silly gunzTarPerm extractEntry lib/json-reader.js
+35 silly gunzTarPerm extractEntry lib/chunker.js
+36 silly gunzTarPerm extractEntry lib/param-reader.js
+37 silly gunzTarPerm extractEntry lib/proxy.js
+38 silly gunzTarPerm extractEntry lib/request.js
+39 silly gunzTarPerm extractEntry lib/response.js
+40 silly gunzTarPerm extractEntry lib/serializer.js
+41 silly gunzTarPerm extractEntry lib/buffer-reader.js
+42 silly gunzTarPerm extractEntry lib/stream-brake.js
+43 silly gunzTarPerm extractEntry lib/body.js
+44 silly gunzTarPerm extractEntry lib/streams.js
+45 silly gunzTarPerm extractEntry lib/logger.js
+46 silly gunzTarPerm extractEntry mit-license.txt
+47 silly gunzTarPerm extractEntry readme.md
+48 silly gunzTarPerm extractEntry test/as-tests.js
+49 silly gunzTarPerm extractEntry test/filtering-tests.js
+50 silly gunzTarPerm extractEntry test/tee-tests.js
+51 silly gunzTarPerm extractEntry test/request-tests.js
+52 silly gunzTarPerm extractEntry test/response-tests.js
+53 silly gunzTarPerm extractEntry test/streams-test.js
+54 silly gunzTarPerm extractEntry test/serializer-tests.js
+55 silly gunzTarPerm extractEntry test/serve-tests.js
+56 silly gunzTarPerm extractEntry test/upstream-tests.js
+57 silly gunzTarPerm extractEntry test/round-trip-tests.js
+58 silly gunzTarPerm extractEntry test/files/abc
+59 silly gunzTarPerm extractEntry test/files/lena.bmp
+60 silly gunzTarPerm extractEntry test/lib/megabyte-stream.js
+61 silly gunzTarPerm extractEntry test/lib/round-trip.js
+62 silly lockFile d6c5a5ce-07689-0-9522313771303743-package tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+63 silly lockFile d6c5a5ce-07689-0-9522313771303743-package tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+64 silly lockFile 28a229b7-07689-0-9522313771303743-tmp-tgz tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+65 silly lockFile 28a229b7-07689-0-9522313771303743-tmp-tgz tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/tmp.tgz
+66 verbose tar pack [ '/Users/greim/.npm/hoxy/1.0.2/package.tgz',
+66 verbose tar pack   '/var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package' ]
+67 verbose tarball /Users/greim/.npm/hoxy/1.0.2/package.tgz
+68 verbose folder /var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+69 silly lockFile d6c5a5ce-07689-0-9522313771303743-package tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+70 verbose lock tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package /Users/greim/.npm/d6c5a5ce-07689-0-9522313771303743-package.lock
+71 silly lockFile 90896e79-greim-npm-hoxy-1-0-2-package-tgz tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz
+72 verbose lock tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz /Users/greim/.npm/90896e79-greim-npm-hoxy-1-0-2-package-tgz.lock
+73 silly lockFile d6c5a5ce-07689-0-9522313771303743-package tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+74 silly lockFile d6c5a5ce-07689-0-9522313771303743-package tar:///var/folders/tm/3r68rkqn7634b8gmr93f2llh0000gp/T/npm-47664--p41TO4O/1393518807689-0.9522313771303743/package
+75 silly lockFile 90896e79-greim-npm-hoxy-1-0-2-package-tgz tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz
+76 silly lockFile 90896e79-greim-npm-hoxy-1-0-2-package-tgz tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz
+77 silly lockFile 2c8a0ecf-ers-greim-npm-hoxy-1-0-2-package /Users/greim/.npm/hoxy/1.0.2/package
+78 verbose lock /Users/greim/.npm/hoxy/1.0.2/package /Users/greim/.npm/2c8a0ecf-ers-greim-npm-hoxy-1-0-2-package.lock
+79 silly lockFile 2c8a0ecf-ers-greim-npm-hoxy-1-0-2-package /Users/greim/.npm/hoxy/1.0.2/package
+80 silly lockFile 2c8a0ecf-ers-greim-npm-hoxy-1-0-2-package /Users/greim/.npm/hoxy/1.0.2/package
+81 verbose tar unpack /Users/greim/.npm/hoxy/1.0.2/package.tgz
+82 silly lockFile a94f4a9d-ers-greim-npm-hoxy-1-0-2-package tar:///Users/greim/.npm/hoxy/1.0.2/package
+83 verbose lock tar:///Users/greim/.npm/hoxy/1.0.2/package /Users/greim/.npm/a94f4a9d-ers-greim-npm-hoxy-1-0-2-package.lock
+84 silly lockFile 90896e79-greim-npm-hoxy-1-0-2-package-tgz tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz
+85 verbose lock tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz /Users/greim/.npm/90896e79-greim-npm-hoxy-1-0-2-package-tgz.lock
+86 silly gunzTarPerm modes [ '755', '644' ]
+87 silly gunzTarPerm extractEntry package.json
+88 silly gunzTarPerm extractEntry .npmignore
+89 silly gunzTarPerm extractEntry hoxy.js
+90 silly gunzTarPerm extractEntry lib/base.js
+91 silly gunzTarPerm extractEntry lib/cycle.js
+92 silly gunzTarPerm extractEntry lib/dom-reader.js
+93 silly gunzTarPerm extractEntry lib/eventer.js
+94 silly gunzTarPerm extractEntry lib/json-reader.js
+95 silly gunzTarPerm extractEntry lib/chunker.js
+96 silly gunzTarPerm extractEntry lib/param-reader.js
+97 silly gunzTarPerm extractEntry lib/proxy.js
+98 silly gunzTarPerm extractEntry lib/request.js
+99 silly gunzTarPerm extractEntry lib/response.js
+100 silly gunzTarPerm extractEntry lib/serializer.js
+101 silly gunzTarPerm extractEntry lib/buffer-reader.js
+102 silly gunzTarPerm extractEntry lib/stream-brake.js
+103 silly gunzTarPerm extractEntry lib/body.js
+104 silly gunzTarPerm extractEntry lib/streams.js
+105 silly gunzTarPerm extractEntry lib/logger.js
+106 silly gunzTarPerm extractEntry mit-license.txt
+107 silly gunzTarPerm extractEntry readme.md
+108 silly gunzTarPerm extractEntry test/as-tests.js
+109 silly gunzTarPerm extractEntry test/filtering-tests.js
+110 silly gunzTarPerm extractEntry test/tee-tests.js
+111 silly gunzTarPerm extractEntry test/request-tests.js
+112 silly gunzTarPerm extractEntry test/response-tests.js
+113 silly gunzTarPerm extractEntry test/streams-test.js
+114 silly gunzTarPerm extractEntry test/serializer-tests.js
+115 silly gunzTarPerm extractEntry test/serve-tests.js
+116 silly gunzTarPerm extractEntry test/upstream-tests.js
+117 silly gunzTarPerm extractEntry test/round-trip-tests.js
+118 silly gunzTarPerm extractEntry test/files/abc
+119 silly gunzTarPerm extractEntry test/files/lena.bmp
+120 silly gunzTarPerm extractEntry test/lib/megabyte-stream.js
+121 silly gunzTarPerm extractEntry test/lib/round-trip.js
+122 silly lockFile a94f4a9d-ers-greim-npm-hoxy-1-0-2-package tar:///Users/greim/.npm/hoxy/1.0.2/package
+123 silly lockFile a94f4a9d-ers-greim-npm-hoxy-1-0-2-package tar:///Users/greim/.npm/hoxy/1.0.2/package
+124 silly lockFile 90896e79-greim-npm-hoxy-1-0-2-package-tgz tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz
+125 silly lockFile 90896e79-greim-npm-hoxy-1-0-2-package-tgz tar:///Users/greim/.npm/hoxy/1.0.2/package.tgz
+126 verbose chmod /Users/greim/.npm/hoxy/1.0.2/package.tgz 644
+127 verbose chown /Users/greim/.npm/hoxy/1.0.2/package.tgz [ 502, 20 ]
+128 silly lockFile 3a52ce78- .
+129 silly lockFile 3a52ce78- .
+130 silly publish { name: 'hoxy',
+130 silly publish   version: '1.0.2',
+130 silly publish   author: { name: 'Greg Reimer', email: 'gregreimer@gmail.com' },
+130 silly publish   description: 'Web-hacking proxy API for node',
+130 silly publish   main: './hoxy',
+130 silly publish   keywords:
+130 silly publish    [ 'develop',
+130 silly publish      'development',
+130 silly publish      'test',
+130 silly publish      'testing',
+130 silly publish      'debug',
+130 silly publish      'debugging',
+130 silly publish      'proxy',
+130 silly publish      'charles',
+130 silly publish      'fiddler',
+130 silly publish      'web' ],
+130 silly publish   dependencies:
+130 silly publish    { 'route-pattern': '0.0.x',
+130 silly publish      'node-static': '0.7.x',
+130 silly publish      'lodash-node': '2.3.x',
+130 silly publish      await: '0.2.x',
+130 silly publish      cheerio: '0.12.x',
+130 silly publish      mkdirp: '~0.3.5' },
+130 silly publish   license: 'MIT',
+130 silly publish   readme: '# Hoxy\n\n**Description**: Web-debugging proxy API for node.\n\n**Documentation**: http://greim.github.io/hoxy/\n\n```javascript\nvar hoxy = require(\'hoxy\');\n\nvar proxy = new hoxy.Proxy();\n\nproxy.intercept({\n  phase: \'response\',\n  mimeType: \'text/html\',\n  as: \'$\'\n}, function(req, resp){\n  resp.$(\'title\').text(\'Unicorns.\');\n});\n\nproxy.listen(8080);\n\n// now proxy your client through localhost:8080 \n```\n\n# Release notes:\n\n* **1.0.2** Added `tee()` method to requests and responses, and accompanying tests.\n* **1.0.1** Fixed bug with URL pattern matching, added filtering tests.\n* **1.0.0** Initial release of Hoxy 1.0 rewrite.\n\n# Note: 1.x vs 0.x\n\nIf you\'re looking for the old command line version of hoxy, it\'s branched as `v0.2.x` in this repository and still available on npm.\nContinued updates to that branch are unlikely.\n\n1.x is an overhaul of the project.\n1.x is a programming API, whereas 0.x was a command line utility.\n1.x is still in an experimental state, but as of Feb 2014, fully passes a decently large test suite.\n',
+130 silly publish   readmeFilename: 'readme.md',
+130 silly publish   _id: 'hoxy@1.0.2',
+130 silly publish   dist: { shasum: '7936b771c77bb797360ee53ce63f193984f24da5' },
+130 silly publish   _from: '.' }
+131 verbose url raw hoxy
+132 verbose url resolving [ 'https://registry.npmjs.org/', './hoxy' ]
+133 verbose url resolved https://registry.npmjs.org/hoxy
+134 info trying registry request attempt 1 at 09:33:29
+135 http PUT https://registry.npmjs.org/hoxy
+136 http 201 https://registry.npmjs.org/hoxy
+137 verbose url raw hoxy
+138 verbose url resolving [ 'https://registry.npmjs.org/', './hoxy' ]
+139 verbose url resolved https://registry.npmjs.org/hoxy
+140 info trying registry request attempt 1 at 09:33:29
+141 http GET https://registry.npmjs.org/hoxy
+142 http 200 https://registry.npmjs.org/hoxy
+143 error publish fail Cannot publish over existing version.
+143 error publish fail Update the 'version' field in package.json and try again.
+143 error publish fail
+143 error publish fail If the previous version was published in error, see:
+143 error publish fail     npm help unpublish
+143 error publish fail
+143 error publish fail To automatically increment version numbers, see:
+143 error publish fail     npm help version
+144 error System Darwin 13.0.0
+145 error command "/usr/local/Cellar/node/0.10.21/bin/node" "/usr/local/bin/npm" "publish"
+146 error cwd /Users/greim/hoxy
+147 error node -v v0.10.21
+148 error npm -v 1.3.11
+149 error code EPUBLISHCONFLICT
+150 verbose exit [ 1, true ]
