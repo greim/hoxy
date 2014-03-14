@@ -24,6 +24,7 @@ proxy.listen(8080);
 
 # Release notes:
 
+* **1.0.5** Fixed static conditional get fail, flexible contentType matching, ability to set fullUrl.
 * **1.0.4** npm distribution no longer contains test directory.
 * **1.0.3** Fixed issue #21 causing breakage on windows, due to use of unix domain sockets.
 * **1.0.2** Added `tee()` method to requests and responses, and accompanying tests.

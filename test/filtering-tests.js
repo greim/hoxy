@@ -309,7 +309,7 @@ describe('Round trips', function(){
     })
   })
 
-  it('should filter based on string matches on mimeType', function(done){
+  it('should filter based on string matches on contentType', function(done){
     roundTrip({
       request: {
         url: '/foobar',
@@ -365,6 +365,190 @@ describe('Round trips', function(){
         opts: { phase:'response', filter: function(){shouldBeUndefined=undefined;return true} },
         callback: function(){ done(shouldBeUndefined) }
       }]
+    })
+  })
+
+  it('should filter request mimeTypes during appropriate phase', function(done){
+    var hits = {}
+    roundTrip({
+      request: {
+        method: 'POST',
+        body: '{"a":"b"}',
+        headers: {
+          'content-type': 'application/json'
+        }
+      },
+      response: {
+        statusCode: 200,
+        body: 'ab',
+        headers: {
+          'content-type': 'text/plain'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'request', mimeType: 'application/json' },
+        callback: function(){ hits.req = true }
+      },{
+        opts: { phase:'response', mimeType: 'text/plain' },
+        callback: function(){ hits.resp = true }
+      },{
+        opts: { phase:'request', mimeType: 'text/plain' },
+        callback: function(){ hits.reqBad = true }
+      },{
+        opts: { phase:'response', mimeType: 'application/json' },
+        callback: function(){ hits.respBad = true }
+      }],
+      client: function(){
+        assert.ok(hits.req, 'did not hit request')
+        assert.ok(hits.resp, 'did not hit response')
+        assert.ok(!hits.reqBad, 'hit request but should not have')
+        assert.ok(!hits.respBad, 'hit response but should not have')
+        done()
+      }
+    })
+  })
+
+  it('should filter request contentTypes during appropriate phase', function(done){
+    var hits = {}
+    roundTrip({
+      request: {
+        method: 'POST',
+        body: '{"a":"b"}',
+        headers: {
+          'content-type': 'application/json'
+        }
+      },
+      response: {
+        statusCode: 200,
+        body: 'ab',
+        headers: {
+          'content-type': 'text/plain'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'request', contentType: 'application/json' },
+        callback: function(){ hits.req = true }
+      },{
+        opts: { phase:'response', contentType: 'text/plain' },
+        callback: function(){ hits.resp = true }
+      },{
+        opts: { phase:'request', contentType: 'text/plain' },
+        callback: function(){ hits.reqBad = true }
+      },{
+        opts: { phase:'response', contentType: 'application/json' },
+        callback: function(){ hits.respBad = true }
+      }],
+      client: function(){
+        assert.ok(hits.req, 'did not hit request')
+        assert.ok(hits.resp, 'did not hit response')
+        assert.ok(!hits.reqBad, 'hit request but should not have')
+        assert.ok(!hits.respBad, 'hit response but should not have')
+        done()
+      }
+    })
+  })
+
+  it('should filter request and response mimeTypes', function(done){
+    var hits = {}
+    roundTrip({
+      request: {
+        method: 'POST',
+        body: '{"a":"b"}',
+        headers: {
+          'content-type': 'application/json'
+        }
+      },
+      response: {
+        statusCode: 200,
+        body: 'ab',
+        headers: {
+          'content-type': 'text/plain'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'response', requestMimeType: 'application/json' },
+        callback: function(){ hits.respReq = true }
+      },{
+        opts: { phase:'request', requestMimeType: 'text/plain' },
+        callback: function(){ hits.reqReqBad = true }
+      },{
+        opts: { phase:'response', responseMimeType: 'application/json' },
+        callback: function(){ hits.respRespBad = true }
+      },{
+        opts: { phase:'request', requestMimeType: 'application/json' },
+        callback: function(){ hits.reqReq = true }
+      },{
+        opts: { phase:'response', responseMimeType: 'text/plain' },
+        callback: function(){ hits.respResp = true }
+      },{
+        opts: { phase:'response', requestMimeType: 'text/plain' },
+        callback: function(){ hits.respReqBad = true }
+      },{
+        opts: { phase:'request', responseMimeType: 'application/json' },
+        callback: function(){ hits.reqRespBad = true }
+      }],
+      client: function(){
+        assert.ok(hits.respReq, 'should have hit response matching request')
+        assert.ok(hits.reqReq, 'should have hit request matching request')
+        assert.ok(hits.respResp, 'should have hit response matching response')
+        assert.ok(!hits.respReqBad, 'should not have hit response matching request')
+        assert.ok(!hits.reqRespBad, 'should not have hit request matching response')
+        assert.ok(!hits.reqReqBad, 'should not have hit request matching request')
+        assert.ok(!hits.respRespBad, 'should not have hit response matching response')
+        done()
+      }
+    })
+  })
+
+  it('should filter request and response contentTypes', function(done){
+    var hits = {}
+    roundTrip({
+      request: {
+        method: 'POST',
+        body: '{"a":"b"}',
+        headers: {
+          'content-type': 'application/json'
+        }
+      },
+      response: {
+        statusCode: 200,
+        body: 'ab',
+        headers: {
+          'content-type': 'text/plain'
+        }
+      },
+      intercepts: [{
+        opts: { phase:'response', requestContentType: 'application/json' },
+        callback: function(){ hits.respReq = true }
+      },{
+        opts: { phase:'request', requestContentType: 'text/plain' },
+        callback: function(){ hits.reqReqBad = true }
+      },{
+        opts: { phase:'response', responseContentType: 'application/json' },
+        callback: function(){ hits.respRespBad = true }
+      },{
+        opts: { phase:'request', requestContentType: 'application/json' },
+        callback: function(){ hits.reqReq = true }
+      },{
+        opts: { phase:'response', responseContentType: 'text/plain' },
+        callback: function(){ hits.respResp = true }
+      },{
+        opts: { phase:'response', requestContentType: 'text/plain' },
+        callback: function(){ hits.respReqBad = true }
+      },{
+        opts: { phase:'request', responseContentType: 'application/json' },
+        callback: function(){ hits.reqRespBad = true }
+      }],
+      client: function(){
+        assert.ok(hits.respReq, 'should have hit response matching request')
+        assert.ok(hits.reqReq, 'should have hit request matching request')
+        assert.ok(hits.respResp, 'should have hit response matching response')
+        assert.ok(!hits.respReqBad, 'should not have hit response matching request')
+        assert.ok(!hits.reqRespBad, 'should not have hit request matching response')
+        assert.ok(!hits.reqReqBad, 'should not have hit request matching request')
+        assert.ok(!hits.respRespBad, 'should not have hit response matching response')
+        done()
+      }
     })
   })
 })

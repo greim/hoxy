@@ -122,4 +122,17 @@ describe('Request', function(){
     req.port = 81;
     assert.strictEqual(req.fullUrl(), 'http://example.com:81/foo.html')
   })
+
+  it('should set full URL', function(){
+    var req = new Request()
+    var data = getRequestData()
+    req._setHttpSource(data)
+    var fullUrl = 'http://example2.com:90/foo'
+    req.fullUrl(fullUrl)
+    assert.strictEqual(req.protocol, 'http:')
+    assert.strictEqual(req.hostname, 'example2.com')
+    assert.strictEqual(req.port, 90)
+    assert.strictEqual(req.url, '/foo')
+    assert.strictEqual(req.fullUrl(), fullUrl)
+  })
 })
