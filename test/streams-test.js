@@ -76,8 +76,8 @@ describe('Streams', function(){
     })
     .onkeep(function(){
       var stop = Date.now();
-      var lower = 1000-300;
-      var upper = 1000+300;
+      var lower = 1000;
+      var upper = 2000;
       var time = stop - start;
       assert.ok(time < upper, 'took too long, expected < '+upper+', got '+time);
       assert.ok(time > lower, 'took too short, expected > '+lower+', got '+time);

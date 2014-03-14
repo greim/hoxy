@@ -372,8 +372,8 @@ describe('Round trips', function(){
       },
       server: function(){
         end = Date.now()
-        var upper = 100+100,
-          lower = 100-1,
+        var upper = 200,
+          lower = 100,
           actual = end - start
         assert.ok(actual > lower, 'latency should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'latency should be below '+upper+'ms (was '+actual+')')
@@ -398,8 +398,8 @@ describe('Round trips', function(){
       },
       client: function(){
         end = Date.now()
-        var upper = 110,
-          lower = 90,
+        var upper = 200,
+          lower = 100,
           actual = end - start
         assert.ok(actual > lower, 'latency should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'latency should be below '+upper+'ms (was '+actual+')')
@@ -427,8 +427,8 @@ describe('Round trips', function(){
       server: function(req, body){
         end = Date.now()
         assert.strictEqual(body.length, 1024000)
-        var upper = 1000+100,
-          lower   = 1000-100,
+        var upper = 2000,
+          lower   = 1000,
           actual = end - start
         assert.ok(actual > lower, 'transfer time should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'transfer time should be below '+upper+'ms (was '+actual+')')
@@ -455,8 +455,8 @@ describe('Round trips', function(){
       client: function(resp, body){
         end = Date.now()
         assert.strictEqual(body.length, 1024000)
-        var upper = 1100,
-          lower = 950,
+        var upper = 2000,
+          lower = 1000,
           actual = end - start
         assert.ok(actual > lower, 'transfer time should be above '+lower+'ms (was '+actual+')')
         assert.ok(actual < upper, 'transfer time should be below '+upper+'ms (was '+actual+')')
