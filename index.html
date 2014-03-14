@@ -51,8 +51,8 @@
 <h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
 
 <p>
-  Hoxy is available as <a href="https://www.npmjs.org/package/hoxy">"hoxy" on npm</a>.
-  You can also <a href="https://github.com/greim/hoxy">check out the source on github</a>.
+  Hoxy is <a href="https://www.npmjs.org/package/hoxy">available on npm</a>.
+  Or <a href="https://github.com/greim/hoxy">check it out on github</a>.
   Hoxy depends on node version 0.10.x or higher.
 </p>
 
@@ -1039,43 +1039,61 @@
     </p>
     <p>
       Use case #1: Serve a specific file.
+      First:
+    </p>
+    <pre class="code">
+      curl http://example.com/js/main.js &gt; main.js
+    </pre>
+    <p>
+      ...then:
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/js/main.js'
       }, function(req, resp, done){
-        this.serve('/Users/bk123/test/main.js', done);
+        this.serve(__dirname + '/main.js', done);
       });
     </pre>
     <p>
       Use case #2: Serve out of a local docroot.
+      First:
+    </p>
+    <pre class="code">
+      mkdir js
+      curl http://example.com/js/main.js &gt; js/main.js
+      curl http://example.com/js/some-lib.js &gt; js/some-lib.js
+      curl http://example.com/js/other-lib.js &gt; js/other-lib.js
+      ...
+    </pre>
+    <p>
+      ...then:
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         host: 'example.com',
-        mimeType: /javascript/i
+        url: /^\/js\/.*/
       }, function(req, resp, done){
         this.serve({
-          docroot: '/Users/bk123/test',
+          docroot: __dirname,
           strategy: 'overlay'
         }, done);
       });
     </pre>
     <p>
       Use case #3: Serve out of a local docroot.
-      But automatically copy the remote files to the local docroot the first time they're requested.
-      This is nice if you're one of those "lazy" programmers.
+      Similar to above, but automatically downloads the files for you, instead of having to curl them as in the above example.
+      You control which files get downloaded locally by the filtering options you provide.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         host: 'example.com',
-        mimeType: /javascript/i
+        url: /^\/js\/.*/
       }, function(req, resp, done){
         this.serve({
-          docroot: '/Users/bk123/test',
+          docroot: __dirname,
           strategy: 'mirror'
         }, done);
       });
@@ -1246,7 +1264,7 @@
 <h2 id="change-accumulation" data-tldr="Behavior over sequential handlers.">Change accumulation</h2>
 
 <p>
-  Changes to requests and responses are cumulative across all intercepts.
+  Changes to requests and responses are cumulative over the whole request/response cycle.
   Among other things, this affects loading content <code>as</code> a certain type, and filtering.
 </p>
 
