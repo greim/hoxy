@@ -425,11 +425,43 @@
           </td>
         </tr>
         <tr>
+          <td><code>requestContentType</code></td>
+          <td class="type">string, regexp</td>
+          <td>no</td>
+          <td>
+            Same as <code>contentType</code> but only matches request.
+          </td>
+        </tr>
+        <tr>
+          <td><code>responseContentType</code></td>
+          <td class="type">string, regexp</td>
+          <td>no</td>
+          <td>
+            Same as <code>contentType</code> but only matches response.
+          </td>
+        </tr>
+        <tr>
           <td><code>mimeType</code></td>
           <td class="type">string, regexp</td>
           <td>no</td>
           <td>
             Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase). I.e., if the entire header is <code>"text/html; charset=utf-8"</code>, just match the <code>"text/html"</code> part.
+          </td>
+        </tr>
+        <tr>
+          <td><code>requestMimeType</code></td>
+          <td class="type">string, regexp</td>
+          <td>no</td>
+          <td>
+            Same as <code>mimeType</code> but only matches request.
+          </td>
+        </tr>
+        <tr>
+          <td><code>responseMimeType</code></td>
+          <td class="type">string, regexp</td>
+          <td>no</td>
+          <td>
+            Same as <code>mimeType</code> but only matches response.
           </td>
         </tr>
         <tr>
@@ -704,10 +736,11 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-fullUrl"><a href="#request-fullUrl">request.fullUrl(<span class="args"></span>)</a></h3>
+  <h3 id="request-fullUrl"><a href="#request-fullUrl">request.fullUrl(<span class="args">[url]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Gets the absolute URL of this request.
+      If <code>url</code> is provided, sets the request's absolute protocol, hostname, port and url.
+      Otherwise it returns the absolute URL of this request.
       This is mainly a convenience method.
     </p>
     <pre class="language-javascript code">
