@@ -1249,15 +1249,30 @@
 </pre>
 
 <pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp){
+    response.statusCode = 200;
+    // The response is now populated so the
+    // server call is skipped. Response body
+    // defaults to empty.
+  });
+</pre>
+
+<pre class="language-javascript code">
   proxy.intercept('response', function(req, resp){
     response.string = 'Hello';
     // The response was already populated,
     // we just overwrite its body. Status
     // code remains the same.
-    response.statusCode = 444;
-    // Oops, no. We just overwrote the status
-    // code. I wonder how the browser will
-    // react to this unexpected turn of events.
+  });
+</pre>
+
+<pre class="language-javascript code">
+  proxy.intercept('response', function(req, resp){
+    response.statusCode = 666;
+    // The response was already populated,
+    // we just overwrote the status. I
+    // wonder how the browser will react
+    // to this unexpected turn of events.
   });
 </pre>
 
