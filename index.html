@@ -57,7 +57,7 @@
 </p>
 
 <pre class="code">
-  npm install hoxy
+  $ npm install hoxy
 </pre>
 
 <pre class="language-javascript code">
@@ -1125,6 +1125,63 @@
       });
     </pre>
   </div>
+</div>
+
+<h2 id="command-line" data-tldr="Command line interface.">Command Line</h2>
+
+<p>
+  In addition to being a programming API, Hoxy provides a command line interface.
+  The CLI provides a way to quickly get up and running with a custom web-debugging proxy.
+  To install it on your system, do:
+</p>
+
+<pre class="code">
+  $ npm install -g hoxy
+</pre>
+
+<p>
+  Now the <code>hoxy</code> command is installed in your environment.
+</p>
+
+<div class="api-detail">
+  <h3 id="hoxy">hoxy</h3>
+  <p>
+    Runs your current hoxy project (created via <a href="#hoxy-init"><code>hoxy init</code></a>) in the current directory.
+    If <code>./hoxy.json</code> doesn't exist, hoxy exits with an error.
+    The difference between doing <code>hoxy</code> and <code>node run-hoxy.js</code> is that using the former, when you edit and resave either <code>hoxy.json</code> or <code>run-hoxy.js</code>, it restarts the proxy server so that your changes are reflected immediately, instead of having to manually restart the proxy server.
+  </p>
+  <pre class="code">
+    $ hoxy
+    proxy running on 8080
+  </pre>
+</div>
+
+<div class="api-detail">
+  <h3 id="hoxy-init">hoxy init</h3>
+  <p>
+    Scaffolds up a web-debugging project in the current directory.
+  </p>
+  <pre class="code">
+    $ hoxy init
+  </pre>
+  <p>
+    The following items are then added to the current directory, if they don't already exist:
+  </p>
+  <ul>
+    <li><code>package.json</code>* - Minimal package info (you can customize this).</li>
+    <li><code>hoxy.json</code>* - Configuration for a hoxy instance (you can customize this).</li>
+    <li><code>run-hoxy.js</code>* - Launches a basic web proxy (you can customize this).</li>
+    <li><code>node_modules</code> - Contains hoxy and all its dependencies.</li>
+    <li><code>.gitignore</code> - Convenience, in case you want to <code>git init</code> later.</li>
+    <li><code>.npmignore</code> - Convenience, in case you want to <code>npm publish</code> later.</li>
+  </ul>
+  <p>
+    * If one of these already exists, no changes are made to the current directory and hoxy exits with an error.
+  </p>
+  <p>
+    Note that you could also do <code>npm init</code>, followed by <code>npm install hoxy --save</code>, then create a file analogous to <code>run-hoxy.js</code>, and execute that file directly with the <code>node</code> command.
+    <code>hoxy init</code> merely provides a fast and consistent way to get from there to here, for situations when you're facing some critical problem and you'd like to debug ASAP, rather than building up the project infrastructure.
+  </p>
 </div>
 
 <h1 id="appendix" data-tldr="Extensive info on various topics.">Appendix</h1>
