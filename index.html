@@ -19,7 +19,9 @@
 
 <p>
   Hoxy is a web debugging proxy API for node.
-  You can use it to debug your production app directly, or as the basis for other development and debugging tools.
+  You can use it to debug your production app directly, or as the basis for other development and debugging tools shared on npm.
+  A CLI is also available, <a href="#command-line">documented below</a>.
+  A debugging proxy can be created in just a few lines:
 </p>
 
 <pre class="language-javascript code">
@@ -33,26 +35,14 @@
 </pre>
 
 <p>
-  After running the above code, you can configure your web client to proxy through <code>localhost:8080</code>.
-  All information flowing through the proxy is exposed as JavaScript variables.
-  Use cases include:
+  After running the above code, configure your web client to proxy through <code>yourmachine:8080</code>.
+  All information flowing through the proxy is exposed as JavaScript variables, allowing you to inspect and manipulate web traffic in arbitrary ways.
 </p>
-
-<ul>
-  <li>Inspecting and logging web traffic.</li>
-  <li>Altering the DOM of web pages.</li>
-  <li>Altering JSON requests and responses.</li>
-  <li>Testing JavaScript changes in production.</li>
-  <li>Simulating latency or slow connections.</li>
-  <li>Tampering with HTTP headers.</li>
-  <li>Causing mayhem, chaos, and confusion.</li>
-</ul>
 
 <h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
 
 <p>
-  Hoxy is <a href="https://www.npmjs.org/package/hoxy">available on npm</a>.
-  Or <a href="https://github.com/greim/hoxy">check it out on github</a>.
+  Hoxy is available on both <a href="https://www.npmjs.org/package/hoxy">npm</a> and <a href="https://github.com/greim/hoxy">github</a>.
   Hoxy depends on node version 0.10.x or higher.
 </p>
 
@@ -68,16 +58,9 @@
 
 <p>
   Hoxy functions as a normal proxy
-  standing between the client and the server.
-  You <a href="#proxy-intercept">intercept</a> traffic during different phases, such as the request or the response.
-  When you intercept in the request phase, the <code>request</code> object contains data sent to the proxy by the client, but which hasn't yet been sent to the server.
-  The <code>response</code> object is unpopulated.
-</p>
-
-<p>
-  When you intercept in the response phase, the <code>request</code> object is now read-only.
-  The <code>response</code> object contains data sent to the proxy by the server, but which hasn't yet been sent to the client.
-  The <a href="#phase-lifecycle">phase lifecycle section</a> contains a complete description of the request/response lifecycle, but here's a simplified illustration.
+  standing between the client and server.
+  You intercept traffic during either the request or response phase, or both.
+  The <a href="#phase-lifecycle">phase lifecycle section</a> contains a more complete description, but here's a simplified illustration.
 </p>
 
 <pre class="code">
@@ -116,29 +99,8 @@
   <div class="api-detail-content">
     <p>
       New proxy constructor.
-      More info below.
+      <a href="#new-proxy">More info below.</a>
     </p>
-  </div>
-</div>
-
-<div class="api-detail">
-  <h3 id="hoxy-forever"><a href="#hoxy-forever">hoxy.forever(<span class="args">[handler]</span>)</a></h3>
-  <div class="api-detail-content">
-    <p>
-      Prevents process dying on uncaught errors.
-      In this example, errors are printed to stderr.
-    </p>
-    <pre class="language-javascript code">
-      hoxy.forever();
-    </pre>
-    <p>
-      Alternatively, call callback on uncaught errors.
-    </p>
-    <pre class="language-javascript code">
-      hoxy.forever(function(err){
-        console.error(err.stack);
-      });
-    </pre>
   </div>
 </div>
 
@@ -178,6 +140,35 @@
         upstreamProxy: process.env.HTTP_PROXY
       });
     </pre>
+    <table>
+      <caption>Options Detail</caption>
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>description</th>
+        </tr>
+      </thead>
+      <tobdy>
+        <tr>
+          <td><code>upstreamProxy</code></td>
+          <td>
+            Optional.
+            If present, this proxy will in turn use another proxy.
+            This allows you to use Hoxy in situations where you're already required to use a proxy.
+            This value should take the form <code>host:port</code>.
+          </td>
+        </tr>
+        <tr>
+          <td><code>reverse</code></td>
+          <td>
+            Optional.
+            If present, this proxy will run as a reverse proxy for the given server.
+            This allows you to point your client directly at the proxy, instead of configuring it in the client's proxy settings.
+            This value should take the form <code>http://host:port</code>.
+          </td>
+        </tr>
+      </tobdy>
+    </table>
   </div>
 </div>
 
@@ -1042,7 +1033,7 @@
       First:
     </p>
     <pre class="code">
-      curl http://example.com/js/main.js &gt; main.js
+      $ curl http://example.com/js/main.js &gt; main.js
     </pre>
     <p>
       ...then:
@@ -1060,10 +1051,10 @@
       First:
     </p>
     <pre class="code">
-      mkdir js
-      curl http://example.com/js/main.js &gt; js/main.js
-      curl http://example.com/js/some-lib.js &gt; js/some-lib.js
-      curl http://example.com/js/other-lib.js &gt; js/other-lib.js
+      $ mkdir js
+      $ curl http://example.com/js/main.js &gt; js/main.js
+      $ curl http://example.com/js/some-lib.js &gt; js/some-lib.js
+      $ curl http://example.com/js/other-lib.js &gt; js/other-lib.js
       ...
     </pre>
     <p>
@@ -1127,11 +1118,11 @@
   </div>
 </div>
 
-<h2 id="command-line" data-tldr="Command line interface.">Command Line</h2>
+<h2 id="command-line">Command Line Interface</h2>
 
 <p>
-  In addition to being a programming API, Hoxy provides a command line interface.
-  The CLI provides a way to quickly get up and running with a custom web-debugging proxy.
+  In addition to a programming API, Hoxy provides a command line interface.
+  The CLI provides a way to quickly get up and running with a web-debugging proxy.
   To install it on your system, do:
 </p>
 
@@ -1140,47 +1131,137 @@
 </pre>
 
 <p>
-  Now the <code>hoxy</code> command is installed in your environment.
+  ...now the executable <code>'hoxy'</code> is installed in your environment.
+  Here are its subcommands.
 </p>
-
-<div class="api-detail">
-  <h3 id="hoxy">hoxy</h3>
-  <p>
-    Runs your current hoxy project (created via <a href="#hoxy-init"><code>hoxy init</code></a>) in the current directory.
-    If <code>./hoxy.json</code> doesn't exist, hoxy exits with an error.
-    The difference between doing <code>hoxy</code> and <code>node run-hoxy.js</code> is that using the former, when you edit and resave either <code>hoxy.json</code> or <code>run-hoxy.js</code>, it restarts the proxy server so that your changes are reflected immediately, instead of having to manually restart the proxy server.
-  </p>
-  <pre class="code">
-    $ hoxy
-    proxy running on 8080
-  </pre>
-</div>
 
 <div class="api-detail">
   <h3 id="hoxy-init">hoxy init</h3>
   <p>
-    Scaffolds up a web-debugging project in the current directory.
+    Scaffolds up a web-debugging project in the current directory so that you can begin debugging immediately.
   </p>
   <pre class="code">
     $ hoxy init
   </pre>
   <p>
-    The following items are then added to the current directory, if they don't already exist:
+    <code>hoxy init</code> adds the following files to the current directory, if they don't already exist:
   </p>
   <ul>
     <li><code>package.json</code>* - Minimal package info (you can customize this).</li>
     <li><code>hoxy.json</code>* - Configuration for a hoxy instance (you can customize this).</li>
     <li><code>run-hoxy.js</code>* - Launches a basic web proxy (you can customize this).</li>
-    <li><code>node_modules</code> - Contains hoxy and all its dependencies.</li>
     <li><code>.gitignore</code> - Convenience, in case you want to <code>git init</code> later.</li>
-    <li><code>.npmignore</code> - Convenience, in case you want to <code>npm publish</code> later.</li>
   </ul>
   <p>
     * If one of these already exists, no changes are made to the current directory and hoxy exits with an error.
   </p>
+  <table>
+    <caption>Command Line Options</caption>
+    <thead>
+      <tr>
+        <th>name</th>
+        <th>description</th>
+        <th>value</th>
+      </tr>
+    </thead>
+    <tobdy>
+      <tr>
+        <td class="option"><code>--port</code></td>
+        <td>
+          Saved as the <code>port</code> property in <code>hoxy.json</code>.
+          Optional.
+        </td>
+        <td>
+          Number.
+          Positive integer greater than zero.
+        </td>
+      </tr>
+      <tr>
+        <td class="option"><code>--upstream-proxy</code></td>
+        <td>
+          Saved as the <code>upstreamProxy</code> property in <code>hoxy.json</code>.
+          Optional.
+        </td>
+        <td>
+          String.
+          <em>host:port</em> combination.
+        </td>
+      </tr>
+      <tr>
+        <td class="option"><code>--reverse</code></td>
+        <td>
+          Saved as the <code>reverse</code> property in <code>hoxy.json</code>.
+          Optional.
+        </td>
+        <td>
+          String.
+          <em>http://host:port</em> combination.
+        </td>
+      </tr>
+    </tobdy>
+  </table>
   <p>
-    Note that you could also do <code>npm init</code>, followed by <code>npm install hoxy --save</code>, then create a file analogous to <code>run-hoxy.js</code>, and execute that file directly with the <code>node</code> command.
-    <code>hoxy init</code> merely provides a fast and consistent way to get from there to here, for situations when you're facing some critical problem and you'd like to debug ASAP, rather than building up the project infrastructure.
+    See the <a href="#cli-workflow">CLI workflow section</a> for more info.
+  </p>
+</div>
+
+<div class="api-detail">
+  <h3 id="hoxy-run">hoxy run</h3>
+  <p>
+    Runs the project as you're developing it by automatically restarting the proxy whenever you resave the code.
+    This avoids having to manually stop and restart the server a lot.
+    This is accomplished using <a href="https://www.npmjs.org/package/nodemon">nodemon</a>.
+  </p>
+  <pre class="code">
+    $ hoxy run
+  </pre>
+  <table>
+    <caption>Command Line Options</caption>
+    <thead>
+      <tr>
+        <th>name</th>
+        <th>description</th>
+        <th>value</th>
+      </tr>
+    </thead>
+    <tobdy>
+      <tr>
+        <td class="option"><code>--port</code></td>
+        <td>
+          Overrides the <code>port</code> property in <code>hoxy.json</code>.
+          Optional.
+        </td>
+        <td>
+          Number.
+          Positive integer greater than zero.
+        </td>
+      </tr>
+      <tr>
+        <td class="option"><code>--upstream-proxy</code></td>
+        <td>
+          Overrides the <code>upstreamProxy</code> property in <code>hoxy.json</code>.
+          Optional.
+        </td>
+        <td>
+          String.
+          <em>host:port</em> combination.
+        </td>
+      </tr>
+      <tr>
+        <td class="option"><code>--reverse</code></td>
+        <td>
+          Overrides the <code>reverse</code> property in <code>hoxy.json</code>.
+          Optional.
+        </td>
+        <td>
+          String.
+          <em>http://host:port</em> combination.
+        </td>
+      </tr>
+    </tobdy>
+  </table>
+  <p>
+    See the <a href="#cli-workflow">CLI workflow section</a> for more info.
   </p>
 </div>
 
@@ -1403,6 +1484,25 @@
     console.log(typeof resp.string); // 'string'
   });
 </pre>
+
+<h2 data-tldr="Common workflow patterns." id="cli-workflow">CLI Workflow</h2>
+
+<p>
+  Using the <a href="#command-line">CLI</a>, A typical workflow might look like this:
+</p>
+<pre class="code">
+  $ hoxy init
+  $ npm install
+  $ hoxy run
+</pre>
+<p>
+  ...after which you'd open <code>run-hoxy.js</code> in your editor and begin customizing it.
+  Each time you save, the proxy server will automatically restart.
+  The command line options for <a href="#hoxy-init"><code>hoxy init</code></a> and <a href="#hoxy-run"><code>hoxy run</code></a> are identical.
+  In former case, they control the defaults for the project.
+  In the latter, they override the defaults.
+  In both cases they're optional.
+</p>
 
 <h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>
 
