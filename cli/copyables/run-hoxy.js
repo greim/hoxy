@@ -9,29 +9,25 @@
 
 var hoxy = require('hoxy');
 var parseArgs = require('minimist');
-var _ = require('lodash_node');
-var hoxyConfig = require('./hoxy.json');
+var _ = require('lodash-node');
+var config = _.extend({port:8080},require('./hoxy.json'));
 
 // CLI args override hoxy.json properties
-var cliArgs = parseArgs(process.argv.slice(2));
-var args = _.extend(hoxyConfig, {
-  port: parseInt(cliArgs.port),
-  upstreamProxy: cliArgs['upstream-proxy'],
-  reverse: cliArgs.reverse
-});
-
-// CLI args turn off hoxy.json args by setting to "none"
+var args = parseArgs(process.argv.slice(2));
 _.forIn(args, function(val, key){
-  if (val === 'none'){
-    delete args[key];
+  if (val !== 'none'){
+    if (key === 'upstream-proxy'){
+      key = 'upstreamProxy';
+    }
+    config[key] = val;
   }
 });
 
 // create a proxy server
-var proxy = new hoxy.Proxy(args);
+var proxy = new hoxy.Proxy(config);
 proxy.log('error warn', process.stderr);
 proxy.log('info', process.stdout);
-proxy.listen(args.port);
+proxy.listen(config.port);
 
 // intercept requests
 proxy.intercept({

@@ -1,9 +1,10 @@
 var nodemon = require('nodemon');
-var pkg = require('./package.json');
+var cwd = process.cwd();
 
 // --------------------------------------------
 
 module.exports = function(args){
-  var commandOpts = pkg.main + ' ' + process.argv.slice(2).join(' ');
+  var pkg = require(cwd + '/package.json');
+  var commandOpts = pkg.main + ' ' + process.argv.slice(3).join(' ');
   nodemon(commandOpts);
 };
