@@ -1,5 +1,5 @@
-var init = require('./init');
-var run = require('./run');
+#!/usr/bin/env node
+
 var parseArgs = require('minimist');
 var await = require('await');
 var fs = require('fs');
@@ -13,9 +13,9 @@ args.port = parseInt(args.port, 10);
 var subcommand = args._[0];
 
 if (subcommand === 'init'){
-  init(args);
+  require('./' + subcommand)(args);
 } else if (subcommand === 'run') {
-  run(args);
+  require('./' + subcommand)(args);
 } else {
   console.error('unknown subcommand ' + subcommand);
   process.exit(1);
