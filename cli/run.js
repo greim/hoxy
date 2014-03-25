@@ -4,6 +4,6 @@ var pkg = require('./package.json');
 // --------------------------------------------
 
 module.exports = function(args){
-  var commandOpts = './' + pkg.main + ' ' + process.argv.slice(2);
+  var commandOpts = pkg.main + ' ' + process.argv.slice(2).join(' ');
   nodemon(commandOpts);
 };

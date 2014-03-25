@@ -1,28 +1,40 @@
 var await = require('await');
 var fs = require('fs');
+var colors = require('colors');
+var util = require('util');
 
 // --------------------------------------------
 
 module.exports = function(args){
-  start('.')
+  start()
   .then(function(){
     return getTransferInfo(args);
   })
   .then(function(got){
     return canCopyFiles(got.transferInfo);
   })
+  .catch(function(err){
+    console.error(f('Error: %s', err.message).red);
+    console.error('No changes were made.'.red);
+    process.exit(1);
+  })
   .then(function(got){
     return copyFiles(got.transferInfo);
   })
   .then(function(){
-    console.log('all done');
+    console.log('All done!'.green.bold);
     process.exit(0);
   })
   .catch(function(err){
-    console.error(err.stack);
+    console.error(f('Error: %s', err.message).red);
     process.exit(1);
-  });
+  })
+  ;
 };
+
+// --------------------------------------------
+
+var f = util.format.bind(util);
 
 // --------------------------------------------
 
@@ -69,8 +81,8 @@ function getTransferInfo(args){
 
 // --------------------------------------------
 
-function start(dir){
-  console.log('initializing in ' + dir);
+function start(){
+  console.log('Initializing new Hoxy project in current directory');
   return await('started').keep('started');
 }
 
@@ -81,12 +93,55 @@ function canCopyFiles(transferInfo){
     return !info.ignorable;
   });
   var proms = unignorables.map(function(info){
-    var prom = await('ok');
+    var prom = await('target', 'exists')
+    .keep('target', info.target);
     fs.exists(info.target, function(exists){
-      if (exists){
-        prom.fail(new Error(info.target + ' already exists'));
+      console.log(f('Checking %s already exists? %s', info.target, (exists ? 'YES'.red : 'NO'.green)));
+      prom.keep('exists', exists);
+    });
+    return prom;
+  });
+  var prom = await('done');
+  await.all(proms)
+  .onfail(prom.fail.bind(prom))
+  .onkeep(function(gots){
+    var existing = gots.filter(function(got){
+      return got.exists;
+    }).map(function(got){
+      return got.target;
+    });
+    if (existing.length === 0){
+      prom.keep('done');
+    } else {
+      prom.fail(new Error(f('Existing file(s) would be clobbered: %s', existing.join(' '))));
+    }
+  });
+  return prom;
+}
+
+// --------------------------------------------
+
+function copyFiles(transferInfo){
+  var proms = transferInfo.map(function(info){
+    var prom = await('done');
+    var doneProm;
+    if (typeof info.source === 'object'){
+      doneProm = saveJson(info.source, info.target);
+    } else {
+      doneProm = copyFile(info.source, info.target);
+    }
+    doneProm
+    .onkeep(function(got){
+      console.log(f('created %s', info.target).green);
+      prom.keep('done');
+    })
+    .onfail(function(err){
+      var mess = err.message;
+      if (info.ignorable && /EEXIST/.test(mess)){
+        console.log(f('Checking %s already exists? ' + 'YES'.yellow, info.target));
+        prom.keep('done')
       } else {
-        prom.keep('ok');
+        prom.fail(err);
       }
     });
     return prom;
@@ -96,26 +151,10 @@ function canCopyFiles(transferInfo){
 
 // --------------------------------------------
 
-function copyFiles(transferInfo){
-  var proms = transferInfo.map(function(info){
-    if (typeof info.source === 'object'){
-      return saveJson(info.source, info.target, info.ignorable);
-    } else {
-      return copyFile(info.source, info.target, info.ignorable);
-    }
-  });
-  return await.all(proms);
-}
-
-// --------------------------------------------
-
-function saveJson(obj, target, failSilent){
-    var prom = await('status')
-    .onkeep(function(got){
-      console.log(got.status);
-    });
+function saveJson(obj, target){
+    var prom = await('done');
     try {
-      var objString = JSON.stringify(obj, null, '  ');
+      var objString = JSON.stringify(obj, null, '  ') + '\n';
     } catch(err) {
       prom.fail(err);
       return;
@@ -123,40 +162,20 @@ function saveJson(obj, target, failSilent){
     fs.writeFile(target, objString, {
       encoding: 'utf8',
       flag: 'wx' // fail if exists
-    }, function(err){
-      if (err){
-        if (failSilent){
-          var status = target + ' not created. ('+err.message+')';
-          prom.keep('status', status);
-        } else {
-          prom.fail(err);
-        }
-      } else {
-        prom.keep('status', target + ' created');
-      }
-    });
+    }, prom.nodify('done'));
     return prom;
 }
 
 // --------------------------------------------
 
-function copyFile(source, target, failSilent){
-    var prom = await('status')
-    .onkeep(function(got){
-      console.log(got.status);
-    });
+function copyFile(source, target){
+    var prom = await('done');
     var sourceStream = fs.createReadStream(source);
     var targetStream = fs.createWriteStream(target,{flags:'wx'}); // fail if exists
     sourceStream.pipe(targetStream);
-    var keeper = prom.keep.bind(prom, 'status', target + ' created');
-    sourceStream.on('end', keeper);
+    sourceStream.on('end', prom.keep.bind(prom, 'done'));
     function failer(err){
-      if (failSilent){
-        var status = target + ' not created. ('+err.message+')';
-        prom.keep('status', status);
-      } else {
-        prom.fail(err);
-      }
+      prom.fail(err);
     }
     sourceStream.on('error', failer);
     targetStream.on('error', failer);

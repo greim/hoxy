@@ -25,7 +25,8 @@
     "cheerio": "0.12.x",
     "mkdirp": "~0.3.5",
     "minimist": "0.0.x",
-    "nodemon": "^1.0.17"
+    "nodemon": "^1.0.17",
+    "colors": "^0.6.2"
   },
   "license": "MIT"
 }
