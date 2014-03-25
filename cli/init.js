@@ -6,7 +6,7 @@ var fs = require('fs');
 module.exports = function(args){
   start('.')
   .then(function(){
-    return getTransferInfo();
+    return getTransferInfo(args);
   })
   .then(function(got){
     return canCopyFiles(got.transferInfo);
