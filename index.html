@@ -15,13 +15,21 @@
 <div id="outer">
 <div id="inner">
 
-<h1 id="introduction">Hoxy Documentation</h1>
+<h1 id="introduction">Hoxy, the Web-Hacking Proxy</h1>
 
 <p>
-  Hoxy is a web debugging proxy API for node.
-  You can use it to debug your production app directly, or as the basis for other development and debugging tools shared on npm.
-  A CLI is also available, <a href="#command-line">documented below</a>.
-  A debugging proxy can be created in just a few lines:
+  Hoxy is two things:
+</p>
+
+<ol>
+  <li>A web-debugging proxy API for node. (<code>npm install hoxy</code>)</li>
+  <li>A CLI for quickly scaffolding up custom proxies. (<code>npm install -g hoxy</code>)</li>
+</ol>
+
+<p>
+  The CLI is <a href="#command-line">documented below</a>.
+  The API provides the basis for the CLI, and generally provides the building blocks for building arbitrary web-debugging proxies.
+  Using the API, you can spin up a proxy in just a few lines of code:
 </p>
 
 <pre class="language-javascript code">
