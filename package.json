@@ -1,6 +1,6 @@
 {
   "name": "hoxy",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
   "bin": "./cli/hoxy-cli.js",
