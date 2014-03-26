@@ -108,6 +108,9 @@ th.caption{
 thead th{
     background:#f6f6f6;
 }
+table .option{
+    white-space:nowrap;
+}
 tbody tr:nth-child(2n) td{
     background:#f6f6f6;
 }
@@ -173,4 +176,7 @@ table li{
 code{
     opacity:.65;
     color:#814100;
+}
+span.comment{
+    opacity:.6;
 }

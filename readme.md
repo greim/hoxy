@@ -24,6 +24,7 @@ proxy.listen(8080);
 
 # Release notes:
 
+* **1.1.0** Added CLI functionality to scaffold new proxy projects.
 * **1.0.5** Fixed static conditional get fail, flexible contentType matching, ability to set fullUrl.
 * **1.0.4** npm distribution no longer contains test directory.
 * **1.0.3** Fixed issue #21 causing breakage on windows, due to use of unix domain sockets.
@@ -38,4 +39,4 @@ Continued updates to that branch are unlikely.
 
 1.x is an overhaul of the project.
 1.x is a programming API, whereas 0.x was a command line utility.
-1.x is still in an experimental state, but as of Feb 2014, fully passes a decently large test suite.
+1.x fully passes a decently large test suite.
