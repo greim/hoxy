@@ -15,7 +15,7 @@
 <div id="outer">
 <div id="inner">
 
-<h1 id="introduction">Hoxy, the Web-Hacking Proxy</h1>
+<h1 id="introduction" data-tldr="Documentation and examples.">Hoxy, the Web-Hacking Proxy</h1>
 
 <p>
   Hoxy is two things:
@@ -28,7 +28,7 @@
 
 <p>
   The CLI is <a href="#command-line">documented below</a>.
-  The API provides the basis for the CLI, and generally provides the building blocks for building arbitrary web-debugging proxies.
+  The API provides the basis for the CLI, and otherwise provides the building blocks for building arbitrary web-debugging proxies.
   Using the API, you can spin up a proxy in just a few lines of code:
 </p>
 
@@ -83,9 +83,9 @@
 
 <ol>
   <li>Client sends request.</li>
-  <li>Hoxy intercepts request.</li>
+  <li>Hoxy lets you intercept the request.</li>
   <li>Server receives request and sends response.</li>
-  <li>Hoxy intercepts response.</li>
+  <li>Hoxy lets you intercept the response.</li>
   <li>Client receives response.</li>
 </ol>
 
@@ -99,18 +99,8 @@
 
 <p>
   The object returned from <code>require('hoxy')</code> is the entry point for all hoxy functionality.
-  Here are its properties.
+  As of now it only has one property, the <code>Proxy</code> constructor, documented below.
 </p>
-
-<div class="api-detail">
-  <h3 id="hoxy-proxy"><a href="#hoxy-proxy">hoxy.Proxy</a></h3>
-  <div class="api-detail-content">
-    <p>
-      New proxy constructor.
-      <a href="#new-proxy">More info below.</a>
-    </p>
-  </div>
-</div>
 
 <h2 id="class-proxy">Class Proxy</h2>
 
@@ -210,7 +200,9 @@
       This is more verbose, but identical to the above.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept({phase:'request'}, function(req, resp){
+      proxy.intercept({
+        phase: 'request'
+      }, function(req, resp){
         console.log('request made to: '+req.url);
       });
     </pre>
@@ -292,7 +284,7 @@
       });
     </pre>
     <table>
-      <caption>General options</caption>
+      <caption>Options</caption>
       <thead>
         <tr>
           <th>name</th>
@@ -343,7 +335,7 @@
       </tbody>
       <thead>
         <tr>
-          <th class="caption" colspan="4">Filtering options (logically ANDed together)</th>
+          <th class="caption" colspan="4">Filtering options (these are logically ANDed together)</th>
         </tr>
       </thead>
       <thead>
