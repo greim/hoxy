@@ -24,6 +24,7 @@ proxy.listen(8080);
 
 # Release notes:
 
+* **1.1.1** Added SSL support for requests (protocol: https).
 * **1.1.0** Added CLI functionality to scaffold new proxy projects.
 * **1.0.5** Fixed static conditional get fail, flexible contentType matching, ability to set fullUrl.
 * **1.0.4** npm distribution no longer contains test directory.
