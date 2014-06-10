@@ -486,4 +486,25 @@ describe('Round trips', function(){
       }
     })
   })
+
+  it('should preserve content length sent if body unchanged', function(done){
+    roundTrip({
+      request:{
+        url: '/foobar',
+        body: 'abcdefg',
+        method: 'POST',
+        headers: {
+          'content-length': 7
+        }
+      },
+      server: function(req, body){
+        assert.strictEqual(body, 'abcdefg')
+        assert.equal(req.headers['content-length'], 7)
+        done()
+      },
+      error: function(err, mess){
+        done(err)
+      }
+    })
+  })
 })
