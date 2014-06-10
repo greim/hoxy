@@ -24,7 +24,8 @@ proxy.listen(8080);
 
 # Release notes:
 
-* **1.1.2** Don't munge content-length headers unless necessary.
+* **1.1.3** Don't munge content-length headers unless necessary.
+* **1.1.2** Burned a version number because I suck at npm.
 * **1.1.1** Added SSL support for requests (protocol: https).
 * **1.1.0** Added CLI functionality to scaffold new proxy projects.
 * **1.0.5** Fixed static conditional get fail, flexible contentType matching, ability to set fullUrl.
