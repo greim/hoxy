@@ -4,6 +4,10 @@
 
 **Documentation**: http://greim.github.io/hoxy/
 
+**Installation**: `npm install hoxy`
+
+**Example**:
+
 ```javascript
 var hoxy = require('hoxy');
 
