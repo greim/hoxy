@@ -328,4 +328,192 @@ describe('Load data as type', function(){
       }
     })
   })
+
+  it('should send content length to server for string', function(done){
+    var bod = 'abc'
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'string'},
+        callback: function(req, resp){
+          assert.ok(req.string !== undefined)
+        }
+      }],
+      server: function(req, body){
+        assert.equal(req.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to server for $', function(done){
+    var bod = '<html></html>'
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'$'},
+        callback: function(req, resp){
+          assert.ok(req.$ !== undefined)
+        }
+      }],
+      server: function(req, body){
+        assert.equal(req.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to server for json', function(done){
+    var bod = JSON.stringify({foo:'bar',baz:2})
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'json'},
+        callback: function(req, resp){
+          assert.ok(req.json !== undefined)
+        }
+      }],
+      server: function(req, body){
+        assert.equal(req.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to server for params', function(done){
+    var bod = 'foo=bar&baz=qux'
+    roundTrip({
+      request: {
+        url: '/',
+        method: 'POST',
+        body: 'foo=bar&baz=qux'
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'request',as:'params'},
+        callback: function(req, resp){
+          assert.ok(req.params !== undefined)
+        }
+      }],
+      server: function(req, body){
+        assert.equal(req.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to client for string', function(done){
+    var bod = 'abcdefg'
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'string'},
+        callback: function(req, resp){
+          assert.ok(resp.string !== undefined)
+        }
+      }],
+      client: function(resp, body){
+        assert.equal(resp.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to client for $', function(done){
+    var bod = '<html></html>'
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'$'},
+        callback: function(req, resp){
+          assert.ok(resp.$ !== undefined)
+        }
+      }],
+      client: function(resp, body){
+        assert.equal(resp.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to client for json', function(done){
+    var bod = JSON.stringify({foo:'bar',baz:2})
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'json'},
+        callback: function(req, resp){
+          assert.ok(resp.json !== undefined)
+        }
+      }],
+      client: function(resp, body){
+        assert.equal(resp.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
+
+  it('should send content length to client for params', function(done){
+    var bod = 'foo=bar&baz=qux'
+    roundTrip({
+      response: {
+        statusCode: 200,
+        body: bod
+      },
+      error: function(err, mess){
+        done(err)
+      },
+      intercepts: [{
+        opts: {phase:'response',as:'params'},
+        callback: function(req, resp){
+          assert.ok(resp.params !== undefined)
+        }
+      }],
+      client: function(resp, body){
+        assert.equal(resp.headers['content-length'], bod.length)
+        done()
+      }
+    })
+  })
 })
