@@ -171,7 +171,7 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="proxy-listen"><a href="#proxy-listen">proxy.listen(<span class="args">port</span>)</a></h3>
+  <h3 id="proxy-listen"><a href="#proxy-listen">proxy.listen(<span class="args">port, [hostname], [backlog], [callback]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Starts proxy listening on <code>port</code>.
@@ -181,6 +181,19 @@
       var hoxy = require('hoxy');
       var proxy = new hoxy.Proxy().listen(8080);
     </pre>
+    <p>
+      A callback may be provided, to run when the proxy has started listening.
+    </p>
+    <pre class="language-javascript code">
+      var hoxy = require('hoxy');
+      var port = 8080;
+      var proxy = new hoxy.Proxy().listen(port, function () {
+        console.log('The proxy is listening on port ' + port + '.');
+      });
+    </pre>
+    <p>
+      This method will pass arguments to Node&apos;s <a href="http://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback">server API</a>.
+    </p>
   </div>
 </div>
 
