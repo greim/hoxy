@@ -28,7 +28,7 @@ proxy.listen(8080);
 
 # Release notes:
 
-* **1.2.1** Make `listen()` accept same args as native `server.listen()` instead of just port. (Thanks Seth Holladay)
+* **1.2.1** Make `listen()` accept same args as native `server.listen()` instead of just port. Thanks [Seth Holladay](https://github.com/sholladay).
 * **1.2.0** Send content-length whenever reasonably possible. (minor version bump since minor alteration to existing behavior)
 * **1.1.5** Default protocol to 'http:' if not found because I'm a genius.
 * **1.1.4** Default protocol to 'http' if not found.
