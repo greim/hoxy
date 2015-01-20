@@ -1,6 +1,6 @@
 {
   "name": "hoxy",
-  "version": "1.1.0",
+  "version": "1.2.2",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
   "bin": "./cli/hoxy-cli.js",
@@ -28,5 +28,8 @@
     "nodemon": "^1.0.17",
     "colors": "^0.6.2"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "string-stream": "0.0.7"
+  }
 }

@@ -4,6 +4,7 @@
  */
 
 var streams = require('../../lib/streams')
+var Readable = require('string-stream')
 
 // ---------------------------
 
@@ -20,6 +21,6 @@ kb = kb.join('')
 module.exports = function(){
   var result = []
   for (var i=0; i<1000; i++)
-    result.push(new Buffer(kb, 'utf8'))
-  return streams.from(result)
+    result.push(kb)
+  return new Readable(result.join(''))
 }

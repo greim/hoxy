@@ -4,6 +4,10 @@
 
 **Documentation**: http://greim.github.io/hoxy/
 
+**Installation**: `npm install hoxy`
+
+**Example**:
+
 ```javascript
 var hoxy = require('hoxy');
 
@@ -24,6 +28,14 @@ proxy.listen(8080);
 
 # Release notes:
 
+* **1.2.2** Fixed errors and test failures occurring on io.js.
+* **1.2.1** Make `listen()` accept same args as native `server.listen()` instead of just port. Thanks [Seth Holladay](https://github.com/sholladay).
+* **1.2.0** Send content-length whenever reasonably possible. (minor version bump since minor alteration to existing behavior)
+* **1.1.5** Default protocol to 'http:' if not found because I'm a genius.
+* **1.1.4** Default protocol to 'http' if not found.
+* **1.1.3** Don't munge content-length headers unless necessary.
+* **1.1.2** Burned a version number because I suck at npm.
+* **1.1.1** Added SSL support for requests (protocol: https).
 * **1.1.0** Added CLI functionality to scaffold new proxy projects.
 * **1.0.5** Fixed static conditional get fail, flexible contentType matching, ability to set fullUrl.
 * **1.0.4** npm distribution no longer contains test directory.
