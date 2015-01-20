@@ -28,5 +28,8 @@
     "nodemon": "^1.0.17",
     "colors": "^0.6.2"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "string-stream": "0.0.7"
+  }
 }
