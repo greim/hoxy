@@ -3,6 +3,10 @@
   "version": "1.2.2",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:greim/hoxy.git"
+  },
   "bin": "./cli/hoxy-cli.js",
   "main": "./hoxy",
   "keywords": [
