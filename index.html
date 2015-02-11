@@ -187,7 +187,7 @@
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
       var port = 8080;
-      var proxy = new hoxy.Proxy().listen(port, function () {
+      var proxy = new hoxy.Proxy().listen(port, function(){
         console.log('The proxy is listening on port ' + port + '.');
       });
     </pre>
@@ -554,14 +554,12 @@
       Finalizes and/or cleans up any resources the proxy uses internally.
     </p>
     <pre class="language-javascript code">
-      proxy.close(
-        function (err) {  // optional callback
-          if (err) {
-            throw err;
-          }
-          console.log('The proxy is no longer accepting new connections.');
+      proxy.close(function(err){ // optional callback
+        if (err){
+          throw err;
         }
-      );
+        console.log('The proxy is no longer accepting new connections.');
+      });
     </pre>
   </div>
 </div>
