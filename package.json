@@ -3,8 +3,15 @@
   "version": "1.2.2",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:greim/hoxy.git"
+  },
   "bin": "./cli/hoxy-cli.js",
   "main": "./hoxy",
+  "scripts": {
+    "test": "node node_modules/.bin/mocha"
+  },
   "keywords": [
     "develop",
     "development",
@@ -18,18 +25,19 @@
     "web"
   ],
   "dependencies": {
-    "route-pattern": "0.0.x",
-    "node-static": "0.7.x",
-    "lodash-node": "2.3.x",
-    "await": "0.2.x",
-    "cheerio": "0.12.x",
-    "mkdirp": "~0.3.5",
+    "await": "^0.2.5",
+    "cheerio": "^0.18.0",
+    "colors": "^0.6.2",
+    "lodash-node": "^3.0.1",
     "minimist": "0.0.x",
+    "mkdirp": "~0.3.5",
+    "node-static": "0.7.x",
     "nodemon": "^1.0.17",
-    "colors": "^0.6.2"
+    "route-pattern": "0.0.x"
   },
   "license": "MIT",
   "devDependencies": {
-    "string-stream": "0.0.7"
+    "string-stream": "0.0.7",
+    "mocha": "2.1.x"
   }
 }
