@@ -3,8 +3,15 @@
   "version": "1.2.2",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:greim/hoxy.git"
+  },
   "bin": "./cli/hoxy-cli.js",
   "main": "./hoxy",
+  "scripts": {
+    "test": "node node_modules/.bin/mocha"
+  },
   "keywords": [
     "develop",
     "development",
@@ -30,6 +37,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "string-stream": "0.0.7"
+    "string-stream": "0.0.7",
+    "mocha": "2.1.x"
   }
 }

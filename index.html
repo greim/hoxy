@@ -547,14 +547,21 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="proxy-close"><a href="#proxy-close">proxy.close(<span class="args"></span>)</a></h3>
+  <h3 id="proxy-close"><a href="#proxy-close">proxy.close(<span class="args">[callback]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Stops proxy receiving requests.
       Finalizes and/or cleans up any resources the proxy uses internally.
     </p>
     <pre class="language-javascript code">
-      proxy.close();
+      proxy.close(
+        function (err) {  // optional callback
+          if (err) {
+            throw err;
+          }
+          console.log('The proxy is no longer accepting new connections.');
+        }
+      );
     </pre>
   </div>
 </div>
@@ -1015,7 +1022,7 @@
             Accepted values:
             <ul>
               <li>
-                <code>replace</code> - 
+                <code>replace</code> -
                 (default)
                 Replaces the remote docroot with the local one.
                 In other words, if a requested file doesn't exist locally, it populates the response with a 404, even if it would have been found remotely.
@@ -1026,7 +1033,7 @@
                 In other words, if a requested file doesn't exist locally, it becomes a no-op, allowing the proxy to "see through" to the one on the remote server.
               </li>
               <li>
-                <code>mirror</code> - 
+                <code>mirror</code> -
                 Automatically mirror the remote docroot locally.
                 In other words, if a requested file doesn't exist locally, it's copied to the local docroot from the remote one, and will be found locally on subsequent requests.
               </li>
