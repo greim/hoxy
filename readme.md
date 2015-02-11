@@ -28,6 +28,7 @@ proxy.listen(8080);
 
 # Release notes:
 
+* **1.2.3** Test command now `npm test` instead of `mocha`. Proxy `close()` method now passes args through to server close. Thanks [Seth Holladay](https://github.com/sholladay).
 * **1.2.2** Fixed errors and test failures occurring on io.js.
 * **1.2.1** Make `listen()` accept same args as native `server.listen()` instead of just port. Thanks [Seth Holladay](https://github.com/sholladay).
 * **1.2.0** Send content-length whenever reasonably possible. (minor version bump since minor alteration to existing behavior)
