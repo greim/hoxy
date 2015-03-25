@@ -538,27 +538,6 @@ describe('Load data as type', function(){
     })
   })
 
-  it('should send xhtml for doctype xhtml', function(done){
-    var bod = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br/></html>'
-    roundTrip({
-      request: { url: '/' },
-      response: { body: bod },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          assert.ok(resp.$ !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.equal(body, bod)
-        done()
-      }
-    })
-  })
-
   it('should send xml for mime type xml', function(done){
     var bod = '<html><br/></html>'
     roundTrip({
@@ -595,14 +574,14 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.ok(body.indexOf('<br/>.<br/>') > -1, 'response was not parsed as html')
+        assert.ok(body.indexOf('<br>.<br>') > -1, 'response was not parsed as html')
         done()
       }
     })
   })
 
   it('should parse as xml for mime type xml', function(done){
-    var bod = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br>.</br></html>'
+    var bod = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><br>.</br></html>'
     roundTrip({
       request: { url: '/' },
       response: { body: bod, headers: {'content-type':'text/xml'} },
