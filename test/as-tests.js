@@ -347,7 +347,7 @@ describe('Load data as type', function(){
         }
       }],
       server: function(req, body){
-        assert.equal(req.headers['content-length'], bod.length)
+        assert.strictEqual(req.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -371,7 +371,7 @@ describe('Load data as type', function(){
         }
       }],
       server: function(req, body){
-        assert.equal(req.headers['content-length'], bod.length)
+        assert.strictEqual(req.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -395,7 +395,7 @@ describe('Load data as type', function(){
         }
       }],
       server: function(req, body){
-        assert.equal(req.headers['content-length'], bod.length)
+        assert.strictEqual(req.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -419,7 +419,7 @@ describe('Load data as type', function(){
         }
       }],
       server: function(req, body){
-        assert.equal(req.headers['content-length'], bod.length)
+        assert.strictEqual(req.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -442,7 +442,7 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.equal(resp.headers['content-length'], bod.length)
+        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -465,7 +465,7 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.equal(resp.headers['content-length'], bod.length)
+        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -488,7 +488,7 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.equal(resp.headers['content-length'], bod.length)
+        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
         done()
       }
     })
@@ -511,14 +511,15 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.equal(resp.headers['content-length'], bod.length)
+        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
         done()
       }
     })
   })
 
-  it('should send html for doctype html', function(done){
-    var bod = '<!doctype html><html><br></html>'
+  it('should send html by default', function(done){
+    // This is valid html but *NOT* xml, because <br> is void.
+    var bod = '<html><br></html>'
     roundTrip({
       request: { url: '/' },
       response: { body: bod },
@@ -532,14 +533,15 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.equal(body, bod)
+        assert.strictEqual(body, bod, 'response was not parsed as html')
         done()
       }
     })
   })
 
   it('should send xml for mime type xml', function(done){
-    var bod = '<html><br/></html>'
+    // This is valid xml but *NOT* html, because <script> is not void.
+    var bod = '<html><body><script src="foo"/></body></html>'
     roundTrip({
       request: { url: '/' },
       response: { body: bod, headers: {'content-type':'text/xml'} },
@@ -553,7 +555,7 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.equal(body, bod)
+        assert.strictEqual(body, bod, 'response was not parsed as xml')
         done()
       }
     })
@@ -563,7 +565,7 @@ describe('Load data as type', function(){
     var bod = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br>.</br></html>'
     roundTrip({
       request: { url: '/' },
-      response: { body: bod, headers: {'content-type':'text/html'} },
+      response: { body: bod, headers: {'content-type':'text/plain'} },
       error: function(err, mess){
         done(err)
       },
@@ -574,13 +576,14 @@ describe('Load data as type', function(){
         }
       }],
       client: function(resp, body){
-        assert.ok(body.indexOf('<br>.<br>') > -1, 'response was not parsed as html')
+        assert.ok(body.indexOf('<br>.<br>') > -1, 'response was parsed as xml')
         done()
       }
     })
   })
 
   it('should parse as xml for mime type xml', function(done){
+    // This is valid xml, because all tags must be closed. But it is *NOT* valid html, because <br> is void.
     var bod = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><br>.</br></html>'
     roundTrip({
       request: { url: '/' },
