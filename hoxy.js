@@ -6,6 +6,9 @@
 var _ = require('lodash-node');
 var Proxy = require('./lib/proxy');
 
+require('babel/register')()
+require('babel/polyfill')
+
 // ---------------------------
 
 module.exports = {
