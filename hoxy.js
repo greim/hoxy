@@ -3,11 +3,11 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var _ = require('lodash-node');
-var Proxy = require('./lib/proxy');
-
 require('babel/register')()
 require('babel/polyfill')
+
+var _ = require('lodash-node');
+var Proxy = require('./lib/proxy');
 
 // ---------------------------
 
