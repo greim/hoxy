@@ -6,7 +6,6 @@
 require('babel/register')()
 require('babel/polyfill')
 
-var _ = require('lodash-node');
 var Proxy = require('./lib/proxy');
 
 // ---------------------------
@@ -25,5 +24,5 @@ module.exports = {
         console.log(err.stack);
       }
     });
-  }
+  },
 };

@@ -10,7 +10,7 @@
   "bin": "./cli/hoxy-cli.js",
   "main": "./hoxy",
   "scripts": {
-    "test": "node node_modules/.bin/mocha"
+    "test": "node node_modules/.bin/mocha --compilers js:babel/register"
   },
   "keywords": [
     "develop",
