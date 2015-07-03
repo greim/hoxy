@@ -6,7 +6,7 @@
 var hoxy = require('../../hoxy');
 var chunker = require('../../lib/chunker');
 var streams = require('../../lib/streams');
-var _ = require('lodash-node');
+var _ = require('lodash');
 var await = require('await');
 var http = require('http');
 
