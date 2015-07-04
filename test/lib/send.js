@@ -4,6 +4,7 @@ import hoxy from '../../hoxy'
 
 /*
  * Utility for testing hoxy.
+ * Alternative to the roundTrip() utility.
  *
  *   send({
  *     path: 'http://acme.com/foo.html',
@@ -102,6 +103,16 @@ class Sender {
   }
 
   to(fn) {
+    if (typeof fn !== 'function') {
+      let obj = fn
+        , headers = obj.headers || {}
+        , statusCode = obj.statusCode || 200
+        , body = obj.body || ''
+      fn = function*(req, resp) {
+        resp.writeHead(statusCode, headers)
+        resp.end(body)
+      }
+    }
     this._serverHandler = fn
     return this
   }

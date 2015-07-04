@@ -6,10 +6,8 @@
 // MOCHA TESTS
 // http://visionmedia.github.com/mocha/
 
-var awate = require('await')
 var fs = require('fs')
 var assert = require('assert')
-var roundTrip = require('./lib/round-trip')
 var send = require('./lib/send')
 var adapt = require('ugly-adapter')
 
@@ -56,19 +54,16 @@ describe('Serving from local', () => {
   })
 
   it('should fallback silently with overlay strategy', () => {
-    var serverHit = false;
     return send({
       path: 'http://example.com/def',
     }).through('request', function*() {
       let opts = { docroot: `${__dirname}/files`, strategy: 'overlay' }
       yield this.serve(opts)
-    }).to(function*(req, resp) {
-      serverHit = true
-      resp.end('def')
+    }).to({
+      body: '1234',
     }).receiving(function*(resp) {
       assert.strictEqual(resp.statusCode, 200)
-      assert.strictEqual(resp.body, 'def')
-      assert.ok(serverHit);
+      assert.strictEqual(resp.body, '1234')
     }).promise()
   })
 
@@ -81,8 +76,8 @@ describe('Serving from local', () => {
         , strategy = 'mirror'
       yield this.serve({ docroot, strategy })
       yield adapt(fs.unlink, file)
-    }).to(function*(req, resp) {
-      resp.end('def')
+    }).to({
+      body: 'def',
     }).receiving(function*(resp) {
       assert.strictEqual(resp.body, 'def')
     }).promise()

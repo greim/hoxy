@@ -212,7 +212,7 @@ describe('send', () => {
     })
   })
 
-  it('receive body data', () => {
+  it('should receive body data', () => {
     return send({
       path: 'http://example.com/',
       method: 'GET',
@@ -220,6 +220,21 @@ describe('send', () => {
       resp.end('hello')
     }).receiving(function*(resp) {
       assert.equal(resp.body, 'hello')
+    }).promise()
+  })
+
+  it('should send to an object literal instead of a function', () => {
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).to({
+      statusCode: 400,
+      headers: { 'x-foo': 'bar' },
+      body: '123',
+    }).receiving(function*(resp) {
+      assert.equal(resp.statusCode, 400)
+      assert.equal(resp.headers['x-foo'], 'bar')
+      assert.equal(resp.body, '123')
     }).promise()
   })
 })
