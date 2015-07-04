@@ -6,231 +6,103 @@
 // MOCHA TESTS
 // http://visionmedia.github.com/mocha/
 
-var await = require('await')
+var awate = require('await')
 var fs = require('fs')
 var assert = require('assert')
 var roundTrip = require('./lib/round-trip')
+var send = require('./lib/send')
+var adapt = require('ugly-adapter')
 
 // ---------------------------
 
-describe('Serving from local', function(){
+describe('Serving from local', () => {
 
-  it('should serve', function(done){
-    roundTrip({
-      request:{
-        url: '/abc',
-        method: 'GET'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        this.serve({
-          docroot: __dirname+'/files'
-        }, function(){
-          next();
-        })
-      },
-      server: function(){
-        done(new Error('server hit was not skipped'))
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'abc')
-        done()
-      }
-    })
+  it('should serve', () => {
+    return send({
+      path: 'http://example.com/abc',
+    }).through('request', function*() {
+      yield this.serve({ docroot: `${__dirname}/files` })
+    }).to(function*() {
+      throw new Error('server hit was not skipped')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, 'abc2')
+    }).promise()
   })
 
-  it('should not fallback silently with serve', function(done){
-    roundTrip({
-      request:{
-        url: '/def',
-        method: 'GET'
-      },
-      response:{
-        statusCode: 200,
-        body: 'def'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        this.serve({
-          docroot: __dirname+'/files'
-        }, function(){
-          next();
-        })
-      },
-      server: function(){
-        done(new Error('server hit was not skipped'))
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, '')
-        assert.strictEqual(resp.statusCode, 404, 'should have been 404 but was '+resp.statusCode)
-        done()
-      }
-    })
+  it('should not see through to server with serve', () => {
+    return send({
+      path: 'http://example.com/def',
+    }).through('request', function*() {
+      yield this.serve({ docroot: `${__dirname}/files` })
+    }).to(function*() {
+      throw new Error('failed to skip server')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, '')
+      assert.strictEqual(resp.statusCode, 404, `should have been 404 but was ${resp.statusCode}`)
+    }).promise()
   })
 
-  it('should serve with overlay strategy', function(done){
-    roundTrip({
-      request:{
-        url: '/abc',
-        method: 'GET'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        this.serve({
-          docroot:__dirname+'/files',
-          strategy: 'overlay'
-        }, function(){
-          next();
-        })
-      },
-      server: function(){
-        done(new Error('server hit was not skipped'))
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'abc')
-        done()
-      }
-    })
+  it('should serve with overlay strategy', () => {
+    return send({
+      path: 'http://example.com/abc',
+    }).through('request', function*() {
+      let opts = { docroot: `${__dirname}/files`, strategy: 'overlay' }
+      yield this.serve(opts)
+    }).to(function*() {
+      throw new Error('server hit was not skipped')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, 'abc2')
+    }).promise()
   })
 
-  it('should fallback silently with overlay strategy', function(done){
+  it('should fallback silently with overlay strategy', () => {
     var serverHit = false;
-    roundTrip({
-      request:{
-        url: '/def',
-        method: 'GET'
-      },
-      response:{
-        statusCode: 200,
-        body: 'def'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        this.serve({
-          docroot:__dirname+'/files',
-          strategy: 'overlay'
-        }, function(){
-          next();
-        })
-      },
-      server: function(){
-        serverHit = true;
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'def')
-        assert.ok(serverHit);
-        done()
-      }
-    })
+    return send({
+      path: 'http://example.com/def',
+    }).through('request', function*() {
+      let opts = { docroot: `${__dirname}/files`, strategy: 'overlay' }
+      yield this.serve(opts)
+    }).to(function*(req, resp) {
+      serverHit = true
+      resp.end('def')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.statusCode, 200)
+      assert.strictEqual(resp.body, 'def')
+      assert.ok(serverHit);
+    }).promise()
   })
 
-  it('should mirror with mirror strategy', function(done){
-    var serverHit = false;
-    roundTrip({
-      request:{
-        url: '/def',
-        method: 'GET'
-      },
-      response:{
-        statusCode: 200,
-        body: 'def'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        this.serve({
-          docroot:__dirname+'/files',
-          strategy: 'mirror'
-        }, function(err){
-          var file = __dirname+'/files/def'
-          fs.exists(file, function(exists){
-            if (exists){
-              next(err)
-            } else {
-              next(new Error('did not create '+file))
-            }
-          });
-        })
-      },
-      server: function(){
-        serverHit = true;
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'def')
-        done()
-      }
-    })
+  it('should mirror with mirror strategy', () => {
+    return send({
+      path: 'http://example.com/def',
+    }).through('request', function*() {
+      let docroot = `${__dirname}/files`
+        , file = `${docroot}/def`
+        , strategy = 'mirror'
+      yield this.serve({ docroot, strategy })
+      yield adapt(fs.unlink, file)
+    }).to(function*(req, resp) {
+      resp.end('def')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, 'def')
+    }).promise()
   })
 
-  it('should not re-mirror with mirror strategy', function(done){
-    var serverHit = false;
-    roundTrip({
-      request:{
-        url: '/abc',
-        method: 'GET'
-      },
-      response:{
-        statusCode: 200,
-        body: 'abc2'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        this.serve({
-          docroot:__dirname+'/files',
-          strategy: 'mirror'
-        }, function(err){
-          var file = __dirname+'/files/def'
-          fs.exists(file, function(exists){
-            if (exists){
-              next(err)
-            } else {
-              next(new Error('did not create '+file))
-            }
-          });
-        })
-      },
-      server: function(){
-        serverHit = true;
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'abc')
-        assert.ok(!serverHit, 'should not have hit server');
-        done()
-      }
-    })
+  it('should not re-mirror with mirror strategy', () => {
+    return send({
+      path: 'http://example.com/abc',
+    }).through('request', function*() {
+      let docroot = `${__dirname}/files`
+        , strategy = 'mirror'
+        , file = `${docroot}/abc`
+      let stat1 = yield adapt(fs.stat, file)
+      yield this.serve({ docroot, strategy })
+      let stat2 = yield adapt(fs.stat, file)
+      assert.equal(stat1.mtime.getTime(), stat2.mtime.getTime())
+    }).to(function*() {
+      throw new Error('should not have hit server')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, 'abc2')
+    }).promise()
   })
 })
-
-var files = [
-  __dirname+'/files/def'
-]
-function removeFiles(done){
-  var fileProms = files.map(function(file){
-    return await('done')
-    .run(function(p){
-      fs.exists(file, function(ex){
-        if (ex){
-          fs.unlink(file, p.nodify('done'))
-        } else {
-          p.keep('done')
-        }
-      })
-    })
-  })
-  await.all(fileProms)
-  .onkeep(function(){done()})
-  .onfail(done)
-}
-before(removeFiles)
-after(removeFiles)
