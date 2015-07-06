@@ -6,60 +6,42 @@
 // MOCHA TESTS
 // http://visionmedia.github.com/mocha/
 
-var await = require('await')
-var assert = require('assert')
-var querystring = require('querystring')
-var streams = require('../lib/streams')
-var roundTrip = require('./lib/round-trip')
+import assert from 'assert'
+import querystring from 'querystring'
+import roundTrip from './lib/round-trip'
+import send from './lib/send'
+import adapt from 'ugly-adapter'
 
 // ---------------------------
 
 describe('Load data as type', function(){
 
-  it('should load request bodies', function(done){
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: 'abcdefg'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp, next){
-        req._load(function(err){
-          assert.strictEqual(req.string, 'abcdefg')
-          next()
-        })
-      },
-      server: function(req, body){
-        assert.strictEqual(body, 'abcdefg')
-        done()
-      }
-    })
+  it('should load request bodies (send)', () => {
+    send({
+      method: 'POST',
+      body: 'abcdefg',
+    }).through('request', function*(req) {
+      yield adapt.method(req, '_load')
+      assert.strictEqual(req.string, 'abcdefg')
+    }).to(function*(req, resp) {
+      req.pipe(resp)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, 'abcdefg')
+    }).promise()
   })
 
-  it('should load response bodies', function(done){
-    roundTrip({
-      response: {
-        status: 200,
-        body: 'abcdefg'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      responseIntercept: function(req, resp, next){
-        resp._load(function(err){
-          assert.strictEqual(resp.string, 'abcdefg')
-          next()
-        })
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'abcdefg')
-        done()
-      }
-    })
+  it('should load response bodies', () => {
+    return send({}).to({
+      body: 'abcdefg',
+    }).through('response', function*(req, resp) {
+      yield adapt.method(resp, '_load')
+      assert.strictEqual(resp.string, 'abcdefg')
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, 'abcdefg')
+    }).promise()
   })
+
+  // TODO: convert remainder of these tests to more compact send() utility.
 
   it('should set request bodies', function(done){
     roundTrip({

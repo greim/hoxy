@@ -71,7 +71,7 @@ class Sender {
         let toServer = http.request({
           hostname: 'localhost',
           port: proxy.address().port,
-          path: reqInfo.path,
+          path: reqInfo.path || 'http://example.com/',
           method: reqInfo.method,
           headers: reqInfo.headers,
         }, response => {
