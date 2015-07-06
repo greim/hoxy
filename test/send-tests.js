@@ -160,7 +160,42 @@ describe('send', () => {
     })
   })
 
-  it('should hit every phase', () => {
+  it('should hit every phase (1)', () => {
+    let steps = ''
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).through('request', function() {
+      steps += '1'
+    }).to(function*(req, resp) {
+      steps += '2'
+      resp.end('')
+    }).receiving(function*() {
+      steps += '3'
+    }).promise().then(() => {
+      assert.equal(steps, '123', 'unexpected steps ordering')
+    })
+  })
+
+  it('should hit every phase (2)', () => {
+    let steps = ''
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).through('request', function(req, resp, done) {
+      steps += '1'
+      setImmediate(done)
+    }).to(function*(req, resp) {
+      steps += '2'
+      resp.end('')
+    }).receiving(function*() {
+      steps += '3'
+    }).promise().then(() => {
+      assert.equal(steps, '123', 'unexpected steps ordering')
+    })
+  })
+
+  it('should hit every phase (3)', () => {
     let steps = ''
     return send({
       path: 'http://example.com/',
@@ -177,7 +212,42 @@ describe('send', () => {
     })
   })
 
-  it('should hit every phase', () => {
+  it('should hit every phase (4)', () => {
+    let steps = ''
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).through('response', function() {
+      steps += '2'
+    }).to(function*(req, resp) {
+      steps += '1'
+      resp.end('')
+    }).receiving(function*() {
+      steps += '3'
+    }).promise().then(() => {
+      assert.equal(steps, '123', 'unexpected steps ordering')
+    })
+  })
+
+  it('should hit every phase (5)', () => {
+    let steps = ''
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).through('response', function(req, resp, done) {
+      steps += '2'
+      setImmediate(done)
+    }).to(function*(req, resp) {
+      steps += '1'
+      resp.end('')
+    }).receiving(function*() {
+      steps += '3'
+    }).promise().then(() => {
+      assert.equal(steps, '123', 'unexpected steps ordering')
+    })
+  })
+
+  it('should hit every phase (6)', () => {
     let steps = ''
     return send({
       path: 'http://example.com/',
@@ -191,6 +261,25 @@ describe('send', () => {
       steps += '3'
     }).promise().then(() => {
       assert.equal(steps, '123', 'unexpected steps ordering')
+    })
+  })
+
+  it('should hit multiple phases', () => {
+    let steps = ''
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).through('request', function*() {
+      steps += '1'
+    }).through('response', function*() {
+      steps += '3'
+    }).to(function*(req, resp) {
+      steps += '2'
+      resp.end('')
+    }).receiving(function*() {
+      steps += '4'
+    }).promise().then(() => {
+      assert.equal(steps, '1234', 'unexpected steps ordering')
     })
   })
 

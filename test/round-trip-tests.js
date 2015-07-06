@@ -97,7 +97,6 @@ describe('Round trips', function(){
         throw new Error('fake error')
       },
       responseIntercept: function(req, resp){
-        console.log('got here')
         respInt = true
       },
       server: function(){

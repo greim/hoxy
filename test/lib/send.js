@@ -54,18 +54,17 @@ class Sender {
         let proxy = new hoxy.Proxy()
         proxy.listen(0)
         proxy.on('error', reject)
+        proxy.on('log', log => {
+          if (log.level === 'error') {
+            reject(log.error)
+          }
+        })
         proxy.intercept('request', (req) => {
           req.hostname = 'localhost'
           req.port = server.address().port
         })
         for (let { opts, handler } of this._interceptHandlers) {
-          proxy.intercept(opts, function(req, resp, done) {
-            co.call(this, function*() {
-              yield* handler.call(this, req, resp)
-            }).then(() => {
-              done()
-            }).catch(reject)
-          })
+          proxy.intercept(opts, handler)
         }
         // -----------------
         let toServer = http.request({
