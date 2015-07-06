@@ -10,6 +10,7 @@ var await = require('await')
 var assert = require('assert')
 var roundTrip = require('./lib/round-trip')
 var getMegaSource = require('./lib/megabyte-stream')
+var send = require('./lib/send')
 
 // ---------------------------
 
@@ -83,10 +84,10 @@ describe('Round trips', function(){
   })
 
   it('should handle a synchronous request intercept error gracefully', function(done){
-    var error = false,
-      reqInt = false,
-      respInt = false,
-      server = false
+    var error = false
+      , reqInt = false
+      , respInt = false
+      , server = false
     roundTrip({
       error: function(err, mess){
         error = true
@@ -96,6 +97,7 @@ describe('Round trips', function(){
         throw new Error('fake error')
       },
       responseIntercept: function(req, resp){
+        console.log('got here')
         respInt = true
       },
       server: function(){
@@ -321,38 +323,20 @@ describe('Round trips', function(){
     })
   })
 
-  it('should skip the server hit if the response statusCode is populated', function(done){
-    roundTrip({
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp){
-        resp.statusCode = 404
-      },
-      server: function(){
-        done(new Error('server hit was not skipped'))
-      },
-      client: function(){
-        done()
-      }
-    })
+  it('should skip the server hit if the response statusCode is populated', () => {
+    return send({}).through('request', function* (req, resp) {
+      resp.statusCode = 404
+    }).to(function*() {
+      throw new Error('server hit was not skipped')
+    }).promise()
   })
 
-  it('should skip the server hit if the response body is populated', function(done){
-    roundTrip({
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp){
-        resp.string = '12345'
-      },
-      server: function(){
-        done(new Error('server hit was not skipped'))
-      },
-      client: function(){
-        done()
-      }
-    })
+  it('should skip the server hit if the response body is populated', () => {
+    return send({}).through('request', function* (req, resp) {
+      resp.string = '123'
+    }).to(function*() {
+      throw new Error('server hit was not skipped')
+    }).promise()
   })
 
   it('should simulate latency upload', function(done){
