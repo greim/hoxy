@@ -3,9 +3,6 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-// MOCHA TESTS
-// http://visionmedia.github.com/mocha/
-
 var fs = require('fs')
 var assert = require('assert')
 var send = require('./lib/send')

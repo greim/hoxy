@@ -3,9 +3,6 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-// MOCHA TESTS
-// http://visionmedia.github.com/mocha/
-
 import assert from 'assert'
 import querystring from 'querystring'
 import roundTrip from './lib/round-trip'

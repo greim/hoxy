@@ -3,9 +3,6 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-// MOCHA TESTS
-// http://visionmedia.github.com/mocha/
-
 var await = require('await')
 var assert = require('assert')
 var roundTrip = require('./lib/round-trip')
