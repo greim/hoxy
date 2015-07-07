@@ -258,7 +258,7 @@ describe('Load data as type', function(){
     })
   })
 
-  it.only('should load reddit', () => {
+  it.skip('should load reddit', () => {
     return send({}).through('request', (req) => {
       req.hostname = 'www.reddit.com'
       req.port = 80
