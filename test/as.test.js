@@ -286,7 +286,7 @@ describe('Load data as type', function(){
     }).promise()
   })
 
-  it.only('should load a reddit-size page', () => {
+  it('should load a reddit-size page', () => {
     return send({}).to((req, resp) => {
       resp.writeHead(200, {
         'date': 'Tue, 07 Jul 2015 04:54:21 GMT',
