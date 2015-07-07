@@ -100,4 +100,46 @@ describe('Serving from local', () => {
       assert.strictEqual(resp.body, 'abc2')
     }).promise()
   })
+
+  it('should return a promise', () => {
+    return send({
+      path: 'http://example.com/abc',
+    }).through('request', function(req, resp, done) {
+      let docroot = `${__dirname}/files`
+      this.serve({ docroot })
+      .then(() => {
+        done()
+      }, done)
+    }).promise()
+  })
+
+  it('should accept a callback', () => {
+    return send({
+      path: 'http://example.com/abc',
+    }).through('request', function(req, resp, done) {
+      let docroot = `${__dirname}/files`
+      this.serve({ docroot }, done)
+    }).promise()
+  })
+
+  it('should not return a promise if callback provided', () => {
+    return send({
+      path: 'http://example.com/abc',
+    }).through('request', function(req, resp, done) {
+      let docroot = `${__dirname}/files`
+        , isPromise = false
+        , checked = false
+      let returned = this.serve({ docroot }, () => {
+        try {
+          assert.ok(checked, 'did not run check')
+          assert.ok(!isPromise, 'returned a promise')
+          done()
+        } catch(ex) {
+          done(ex)
+        }
+      })
+      isPromise = returned && typeof returned.then === 'function'
+      checked = true
+    }).promise()
+  })
 })

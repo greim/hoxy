@@ -206,7 +206,7 @@
     </p>
     <pre class="language-javascript code">
       proxy.intercept('request', function(req, resp){
-        console.log('request made to: '+req.url);
+        console.log('request made to: ' + req.url);
       });
     </pre>
     <p>
@@ -220,33 +220,53 @@
       });
     </pre>
     <p>
-      Intercept callbacks with arity of three are treated as asynchronous.
-      In this case, call <code>done()</code> to pass control to the next intercept handler.
+      Hoxy waits for an interceptor to finish before proceeding to the next step.
+      That happens naturally when everything's synchronous.
+      But if you want hoxy to wait for async things to finish first, you need to tell it.
+      Generators + promises are currently the easiest way to do this.
+      Simply declare your interceptor a generator, then yield promises from it.
+      Error handling gets rolled up automatically.
+      For more info, check out the <a href="https://www.npmjs.com/package/co">co utility</a>.
     </p>
     <pre class="language-javascript code">
-      // make everything slow
-      proxy.intercept('request', function(req, resp, done){
-        setTimeout(done, 1000);
+      proxy.intercept('request', function*(req, resp){
+        var symbol = yield getSymbol();
+        var price = yield stockPrice(symbol);
+        // do something with "price"
       });
     </pre>
     <p>
-      Admit that you screwed up.
+      If generators aren't an option, returning a promise also works.
     </p>
     <pre class="language-javascript code">
-      // sync
       proxy.intercept('request', function(req, resp){
-        throw new Error('I screwed up.');
-      });
-
-      // async
-      proxy.intercept('request', function(req, resp, done){
-        setTimeout(function(){
-          done(new Error('I screwed up.'));
-        }, 1000);
+        return getSymbol().then(function(symbol) {
+          return stockPrice(symbol);
+        }).then(function(proce) {
+          // do something with "price"
+        });
       });
     </pre>
     <p>
-      Intercept all <code>GET</code> requests to <code>example.com</code>.
+      If none of the above is an option, callbacks also work.
+      An interceptor with an arity of 3 signals hoxy to wait until you call <code>done()</code>, like below.
+      Just remember to handle your errors!
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept('request', function(req, resp, done){
+        getSymbol(function(err, symbol) {
+          if (err) { return done(err); }
+          stockPrice(symbol, function(err, price) {
+            if (err) { return done(err); }
+            // do something with "price"
+            done();
+          })
+        })
+      });
+    </pre>
+    <p>
+      Options affect how, or if, interceptors get called.
+      The following will only intercept <code>GET</code> requests to <code>example.com</code>.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -258,7 +278,8 @@
       });
     </pre>
     <p>
-      Intercept all <code>text/html</code> responses, exposing the response body as the <code>$</code> variable.
+      Intercept only <code>text/html</code> responses.
+      Expose the response body as a readable/writable <code>$</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -271,7 +292,7 @@
       });
     </pre>
     <p>
-      Intercept <code>UTF-8</code> responses, exposing the response body as the <code>string</code> variable.
+      Intercept only <code>UTF-8</code> responses, exposing the response body as the <code>string</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -948,20 +969,21 @@
 </p>
 
 <div class="api-detail">
-  <h3 id="cycle-serve"><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>)</a></h3>
+  <h3 id="cycle-serve"><a href="#cycle-serve">this.serve(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Provisions responses from the local filesystem.
       Generally, the reason you'd do this is to be able to edit those files locally and test them as if they were live on the remote server.
       This action populates the response object; see <a href="#response-population">response population</a> for more info.
+      The completion of this action is asynchronous, so <code>serve()</code> returns a promise.
       Example.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
-      }, function(req, resp, done){
-        this.serve('/Users/gr123/test/main.js', done);
+      }, function(req, resp){
+        return this.serve('/Users/gr123/test/main.js');
       });
     </pre>
     <p>
@@ -971,11 +993,9 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
-      }, function(req, resp, done){
-        this.serve({
+      }, function(req, resp){
+        return this.serve({
           path: '/Users/gr123/test/main.js'
-        }, function(err){
-          done(err);
         });
       });
     </pre>
@@ -1041,9 +1061,7 @@
       </tbody>
     </table>
     <p>
-      <code>callback</code> is called after the response has been populated.
-      If an error occurred, the error is passed to the callback, otherwise no arguments are passed.
-      Note that a 404 response is <em>not</em> considered an error in this case.
+      The returned promise resolves after the response has been populated.
       There are at least three use cases worth mentioning.
     </p>
     <p>
@@ -1060,8 +1078,8 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/js/main.js'
-      }, function(req, resp, done){
-        this.serve(__dirname + '/main.js', done);
+      }, function(req, resp){
+        return this.serve(__dirname + '/main.js');
       });
     </pre>
     <p>
@@ -1083,11 +1101,11 @@
         phase: 'request',
         host: 'example.com',
         url: /^\/js\/.*/
-      }, function(req, resp, done){
-        this.serve({
+      }, function(req, resp){
+        return this.serve({
           docroot: __dirname,
           strategy: 'overlay'
-        }, done);
+        });
       });
     </pre>
     <p>
@@ -1100,11 +1118,11 @@
         phase: 'request',
         host: 'example.com',
         url: /^\/js\/.*/
-      }, function(req, resp, done){
-        this.serve({
+      }, function(req, resp){
+        return this.serve({
           docroot: __dirname,
           strategy: 'mirror'
-        }, done);
+        });
       });
     </pre>
   </div>

@@ -9,10 +9,26 @@ import roundTrip from './lib/round-trip'
 import send from './lib/send'
 import adapt from 'ugly-adapter'
 import wait from '../lib/wait'
+import co from 'co'
 
 // ---------------------------
 
 describe('pseudo-synchronous', function(){
+
+  it('wait on returned promises', () => {
+    let start = Date.now()
+    return send({}).through('request', function() {
+      return co(function*() {
+        yield wait(50)
+      })
+    }).to({
+      body: '123',
+    }).receiving(function*(resp) {
+      let end = Date.now()
+      assert.strictEqual(resp.body, '123')
+      assert.ok(end - start >= 50)
+    }).promise()
+  })
 
   it('should allow a generator in request', () => {
     let start = Date.now()
