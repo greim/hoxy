@@ -8,6 +8,7 @@ import querystring from 'querystring'
 import roundTrip from './lib/round-trip'
 import send from './lib/send'
 import adapt from 'ugly-adapter'
+import fs from 'fs'
 
 // ---------------------------
 
@@ -282,6 +283,34 @@ describe('Load data as type', function(){
       resp.$('title').text('bar')
     }).receiving(function*(resp) {
       assert.equal(resp.body, '<!doctype html><html><head><title>bar</title></head><body><div id="content"></div></body></html>')
+    }).promise()
+  })
+
+  it.only('should load a reddit-size page', () => {
+    return send({}).to((req, resp) => {
+      resp.writeHead(200, {
+        'date': 'Tue, 07 Jul 2015 04:54:21 GMT',
+        'content-type': 'text/html; charset=UTF-8',
+        'connection': 'keep-alive',
+        'set-cookie': '__cfduid=d584541646503d8561ef841d43c7e98ec1436244861; expires=Wed, 06-Jul-16 04:54:21 GMT; path=/; domain=.reddit.com; HttpOnly',
+        'x-ua-compatible': 'IE=edge',
+        'x-frame-options': 'SAMEORIGIN',
+        'x-content-type-options': 'nosniff',
+        'x-xss-protection': '1; mode=block',
+        'vary': 'accept-encoding',
+        'cache-control': 'no-cache',
+        'x-moose': 'majestic',
+        'cf-cache-status': 'HIT',
+        'server': 'cloudflare-nginx',
+        'cf-ray': '2020f36f3a35118f-DFW',
+      })
+      let reddit = fs.createReadStream(`${__dirname}/files/reddit.html`)
+      reddit.pipe(resp)
+    }).through({
+      phase: 'response',
+      as: '$',
+    }, (req, resp) => {
+      resp.$('title').text('Unicorns!')
     }).promise()
   })
 
