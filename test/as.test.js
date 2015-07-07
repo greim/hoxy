@@ -258,54 +258,45 @@ describe('Load data as type', function(){
     })
   })
 
-  it('should intercept response DOM', function(done){
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          //try{
-          assert.ok(resp.$, '$ should exist')
-          assert.strictEqual(resp.$('title').text(), 'foo')
-          resp.$('title').text('bar')
-          //}catch(err){console.log(err)}
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(body, '<!doctype html><html><head><title>bar</title></head><body><div id="content"></div></body></html>')
-        done()
-      }
-    })
+  it.skip('should load reddit', () => {
+    return send({}).through('request', (req) => {
+      req.hostname = 'www.reddit.com'
+      req.port = 80
+    }).through({
+      phase: 'response',
+      as: '$',
+    }, (req, resp) => {
+      resp.$('title').text('Unicorns!')
+    }).promise()
   })
 
-  it('should intercept response JSON', function(done){
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: JSON.stringify({foo:'bar',baz:2})
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'json'},
-        callback: function(req, resp){
-          assert.ok(resp.json, 'json should exist')
-          assert.deepEqual(resp.json, {foo:'bar',baz:2})
-          resp.json.qux = {};
-        }
-      }],
-      client: function(resp, body){
-        assert.deepEqual(JSON.parse(body), {foo:'bar',baz:2,qux:{}})
-        done()
-      }
-    })
+  it('should intercept response DOM', () => {
+    return send({}).to({
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+      body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>',
+    }).through({
+      phase: 'response',
+      mimeType: 'text/html',
+      as: '$',
+    }, (req, resp) => {
+      resp.$('title').text('bar')
+    }).receiving(function*(resp) {
+      assert.equal(resp.body, '<!doctype html><html><head><title>bar</title></head><body><div id="content"></div></body></html>')
+    }).promise()
+  })
+
+  it('should intercept response JSON', () => {
+    return send({}).to({
+      headers: { 'content-type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({foo:{bar:{baz:{qux:{}}}}}),
+    }).through({
+      phase: 'response',
+      as: 'json',
+    }, (req, resp) => {
+      resp.json.foo.bar.baz.qux = 1
+    }).receiving(function*(resp) {
+      assert.equal(resp.body, JSON.stringify({foo:{bar:{baz:{qux:1}}}}))
+    }).promise()
   })
 
   it('should send content length to server for string', function(done){
