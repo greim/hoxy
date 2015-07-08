@@ -226,7 +226,7 @@
       Generators + promises are currently the easiest way to do this.
       Simply declare your interceptor a generator, then yield promises from it.
       Error handling gets rolled up automatically.
-      For more info, check out the <a href="https://www.npmjs.com/package/co">co utility</a>.
+      For more info, check out the <a href="https://www.npmjs.com/package/co">co utility</a> and the <a href="https://github.com/greim/ugly-adapter">ugly-adapter utility</a>.
     </p>
     <pre class="language-javascript code">
       proxy.intercept('request', function*(req, resp){
@@ -1048,7 +1048,7 @@
               <li>
                 <code>overlay</code> -
                 Overlays the local docroot on top of the remote one.
-                In other words, if a requested file doesn't exist locally, it becomes a no-op, allowing the proxy to "see through" to the one on the remote server.
+                In other words, if a requested file doesn't exist locally, the request will transparently fall through to the remote server.
               </li>
               <li>
                 <code>mirror</code> -
@@ -1543,9 +1543,10 @@
 <h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>
 
 <ul>
-  <li>Copyright &copy; 2014 by <a href="https://github.com/greim">Greg Reimer</a></li>
+  <li>Copyright &copy; 2015 by <a href="https://github.com/greim">Greg Reimer</a></li>
   <li>MIT License</li>
   <li><a href="https://github.com/greim/hoxy">Project on GitHub</a></li>
+  <li><a href="https://www.npmjs.org/package/hoxy">Project on npm</a></li>
 </ul>
 
 <ul id="nav"></ul>
