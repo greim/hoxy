@@ -8,8 +8,6 @@ var assert = require('assert')
 var send = require('./lib/send')
 var adapt = require('ugly-adapter')
 
-// ---------------------------
-
 describe('Serving from local', () => {
 
   it('should serve', () => {

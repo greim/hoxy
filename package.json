@@ -10,7 +10,7 @@
   "bin": "./cli/hoxy-cli.js",
   "main": "./hoxy",
   "scripts": {
-    "test": "node node_modules/.bin/mocha --compilers js:babel/register"
+    "test": "node node_modules/.bin/mocha --compilers js:babel/register --bail --timeout 3000"
   },
   "keywords": [
     "develop",
@@ -36,6 +36,7 @@
     "node-static": "^0.7.6",
     "nodemon": "^1.0.17",
     "route-pattern": "^0.0.6",
+    "stream-throttle": "^0.1.3",
     "ugly-adapter": "^1.1.0"
   },
   "license": "MIT",

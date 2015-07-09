@@ -1,6 +1,7 @@
 import co from 'co'
 import http from 'http'
 import hoxy from '../../hoxy'
+import wait from '../../lib/wait'
 
 /*
  * Utility for testing hoxy.
@@ -36,7 +37,7 @@ import hoxy from '../../hoxy'
 
 class Sender {
 
-  constructor(reqInfo) {
+  constructor(reqInfo, ignoreInterceptorErrors, proxyOpts) {
     this._serverHandler = (req, resp) => { resp.end('') }
     this._clientHandler = () => {}
     this._interceptHandlers = []
@@ -51,14 +52,16 @@ class Sender {
           }).catch(reject)
         })
         // -----------------
-        let proxy = new hoxy.Proxy()
+        let proxy = new hoxy.Proxy(proxyOpts)
         proxy.listen(0)
         proxy.on('error', reject)
-        proxy.on('log', log => {
-          if (log.level === 'error') {
-            reject(log.error)
-          }
-        })
+        if (!ignoreInterceptorErrors) {
+          proxy.on('log', log => {
+            if (log.level === 'error') {
+              reject(log.error)
+            }
+          })
+        }
         proxy.intercept('request', (req) => {
           req.hostname = 'localhost'
           req.port = server.address().port
@@ -78,6 +81,7 @@ class Sender {
           response.on('data', chunk => body += chunk.toString('utf8'))
           response.on('end', () => {
             co.call(this, function*() {
+              yield wait()
               yield* this._clientHandler({
                 statusCode: response.statusCode,
                 headers: response.headers,
@@ -86,11 +90,16 @@ class Sender {
             }).then(resolve, reject)
           })
         })
+        toServer.on('error', reject)
         let sendBody = reqInfo.body
-        if (!(sendBody instanceof Buffer)) {
-          sendBody = new Buffer(sendBody || '', 'utf8')
+        if (sendBody && typeof sendBody.pipe === 'function') {
+          sendBody.on('error', reject)
+          sendBody.pipe(toServer)
+        } else {
+          if (!sendBody) { sendBody = '' }
+          if (!Buffer.isBuffer(sendBody)) { sendBody = new Buffer(sendBody, 'utf8') }
+          toServer.end(sendBody)
         }
-        toServer.end(sendBody)
         // -----------------
         this._close = () => {
           server.close()
@@ -109,7 +118,11 @@ class Sender {
         , body = obj.body || ''
       fn = function*(req, resp) {
         resp.writeHead(statusCode, headers)
-        resp.end(body)
+        if (typeof body.pipe === 'function') {
+          body.pipe(resp)
+        } else {
+          resp.end(body)
+        }
       }
     }
     this._serverHandler = fn
@@ -131,6 +144,6 @@ class Sender {
   }
 }
 
-export default function send(reqInfo) {
-  return new Sender(reqInfo)
+export default function send(...args) {
+  return new Sender(...args)
 }

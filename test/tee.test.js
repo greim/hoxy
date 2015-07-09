@@ -3,36 +3,22 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var await = require('await')
-var assert = require('assert')
-var roundTrip = require('./lib/round-trip')
-var getMegaSource = require('./lib/megabyte-stream')
-var PassThrough = require('stream').PassThrough
+import assert from 'assert'
+import { PassThrough } from 'stream'
+import send from './lib/send'
+import streams from '../lib/streams'
 
-// ---------------------------
+describe('tee', function() {
 
-describe('Round trips', function(){
-
-  it('should round trip synchronously', function(done){
-    roundTrip({
-      error: function(err){
-        done(err)
-      },
-      response:{
-        body: 'abcdefghijklmnopqrstuvwxyz'
-      },
-      responseIntercept: function(req, resp){
-        var pass = new PassThrough()
-        var str = ''
-        resp.tee(pass)
-        pass.on('data', function(ch){
-          str += ch
-        })
-        pass.on('end', function(){
-          assert.strictEqual(str, 'abcdefghijklmnopqrstuvwxyz')
-          done()
-        })
-      }
-    })
+  it('should tee', () => {
+    let pass = new PassThrough()
+    return send({}).to({
+      body: 'abcdefghijklmnopqrstuvwxyz',
+    }).through('response', function(req, resp) {
+      resp.tee(pass)
+    }).receiving(function*() {
+      let passed = yield streams.collect(pass, 'utf8')
+      assert.equal(passed, 'abcdefghijklmnopqrstuvwxyz')
+    }).promise()
   })
 })

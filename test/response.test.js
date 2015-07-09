@@ -7,8 +7,6 @@ var assert = require('assert')
 var Response = require('../lib/response')
 var streams = require('../lib/streams')
 
-// ---------------------------
-
 function getResponseData(){
   var data = streams.from([
     new Buffer('<!doctype html><html><head></head><body>', 'utf8'),

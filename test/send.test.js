@@ -6,8 +6,6 @@
 import assert from 'assert'
 import send from './lib/send'
 
-// ---------------------------
-
 function failAfter(t) {
   return new Promise((res, rej) => {
     setTimeout(() => rej(new Error('fake')), t)

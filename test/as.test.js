@@ -5,21 +5,18 @@
 
 import assert from 'assert'
 import querystring from 'querystring'
-import roundTrip from './lib/round-trip'
 import send from './lib/send'
-import adapt from 'ugly-adapter'
 import fs from 'fs'
+import streams from '../lib/streams'
 
-// ---------------------------
-
-describe('Load data as type', function(){
+describe('Load data as type', function() {
 
   it('should load request bodies (send)', () => {
     send({
       method: 'POST',
       body: 'abcdefg',
     }).through('request', function*(req) {
-      yield adapt.method(req, '_load')
+      yield req._load()
       assert.strictEqual(req.string, 'abcdefg')
     }).to(function*(req, resp) {
       req.pipe(resp)
@@ -32,7 +29,7 @@ describe('Load data as type', function(){
     return send({}).to({
       body: 'abcdefg',
     }).through('response', function*(req, resp) {
-      yield adapt.method(resp, '_load')
+      yield resp._load()
       assert.strictEqual(resp.string, 'abcdefg')
     }).receiving(function*(resp) {
       assert.strictEqual(resp.body, 'abcdefg')
@@ -41,222 +38,168 @@ describe('Load data as type', function(){
 
   // TODO: convert remainder of these tests to more compact send() utility.
 
-  it('should set request bodies', function(done){
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: 'abcdefg'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      requestIntercept: function(req, resp){
-        req.string = 'foobarbaz'
-      },
-      server: function(req, body){
-        assert.strictEqual(body, 'foobarbaz')
-        done()
-      }
-    })
+  it('should set request bodies', () => {
+    return send({
+      path: 'http://example.com/',
+      method: 'POST',
+      body: 'abcdefg',
+    }).through('request', function(req) {
+      req.string = 'foobarbaz'
+    }).to(function*(req, resp) {
+      let body = yield streams.collect(req, 'utf8')
+      assert.strictEqual(body, 'foobarbaz')
+      resp.end('')
+    }).promise()
   })
 
-  it('should set response bodies', function(done){
-    roundTrip({
-      response: {
-        status: 200,
-        body: 'abcdefg'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      responseIntercept: function(req, resp){
-        resp.string = 'foobarbaz'
-      },
-      client: function(resp, body){
-        assert.strictEqual(body, 'foobarbaz')
-        done()
-      }
-    })
+  it('should set response bodies', () => {
+    return send({}).to({
+      status: 200,
+      body: 'abcdefg',
+    }).through('response', function(req, resp) {
+      resp.string = 'foobarbaz'
+    }).receiving(function(resp) {
+      assert.strictEqual(resp.body, 'foobarbaz')
+    }).promise()
   })
 
-  it('should have undefined values for things', function(done){
-    roundTrip({
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request'},
-        callback: function(req, resp){
-          assert.strictEqual(req.buffers, undefined)
-          assert.strictEqual(req.string, undefined)
-          assert.strictEqual(req.$, undefined)
-          assert.strictEqual(req.json, undefined)
-          assert.strictEqual(req.params, undefined)
-          assert.strictEqual(resp.buffers, undefined)
-          assert.strictEqual(resp.string, undefined)
-          assert.strictEqual(resp.$, undefined)
-          assert.strictEqual(resp.json, undefined)
-          assert.strictEqual(resp.params, undefined)
-          done()
-        }
-      }]
-    })
+  it('should have undefined values for things', () => {
+    return send({}).through('request', function(req, resp) {
+      assert.strictEqual(req.buffers, undefined)
+      assert.strictEqual(req.string, undefined)
+      assert.strictEqual(req.$, undefined)
+      assert.strictEqual(req.json, undefined)
+      assert.strictEqual(req.params, undefined)
+      assert.strictEqual(resp.buffers, undefined)
+      assert.strictEqual(resp.string, undefined)
+      assert.strictEqual(resp.$, undefined)
+      assert.strictEqual(resp.json, undefined)
+      assert.strictEqual(resp.params, undefined)
+    }).promise()
   })
 
-  it('should intercept request buffers', function(done){
-    var aBody = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>';
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: aBody
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'buffers'},
-        callback: function(req, resp){
-          assert.ok(req.buffers, 'req.buffers should exist')
-          assert.strictEqual(req.buffers.join(''), aBody)
-          req.buffers = [new Buffer('abcdef')]
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(body, 'abcdef')
-        done()
-      }
-    })
+  it('should intercept request buffer', () => {
+    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: 'buffer',
+    }, function*(req) {
+      assert.ok(Buffer.isBuffer(req.buffer))
+      assert.strictEqual(req.buffer.toString('utf8'), body)
+    }).to(function*(req, resp) {
+      let rBod = yield streams.collect(req, 'utf8')
+      assert.strictEqual(rBod, body)
+      resp.end('')
+    }).promise()
   })
 
-  it('should intercept request string', function(done){
-    var aBody = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>';
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: aBody
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'string'},
-        callback: function(req, resp){
-          assert.ok(req.string, 'req.string should exist')
-          assert.strictEqual(req.string, aBody)
-          req.string = 'abcdef'
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(body, 'abcdef')
-        done()
-      }
-    })
+  it('should intercept response buffer', () => {
+    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    return send({}).to({ body }).through({
+      phase: 'response',
+      as: 'buffer',
+    }, function*(req, resp) {
+      assert.ok(Buffer.isBuffer(resp.buffer))
+      assert.strictEqual(resp.buffer.toString('utf8'), body)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, body)
+    }).promise()
   })
 
-  it('should intercept request params', function(done){
-    var aBody = 'foo=bar&foo%20bar=qux';
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: aBody
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'params'},
-        callback: function(req, resp){
-          assert.ok(req.params, 'req.params should exist')
-          assert.strictEqual(req.params.foo, 'bar')
-          assert.strictEqual(req.params['foo bar'], 'qux')
-          req.params = {a:'b'}
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(body, querystring.stringify({a:'b'}))
-        done()
-      }
-    })
+  it('should intercept request string', () => {
+    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: 'string',
+    }, function*(req) {
+      assert.ok(typeof req.string === 'string')
+      assert.strictEqual(req.string, body)
+    }).to(function*(req, resp) {
+      let rBod = yield streams.collect(req, 'utf8')
+      assert.strictEqual(rBod, body)
+      resp.end('')
+    }).promise()
   })
 
-  it('should intercept request JSON', function(done){
-    var aObj = {a:1,b:2}
-    var aBody = JSON.stringify(aObj)
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: aBody
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'json'},
-        callback: function(req, resp){
-          assert.ok(req.json, 'req.json should exist')
-          assert.strictEqual(req.json.a, 1)
-          assert.strictEqual(req.json.b, 2)
-          req.json.a = 0
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(body, JSON.stringify({a:0,b:2}))
-        done()
-      }
-    })
+  it('should intercept response string', () => {
+    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    return send({}).to({ body }).through({
+      phase: 'response',
+      as: 'string',
+    }, function*(req, resp) {
+      assert.ok(typeof resp.string === 'string')
+      assert.strictEqual(resp.string, body)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, body)
+    }).promise()
   })
 
-  it('should intercept response buffers', function(done){
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'buffers'},
-        callback: function(req, resp){
-          //try{
-          assert.ok(resp.buffers, 'resp.buffers should exist')
-          resp.buffers = [new Buffer('abcdef')]
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(body, 'abcdef')
-        done()
-      }
-    })
+  it('should intercept request params', () => {
+    let params = { foo: 'bar', baz: 'qux qux' }
+      , body = querystring.stringify(params)
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: 'params',
+    }, function*(req) {
+      assert.deepEqual(req.params, params)
+    }).to(function*(req, resp) {
+      let rBod = yield streams.collect(req, 'utf8')
+      assert.strictEqual(rBod, body)
+      resp.end('')
+    }).promise()
   })
 
-  it('should intercept response string', function(done){
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'string'},
-        callback: function(req, resp){
-          //try{
-          assert.ok(resp.string, 'resp.string should exist')
-          resp.string = 'abcdef'
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(body, 'abcdef')
-        done()
-      }
-    })
+  it('should intercept response params', () => {
+    let params = { foo: 'bar', baz: 'qux qux' }
+      , body = querystring.stringify(params)
+    return send({}).to({ body }).through({
+      phase: 'response',
+      as: 'params',
+    }, function*(req, resp) {
+      assert.deepEqual(resp.params, params)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, body)
+    }).promise()
+  })
+
+  it('should intercept request json', () => {
+    let json = { foo: 'bar', baz: 'qux qux' }
+      , body = JSON.stringify(json)
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: 'json',
+    }, function*(req) {
+      assert.deepEqual(req.json, json)
+    }).to(function*(req, resp) {
+      let rBod = yield streams.collect(req, 'utf8')
+      assert.strictEqual(rBod, body)
+      resp.end('')
+    }).promise()
+  })
+
+  it('should intercept response json', () => {
+    let json = { foo: 'bar', baz: 'qux qux' }
+      , body = JSON.stringify(json)
+    return send({}).to({ body }).through({
+      phase: 'response',
+      as: 'json',
+    }, function*(req, resp) {
+      assert.deepEqual(resp.json, json)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, body)
+    }).promise()
   })
 
   it.skip('should load reddit', () => {
@@ -314,292 +257,183 @@ describe('Load data as type', function(){
     }).promise()
   })
 
-  it('should intercept response JSON', () => {
-    return send({}).to({
-      headers: { 'content-type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({foo:{bar:{baz:{qux:{}}}}}),
+  it('should send content length to server for string', () => {
+    var body = 'abc'
+    return send({
+      method: 'POST',
+      body,
     }).through({
-      phase: 'response',
-      as: 'json',
-    }, (req, resp) => {
-      resp.json.foo.bar.baz.qux = 1
-    }).receiving(function*(resp) {
-      assert.equal(resp.body, JSON.stringify({foo:{bar:{baz:{qux:1}}}}))
+      phase: 'request',
+      as: 'string',
+    }, function() {
+      // nothing here
+    }).to(function*(req, resp) {
+      assert.equal(req.headers['content-length'], body.length)
+      resp.end('')
     }).promise()
   })
 
-  it('should send content length to server for string', function(done){
-    var bod = 'abc'
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'string'},
-        callback: function(req, resp){
-          assert.ok(req.string !== undefined)
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(req.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to server for $', () => {
+    var body = '<html></html>'
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: '$',
+    }, function() {
+      // nothing here
+    }).to(function*(req, resp) {
+      assert.equal(req.headers['content-length'], body.length)
+      resp.end('')
+    }).promise()
   })
 
-  it('should send content length to server for $', function(done){
-    var bod = '<html></html>'
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'$'},
-        callback: function(req, resp){
-          assert.ok(req.$ !== undefined)
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(req.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to server for json', () => {
+    var body = JSON.stringify({ foo: 'bar', baz: 2 })
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: 'json',
+    }, function() {
+      // nothing here
+    }).to(function*(req, resp) {
+      assert.equal(req.headers['content-length'], body.length)
+      resp.end('')
+    }).promise()
   })
 
-  it('should send content length to server for json', function(done){
-    var bod = JSON.stringify({foo:'bar',baz:2})
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'json'},
-        callback: function(req, resp){
-          assert.ok(req.json !== undefined)
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(req.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to server for params', () => {
+    var body = 'foo=bar&baz=qux'
+    return send({
+      method: 'POST',
+      body,
+    }).through({
+      phase: 'request',
+      as: 'params',
+    }, function() {
+      // nothing here
+    }).to(function*(req, resp) {
+      assert.equal(req.headers['content-length'], body.length)
+      resp.end('')
+    }).promise()
   })
 
-  it('should send content length to server for params', function(done){
-    var bod = 'foo=bar&baz=qux'
-    roundTrip({
-      request: {
-        url: '/',
-        method: 'POST',
-        body: 'foo=bar&baz=qux'
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'request',as:'params'},
-        callback: function(req, resp){
-          assert.ok(req.params !== undefined)
-        }
-      }],
-      server: function(req, body){
-        assert.strictEqual(req.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to client for string', () => {
+    var body = 'abcdefg'
+    return send({}).to(function*(req, resp) {
+      resp.end(body)
+    }).through({
+      phase: 'response',
+      as: 'string',
+    }, function() {
+      // nothing here
+    }).receiving(function*(resp) {
+      assert.equal(resp.headers['content-length'], body.length)
+    }).promise()
   })
 
-  it('should send content length to client for string', function(done){
-    var bod = 'abcdefg'
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'string'},
-        callback: function(req, resp){
-          assert.ok(resp.string !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to client for $', () => {
+    var body = '<html></html>'
+    return send({}).to(function*(req, resp) {
+      resp.end(body)
+    }).through({
+      phase: 'response',
+      as: '$',
+    }, function() {
+      // nothing here
+    }).receiving(function*(resp) {
+      assert.equal(resp.headers['content-length'], body.length)
+    }).promise()
   })
 
-  it('should send content length to client for $', function(done){
-    var bod = '<html></html>'
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          assert.ok(resp.$ !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to client for json', () => {
+    var body = JSON.stringify({ foo: 'bar', baz: 2 })
+    return send({}).to(function*(req, resp) {
+      resp.end(body)
+    }).through({
+      phase: 'response',
+      as: 'json',
+    }, function() {
+      // nothing here
+    }).receiving(function*(resp) {
+      assert.equal(resp.headers['content-length'], body.length)
+    }).promise()
   })
 
-  it('should send content length to client for json', function(done){
-    var bod = JSON.stringify({foo:'bar',baz:2})
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'json'},
-        callback: function(req, resp){
-          assert.ok(resp.json !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
+  it('should send content length to client for params', () => {
+    var body = 'foo=bar&baz=qux'
+    return send({}).to(function*(req, resp) {
+      resp.end(body)
+    }).through({
+      phase: 'response',
+      as: 'params',
+    }, function() {
+      // nothing here
+    }).receiving(function*(resp) {
+      assert.equal(resp.headers['content-length'], body.length)
+    }).promise()
   })
 
-  it('should send content length to client for params', function(done){
-    var bod = 'foo=bar&baz=qux'
-    roundTrip({
-      response: {
-        statusCode: 200,
-        body: bod
-      },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'params'},
-        callback: function(req, resp){
-          assert.ok(resp.params !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(resp.headers['content-length'], bod.length.toString())
-        done()
-      }
-    })
-  })
-
-  it('should send html by default', function(done){
+  it('should send html by default', () => {
     // This is valid html but *NOT* xml, because <br> is void.
-    var bod = '<html><br></html>'
-    roundTrip({
-      request: { url: '/' },
-      response: { body: bod },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          assert.ok(resp.$ !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(body, bod, 'response was not parsed as html')
-        done()
-      }
-    })
+    var body = '<html><br></html>'
+    return send({}).to({ body }).through({
+      phase: 'response',
+      as: '$',
+    }, function(req, resp) {
+      assert.ok(resp.$ !== undefined)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, body, 'response was not parsed as html')
+    }).promise()
   })
 
-  it('should send xml for mime type xml', function(done){
+  it('should send xml for mime type xml', () => {
     // This is valid xml but *NOT* html, because <script> is not void.
-    var bod = '<html><body><script src="foo"/></body></html>'
-    roundTrip({
-      request: { url: '/' },
-      response: { body: bod, headers: {'content-type':'text/xml'} },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          assert.ok(resp.$ !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.strictEqual(body, bod, 'response was not parsed as xml')
-        done()
-      }
-    })
+    var body = '<html><body><script src="foo"/></body></html>'
+    return send({}).to({
+      headers: { 'content-type': 'text/xml' },
+      body,
+    }).through({
+      phase: 'response',
+      as: '$',
+    }, function(req, resp) {
+      assert.ok(resp.$ !== undefined)
+    }).receiving(function*(resp) {
+      assert.strictEqual(resp.body, body, 'response was not parsed as html')
+    }).promise()
   })
 
-  it('should parse as html for non-xml mime type', function(done){
-    var bod = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br>.</br></html>'
-    roundTrip({
-      request: { url: '/' },
-      response: { body: bod, headers: {'content-type':'text/plain'} },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          assert.ok(resp.$ !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.ok(body.indexOf('<br>.<br>') > -1, 'response was parsed as xml')
-        done()
-      }
-    })
+  it('should parse as html for non-xml mime type', () => {
+    var body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br>.</br></html>'
+    return send({}).to({
+      headers: { 'content-type': 'text/plain' },
+      body,
+    }).through({
+      phase: 'response',
+      as: '$',
+    }, function(req, resp) {
+      assert.ok(resp.$ !== undefined)
+    }).receiving(function*(resp) {
+        assert.ok(resp.body.indexOf('<br>.<br>') > -1, 'response was parsed as xml')
+    }).promise()
   })
 
-  it('should parse as xml for mime type xml', function(done){
+  it('should parse as html for non-xml mime type', () => {
     // This is valid xml, because all tags must be closed. But it is *NOT* valid html, because <br> is void.
-    var bod = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><br>.</br></html>'
-    roundTrip({
-      request: { url: '/' },
-      response: { body: bod, headers: {'content-type':'text/xml'} },
-      error: function(err, mess){
-        done(err)
-      },
-      intercepts: [{
-        opts: {phase:'response',as:'$'},
-        callback: function(req, resp){
-          assert.ok(resp.$ !== undefined)
-        }
-      }],
-      client: function(resp, body){
-        assert.ok(body.indexOf('<br>.</br>') > -1, 'response was parsed as html')
-        done()
-      }
-    })
+    var body = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><br>.</br></html>'
+    return send({}).to({
+      headers: { 'content-type': 'text/xml' },
+      body,
+    }).through({
+      phase: 'response',
+      as: '$',
+    }, function(req, resp) {
+      assert.ok(resp.$ !== undefined)
+    }).receiving(function*(resp) {
+      assert.ok(resp.body.indexOf('<br>.</br>') > -1, 'response was parsed as html')
+    }).promise()
   })
 })

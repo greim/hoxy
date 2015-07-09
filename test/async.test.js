@@ -4,14 +4,9 @@
  */
 
 import assert from 'assert'
-import querystring from 'querystring'
-import roundTrip from './lib/round-trip'
 import send from './lib/send'
-import adapt from 'ugly-adapter'
 import wait from '../lib/wait'
 import co from 'co'
-
-// ---------------------------
 
 describe('pseudo-synchronous', function(){
 
