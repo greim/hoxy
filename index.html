@@ -120,7 +120,7 @@
       var proxy = new hoxy.Proxy({
         upstreamProxy: 'localhost:9090',
         reverse: 'http://example.com',
-        tlsPassThrough: { key, cert }
+        certAuthority: { key, cert }
       });
     </pre>
     <table>
@@ -151,7 +151,7 @@
           </td>
         </tr>
         <tr>
-          <td><code>tlsPassThrough {&nbsp;key,&nbsp;cert&nbsp;}</code></td>
+          <td><code>certAuthority {&nbsp;key,&nbsp;cert&nbsp;}</code></td>
           <td>
             Optional.
             If present, this should contain a key/cert combo representing a certificate authority that your client trusts.

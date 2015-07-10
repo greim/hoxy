@@ -8,7 +8,7 @@ import streams from '../lib/streams'
 import assert from 'assert'
 import http from 'http'
 
-describe.only('reverse', function() {
+describe('reverse', function() {
 
   it('should accept a valid reverse proxy', () => {
     let proxy = new Proxy({
