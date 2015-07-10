@@ -1,33 +1,35 @@
 # Hoxy
 
-**Description**: Web-debugging proxy API for node.
+An HTTP hacking tool for JavaScript programmers. Document can be found here: http://greim.github.io/hoxy/
 
-**Documentation**: http://greim.github.io/hoxy/
-
-**Installation**: `npm install hoxy`
-
-**Example**:
-
-```javascript
-var hoxy = require('hoxy');
-
-var proxy = new hoxy.Proxy();
-
+```js
+import { Proxy } from 'hoxy'
+let proxy = new Proxy().listen(8080)
 proxy.intercept({
   phase: 'response',
   mimeType: 'text/html',
   as: '$'
-}, function(req, resp){
-  resp.$('title').text('Unicorns.');
-});
-
-proxy.listen(8080);
-
-// now proxy your client through localhost:8080 
+}, (req, resp) => {
+  resp.$('title').text('Unicorns!')
+})
 ```
+
+# Version 2.0
+
+As of mid-2015 Hoxy has released version 2.0.
+This release keeps a the API nearly identical to 1.x, but much of the internals are re-written.
+Most notably, 2.0 contains:
+
+ * HTTPS direct proxying.
+ * In lieu of calling done(), asynchronous interceptors can return promises or iterators.
+ * Refactor and simplification of internals, including streams, async logic, and unit tests.
+ * Various bugfixes and performance improvements.
 
 # Release notes:
 
+* **2.0.0** Direct HTTPS proxying and improved async support in interceptors. Thanks [@snoj](https://github.com/snoj), [@Phoenixmatrix](https://github.com/Phoenixmatrix), [@sholladay](https://github.com/sholladay) and others for helping with the HTTPS stuff!
+* **1.2.4** Improved cheerio markup serialization. Thanks [Seth Holladay](https://github.com/sholladay).
+* **1.2.3** Test command now `npm test` instead of `mocha`. Proxy `close()` method now passes args through to server close. Thanks [Seth Holladay](https://github.com/sholladay).
 * **1.2.2** Fixed errors and test failures occurring on io.js.
 * **1.2.1** Make `listen()` accept same args as native `server.listen()` instead of just port. Thanks [Seth Holladay](https://github.com/sholladay).
 * **1.2.0** Send content-length whenever reasonably possible. (minor version bump since minor alteration to existing behavior)
@@ -43,12 +45,3 @@ proxy.listen(8080);
 * **1.0.2** Added `tee()` method to requests and responses, and accompanying tests.
 * **1.0.1** Fixed bug with URL pattern matching, added filtering tests.
 * **1.0.0** Initial release of Hoxy 1.0 rewrite.
-
-# Note: 1.x vs 0.x
-
-If you're looking for the old command line version of hoxy, it's branched as `v0.2.x` in this repository and still available on npm.
-Continued updates to that branch are unlikely.
-
-1.x is an overhaul of the project.
-1.x is a programming API, whereas 0.x was a command line utility.
-1.x fully passes a decently large test suite.

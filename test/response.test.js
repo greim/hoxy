@@ -1,16 +1,11 @@
 /*
- * Copyright (c) 2014 by Greg Reimer <gregreimer@gmail.com>
+ * Copyright (c) 2015 by Greg Reimer <gregreimer@gmail.com>
  * MIT License. See mit-license.txt for more info.
  */
-
-// MOCHA TESTS
-// http://visionmedia.github.com/mocha/
 
 var assert = require('assert')
 var Response = require('../lib/response')
 var streams = require('../lib/streams')
-
-// ---------------------------
 
 function getResponseData(){
   var data = streams.from([

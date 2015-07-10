@@ -1,3 +1,5 @@
 test/
 page-resources/
 index.html
+.eslintrc
+poc.js
