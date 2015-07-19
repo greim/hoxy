@@ -8,6 +8,7 @@ var Proxy = require('./lib/proxy')
 module.exports = {
   Proxy: Proxy,
   forever: function(handler, ctx) {
+    console.error('warning: the forever() function is deprecated and will go away in a future release')
     process.on('uncaughtException', function(err) {
       if (handler === undefined) {
         console.log(err.stack)
