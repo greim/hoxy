@@ -15,6 +15,8 @@ import adapt from 'ugly-adapter'
 import { SNISpoofer } from './sni-spoofer'
 import net from 'net'
 import https from 'https'
+import _ from 'lodash'
+import { ThrottleGroup } from 'stream-throttle'
 
 function isAsync(fun) {
   return fun.length >= 3
@@ -135,6 +137,32 @@ export default class Proxy extends EventEmitter {
         throw new Error(`invalid value for upstreamProxy: "${opts.upstreamProxy}"`)
       }
       this._upstreamProxy = proxy
+    }
+
+    if (opts.slow) {
+      let slow = this._slow = { latency: 0 };
+      ['rate', 'latency', 'up', 'down'].forEach(name => {
+        let val = opts.slow[name]
+        if (val === undefined) { return }
+        if (typeof val !== 'number') {
+          throw new Error(`slow.${name} must be a number`)
+        }
+        if (val < 0) {
+          throw new Error(`slow.${name} must be >= 0`)
+        }
+      })
+      if (opts.slow.rate) {
+        slow.rate = new ThrottleGroup({ rate: opts.slow.rate })
+      }
+      if (opts.slow.latency) {
+        slow.latency = opts.slow.latency
+      }
+      if (opts.slow.up) {
+        slow.up = new ThrottleGroup({ rate: opts.slow.up })
+      }
+      if (opts.slow.down) {
+        slow.down = new ThrottleGroup({ rate: opts.slow.down })
+      }
     }
 
     this._tls = opts.tls
