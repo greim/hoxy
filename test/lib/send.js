@@ -1,6 +1,6 @@
 import co from 'co'
 import http from 'http'
-import hoxy from '../../hoxy'
+import hoxy from '../../index'
 import wait from '../../lib/wait'
 
 /*
