@@ -283,6 +283,10 @@ export default class Cycle extends EventEmitter {
         let brake = streams.brake(rSlow.rate)
         source = source.pipe(brake)
       }
+      if (pSlow.rate) {
+        let groupedBrake = pSlow.rate.throttle()
+        source = source.pipe(groupedBrake)
+      }
       if (pSlow.up) {
         let groupedBrake = pSlow.up.throttle()
         source = source.pipe(groupedBrake)
@@ -309,6 +313,10 @@ export default class Cycle extends EventEmitter {
       if (rSlow.rate > 0) {
         let brake = streams.brake(rSlow.rate)
         source = source.pipe(brake)
+      }
+      if (pSlow.rate) {
+        let groupedBrake = pSlow.rate.throttle()
+        source = source.pipe(groupedBrake)
       }
       if (pSlow.down) {
         let groupedBrake = pSlow.down.throttle()
