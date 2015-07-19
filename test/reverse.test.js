@@ -3,7 +3,7 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-import { Proxy } from '../hoxy'
+import { Proxy } from '../index'
 import streams from '../lib/streams'
 import assert from 'assert'
 import http from 'http'
