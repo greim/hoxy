@@ -120,7 +120,8 @@
         upstreamProxy: 'localhost:9090',
         reverse: 'http://example.com',
         certAuthority: { key, cert },
-        tls: { key, cert }
+        tls: { key, cert },
+        slow: { rate, latency, up, down }
       });
     </pre>
     <table>
@@ -151,7 +152,7 @@
           </td>
         </tr>
         <tr>
-          <td><code>certAuthority {&nbsp;key,&nbsp;cert&nbsp;}</code></td>
+          <td><code>certAuthority&nbsp;{&nbsp;key,&nbsp;cert&nbsp;}</code></td>
           <td>
             Optional.
             If present, this should contain a key/cert combo representing a certificate authority that your client trusts.
@@ -161,13 +162,27 @@
           </td>
         </tr>
         <tr>
-          <td><code>tls {&nbsp;key,&nbsp;cert&nbsp;}</code></td>
+          <td><code>tls&nbsp;{&nbsp;key,&nbsp;cert&nbsp;}</code></td>
           <td>
             Optional.
             Should only be used in comination with <code>reverse</code>.
-            If present, this should contain a key/cert combo representing a certificate that your client trusts.
-            See <a href="https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js">these instructions</a> for how to generate these files.
-            It will cause Hoxy to run as an https server.
+            If present, causes Hoxy to run as an https server.
+            Passed as <code>opts</code> to <code>https.createServer(opts, function)</code> (see the <a href="https://iojs.org/api/https.html">https module docs</a>).
+          </td>
+        </tr>
+        <tr>
+          <td><code>slow&nbsp;{&nbsp;rate,&nbsp;latency,&nbsp;up,&nbsp;down&nbsp;}</code></td>
+          <td>
+            Optional.
+            <ul>
+              <li><code>latency</code> imposes a delay (in milliseconds) between all requests and responses.</li>
+              <li><code>rate</code> imposes a single rate-limiting bottleneck (in bytes per second) on all throughput.</li>
+              <li><code>up</code> imposes a single rate-limiting bottleneck (in bytes per second) on all uploads.</li>
+              <li><code>down</code> imposes a single rate-limiting bottleneck (in bytes per second) on all downloads.</li>
+            </ul>
+            Note: <code>up</code> and <code>down</code> are independent.
+            However, <code>rate</code> and <code>up</code> (if they both exist) form a pipeline; the slower of the two governing the total speed.
+            The same is true of <code>rate</code> and <code>down</code>.
           </td>
         </tr>
       </tobdy>

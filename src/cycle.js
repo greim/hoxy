@@ -260,7 +260,9 @@ export default class Cycle extends EventEmitter {
       , resp = this._response
       , upstreamProxy = this._proxy._upstreamProxy
       , source = req._source
-      , { rate, latency } = req.slow()
+      , pSlow = this._proxy._slow || {}
+      , rSlow = req.slow() || {}
+      , latency = rSlow.latency || 0
     if (resp._populated) {
       return Promise.resolve(undefined)
     }
@@ -274,12 +276,20 @@ export default class Cycle extends EventEmitter {
         path: req.url,
         headers: req.headers,
       })
-      if (rate > 0) {
-        let brake = streams.brake(rate)
-        source = source.pipe(brake)
-      }
       if (latency > 0) {
         yield wait(latency)
+      }
+      if (rSlow.rate > 0) {
+        let brake = streams.brake(rSlow.rate)
+        source = source.pipe(brake)
+      }
+      if (pSlow.rate) {
+        let groupedBrake = pSlow.rate.throttle()
+        source = source.pipe(groupedBrake)
+      }
+      if (pSlow.up) {
+        let groupedBrake = pSlow.up.throttle()
+        source = source.pipe(groupedBrake)
       }
       req._tees().forEach(writable => source.pipe(writable))
       yield provisionableReq.send(source) // wait for it all to pipe out
@@ -290,15 +300,27 @@ export default class Cycle extends EventEmitter {
   _sendToClient(outResp) {
     let resp = this._response._finalize()
       , source = resp._source
-      , { latency, rate } = resp.slow()
+      , rSlow = resp.slow() || {}
+      , pSlow = this._proxy._slow || {}
+      , rLatency = rSlow.latency || 0
+      , pLatency = pSlow.latency || 0
+      , latency = Math.max(pLatency, rLatency)
     return co.call(this, function*() {
-      outResp.writeHead(resp.statusCode, resp.headers)
-      if (rate > 0) {
-        let brake = streams.brake(rate)
-        source = source.pipe(brake)
-      }
       if (latency > 0) {
         yield wait(latency)
+      }
+      outResp.writeHead(resp.statusCode, resp.headers)
+      if (rSlow.rate > 0) {
+        let brake = streams.brake(rSlow.rate)
+        source = source.pipe(brake)
+      }
+      if (pSlow.rate) {
+        let groupedBrake = pSlow.rate.throttle()
+        source = source.pipe(groupedBrake)
+      }
+      if (pSlow.down) {
+        let groupedBrake = pSlow.down.throttle()
+        source = source.pipe(groupedBrake)
       }
       let tees = resp._tees()
       tees.forEach(writable => source.pipe(writable))

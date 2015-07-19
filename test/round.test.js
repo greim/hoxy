@@ -286,4 +286,64 @@ describe('Round trips', function() {
       resp.end('')
     }).promise()
   })
+
+  it('should simulate proxy-level slow download', () => {
+    let start = Date.now()
+    let slow = { rate: 1024000 }
+    return send({}, false, { slow }).to({
+      body: getMegaSource(),
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 1000, `took ${diff}ms`)
+    })
+  })
+
+  it('should simulate proxy-level slow download (2)', () => {
+    let start = Date.now()
+    let slow = { down: 1024000 }
+    return send({}, false, { slow }).to({
+      body: getMegaSource(),
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 1000, `took ${diff}ms`)
+    })
+  })
+
+  it('proxy-level rate and down should work together', () => {
+    let start = Date.now()
+    let slow = { rate: 1024000, down: 512000 }
+    return send({}, false, { slow }).to({
+      body: getMegaSource(),
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 2000, `took ${diff}ms`)
+    })
+  })
+
+  it('proxy-level rate and down should work together (2)', () => {
+    let start = Date.now()
+    let slow = { rate: 512000, down: 1024000 }
+    return send({}, false, { slow }).to({
+      body: getMegaSource(),
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 2000, `took ${diff}ms`)
+    })
+  })
+
+  it('should simulate proxy-level latency download', () => {
+    let start = Date.now()
+    let slow = { latency: 1000 }
+    return send({}, false, { slow }).to({
+      body: getMegaSource(),
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 1000, `took ${diff}ms`)
+    })
+  })
 })
