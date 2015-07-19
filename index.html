@@ -24,19 +24,18 @@
 </p>
 
 <ul>
-  <li>Inspects and manipulate URLs, headers, status codes, etc.</li>
-  <li>Transparently passes through traffic you don't care about.</li>
-  <li>Supports direct and reverse proxying.</li>
-  <li>Supports HTTPS direct proxying.</li>
-  <li>Manipulates request and response bodies as JSON, jQuery (cheerio), etc.</li>
-  <li>Simulates latency and low-bandwidth connections.</li>
-  <li>Swaps in local files for remote ones.</li>
+  <li>Inspect and manipulate URLs, headers, status codes, etc.</li>
+  <li>Support for direct and reverse proxying.</li>
+  <li>Support for HTTPS proxying.</li>
+  <li>Manipulate request and response bodies as JSON, jQuery (cheerio), etc.</li>
+  <li>Simulate latency and low-bandwidth connections.</li>
+  <li>Swap in local files for remote ones.</li>
 </ul>
 
 <pre class="language-javascript code">
   var hoxy = require('hoxy');
 
-  var proxy = new hoxy.Proxy().listen(8080);
+  var proxy = hoxy.createServer().listen(8080);
 
   proxy.intercept('request', function(req, resp) {
     console.log('request made to: ' + req.fullUrl());
@@ -66,8 +65,7 @@
 <h2 id="how-it-works">How it works</h2>
 
 <p>
-  Hoxy functions as a normal proxy
-  standing between the client and server.
+  Hoxy functions as a normal proxy standing between the client and server.
   You intercept traffic during either the request or response phase, or both.
   The <a href="#phase-lifecycle">phase lifecycle section</a> contains a more complete description, but here's a simplified illustration.
 </p>
@@ -100,25 +98,25 @@
 
 <p>
   The object returned from <code>require('hoxy')</code> is just a namespace.
-  As of now it only has one property, the <code>Proxy</code> constructor, documented below.
 </p>
 
 <h2 id="class-proxy">Class Proxy</h2>
 
 <p>
   Represents a proxy server.
+  An instance of this is returned from <code>hoxy.createServer()</code>.
 </p>
 
 <div class="api-detail">
-  <h3 id="new-proxy"><a href="#new-proxy">new hoxy.Proxy(<span class="args">options</span>)</a></h3>
+  <h3 id="new-proxy"><a href="#new-proxy">hoxy.createServer(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Constructs a new proxy with given options.
-      All options are, well... optional.
+      Factory for a new proxy with given options.
+      All options are optional.
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy({
+      var proxy = hoxy.createServer({
         upstreamProxy: 'localhost:9090',
         reverse: 'http://example.com',
         certAuthority: { key, cert },
@@ -186,7 +184,7 @@
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy().listen(8080);
+      var proxy = hoxy.createServer().listen(8080);
     </pre>
     <p>
       A callback may be provided, to run when the proxy has started listening.
@@ -194,7 +192,7 @@
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
       var port = 8080;
-      var proxy = new hoxy.Proxy().listen(port, function() {
+      var proxy = hoxy.createServer().listen(port, function() {
         console.log('The proxy is listening on port ' + port + '.');
       });
     </pre>

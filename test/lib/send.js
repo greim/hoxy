@@ -52,7 +52,7 @@ class Sender {
           }).catch(reject)
         })
         // -----------------
-        let proxy = new hoxy.Proxy(proxyOpts)
+        let proxy = hoxy.createServer(proxyOpts)
         proxy.listen(0)
         proxy.on('error', reject)
         if (!ignoreInterceptorErrors) {
