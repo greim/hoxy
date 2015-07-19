@@ -1,6 +1,6 @@
 import co from 'co'
 import http from 'http'
-import hoxy from '../../hoxy'
+import hoxy from '../../index'
 import wait from '../../lib/wait'
 
 /*
@@ -52,7 +52,7 @@ class Sender {
           }).catch(reject)
         })
         // -----------------
-        let proxy = new hoxy.Proxy(proxyOpts)
+        let proxy = hoxy.createServer(proxyOpts)
         proxy.listen(0)
         proxy.on('error', reject)
         if (!ignoreInterceptorErrors) {

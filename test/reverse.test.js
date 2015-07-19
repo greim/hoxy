@@ -3,7 +3,7 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-import { Proxy } from '../hoxy'
+import { Proxy } from '../index'
 import streams from '../lib/streams'
 import assert from 'assert'
 import http from 'http'
@@ -22,7 +22,7 @@ describe('reverse', function() {
     })
   })
 
-  it('should reject a valid reverse proxy', () => {
+  it('should reject an invalid reverse proxy', () => {
     assert.throws(() => {
       let proxy = new Proxy({
         reverse: '//////',
@@ -30,7 +30,7 @@ describe('reverse', function() {
     })
   })
 
-  it('should reject a valid reverse proxy', () => {
+  it('should reject an invalid reverse proxy', () => {
     assert.throws(() => {
       let proxy = new Proxy({
         reverse: 'foo:bar:baz',

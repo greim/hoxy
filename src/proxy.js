@@ -137,6 +137,8 @@ export default class Proxy extends EventEmitter {
       this._upstreamProxy = proxy
     }
 
+    this._tls = opts.tls
+
     this._intercepts = Object.freeze({
       'request': [],
       'request-sent': [],
@@ -144,7 +146,11 @@ export default class Proxy extends EventEmitter {
       'response-sent': [],
     })
 
-    this._server = http.createServer((fromClient, toClient) => {
+    let createServer = opts.tls
+      ? https.createServer.bind(https, opts.tls)
+      : http.createServer.bind(http)
+
+    this._server = createServer((fromClient, toClient) => {
 
       let cycle = new Cycle(this)
         , req = cycle._request
@@ -245,6 +251,9 @@ export default class Proxy extends EventEmitter {
     // TODO: test bogus port
     this._server.listen.apply(this._server, arguments)
     let message = 'proxy listening on ' + port
+    if (this._tls) {
+      message = 'https ' + message
+    }
     if (this._reverse) {
       message += ', reverse ' + this._reverse
     }
