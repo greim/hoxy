@@ -121,7 +121,8 @@
       var proxy = new hoxy.Proxy({
         upstreamProxy: 'localhost:9090',
         reverse: 'http://example.com',
-        certAuthority: { key, cert }
+        certAuthority: { key, cert },
+        tls: { key, cert }
       });
     </pre>
     <table>
@@ -159,6 +160,16 @@
             See <a href="https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js">these instructions</a> for how to generate these files.
             You'll then need to configure your client to use this proxy for https in addition to http.
             Once you've got all of that set up, Hoxy will generate fake keys/cert combos for every hostname you visit, caching them in memory for subsequent visits, thus allowing the proxy to handle https requests as cleartext.
+          </td>
+        </tr>
+        <tr>
+          <td><code>tls {&nbsp;key,&nbsp;cert&nbsp;}</code></td>
+          <td>
+            Optional.
+            Should only be used in comination with <code>reverse</code>.
+            If present, this should contain a key/cert combo representing a certificate that your client trusts.
+            See <a href="https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js">these instructions</a> for how to generate these files.
+            It will cause Hoxy to run as an https server.
           </td>
         </tr>
       </tobdy>
