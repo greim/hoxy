@@ -27,6 +27,7 @@ Most notably, 2.0 contains:
 
 # Release notes:
 
+* **2.2.3** Fixed broken reference to lodash-node in CLI.
 * **2.2.2** Updated hoxy version in CLI.
 * **2.2.1** Fixed error in npmignore.
 * **2.2.0** Added proxy-level throttling.
