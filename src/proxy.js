@@ -43,20 +43,6 @@ function asyncIntercept(opts, intercept) {
   return intercept
 }
 
-function filterIntercept(opts, intercept) {
-  if (opts.filter) {
-    let origIntercept = intercept
-    intercept = function(req, resp, done) {
-      if (opts.filter(req, resp)) {
-        origIntercept.apply(this, arguments)
-      } else {
-        done()
-      }
-    }
-  }
-  return intercept
-}
-
 function asIntercept(opts, intercept) {
   if (opts.as) {
     let origIntercept = intercept
@@ -317,7 +303,6 @@ export default class Proxy extends EventEmitter {
     }
     intercept = asyncIntercept(opts, intercept)
     intercept = asIntercept(opts, intercept) // TODO: test asIntercept this, args, async
-    intercept = filterIntercept(opts, intercept) // TODO: test filterIntercept this, args, async
     intercept = otherIntercept(opts, intercept) // TODO: test otherIntercept this, args, async
     this._intercepts[phase].push(intercept)
   }
