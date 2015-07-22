@@ -10,18 +10,4 @@ module.exports = {
   createServer: function(opts) {
     return new Proxy(opts)
   },
-  forever: function(handler, ctx) {
-    console.error('warning: the forever() function is deprecated and will go away in a future release')
-    process.on('uncaughtException', function(err) {
-      if (handler === undefined) {
-        console.log(err.stack)
-      } else if (typeof handler === 'function') {
-        handler.call(ctx, err)
-      } else if (typeof handler.write === 'function') {
-        handler.write(err.stack)
-      } else {
-        console.log(err.stack)
-      }
-    })
-  },
 }

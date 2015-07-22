@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015 by Greg Reimer <gregreimer@gmail.com>
+ * MIT License. See mit-license.txt for more info.
+ */
+
 import adapt from 'ugly-adapter'
 import co from 'co'
 import pem from 'pem'

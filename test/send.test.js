@@ -180,9 +180,9 @@ describe('send', () => {
     return send({
       path: 'http://example.com/',
       method: 'GET',
-    }).through('request', function(req, resp, done) {
+    }).through('request', function() {
       steps += '1'
-      setImmediate(done)
+      return Promise.resolve()
     }).to(function*(req, resp) {
       steps += '2'
       resp.end('')
@@ -232,9 +232,9 @@ describe('send', () => {
     return send({
       path: 'http://example.com/',
       method: 'GET',
-    }).through('response', function(req, resp, done) {
+    }).through('response', function() {
       steps += '2'
-      setImmediate(done)
+      return Promise.resolve()
     }).to(function*(req, resp) {
       steps += '1'
       resp.end('')
