@@ -15,7 +15,6 @@ import adapt from 'ugly-adapter'
 import { SNISpoofer } from './sni-spoofer'
 import net from 'net'
 import https from 'https'
-import _ from 'lodash'
 import { ThrottleGroup } from 'stream-throttle'
 
 function isAsync(fun) {
@@ -64,7 +63,7 @@ function asIntercept(opts, intercept) {
       let args = arguments
       let r = opts.phase === 'request' ? req : resp
       r._load().then(() => {
-        asHandlers[opts.as](r)
+        asHandlers[opts.as](r) //eslint-disable-line no-use-before-define
         origIntercept.apply(this, args)
         done()
       }).catch(done)
@@ -79,7 +78,9 @@ let otherIntercept = (() => {
     if (tester === undefined) { return true }
     if (tester instanceof RegExp) { return tester.test(testee) }
     if (isUrl) { return getUrlTester(tester)(testee) }
+    /*eslint-disable */
     return tester == testee // intentional double-equals
+    /*eslint-enable */
   }
   return function(opts, intercept) {
     let isReq = opts.phase === 'request' || opts.phase === 'request-sent'
@@ -371,16 +372,24 @@ export default class Proxy extends EventEmitter {
     return co(function*() {
       cycle._setPhase(phase)
       for (let intercept of intercepts) {
-        let t = setTimeout(() => {
-          self.emit('log', {
-            level: 'debug',
-            message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
-          })
-        }, 5000)
+        const stopLogging = self._logLongTakingIntercept(phase, req);
         yield adapt.method(intercept, 'call', cycle, req, resp)
-        clearTimeout(t)
+        stopLogging();
       }
     })
+  }
+
+  _logLongTakingIntercept(phase, req) {
+    const t = setTimeout(() => {
+      this.emit('log', {
+        level: 'debug',
+        message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
+      })
+    }, 5000);
+
+    return function stopLogging() {
+      clearTimeout(t)
+    };
   }
 }
 
