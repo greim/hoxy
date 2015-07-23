@@ -71,7 +71,9 @@ let otherIntercept = (() => {
     if (tester === undefined) { return true }
     if (tester instanceof RegExp) { return tester.test(testee) }
     if (isUrl) { return getUrlTester(tester)(testee) }
+    /*eslint-disable */
     return tester == testee // intentional double-equals
+    /*eslint-enable */
   }
   return function(opts, intercept) {
     return function(req, resp, cycle) {
@@ -363,16 +365,24 @@ export default class Proxy extends EventEmitter {
     return co(function*() {
       cycle._setPhase(phase)
       for (let intercept of intercepts) {
-        let t = setTimeout(() => {
-          self.emit('log', {
-            level: 'debug',
-            message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
-          })
-        }, 5000)
+        const stopLogging = self._logLongTakingIntercept(phase, req)
         yield intercept.call(cycle, req, resp, cycle)
-        clearTimeout(t)
+        stopLogging()
       }
     })
+  }
+
+  _logLongTakingIntercept(phase, req) {
+    const t = setTimeout(() => {
+      this.emit('log', {
+        level: 'debug',
+        message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
+      })
+    }, 5000)
+
+    return function stopLogging() {
+      clearTimeout(t)
+    }
   }
 }
 
