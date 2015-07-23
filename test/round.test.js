@@ -206,12 +206,12 @@ describe('Round trips', function() {
   })
 
   // TODO: I can't figure out why this is failing.
-  //it('should handle large uploads', () => {
-  //  return send({
-  //    method: 'POST',
-  //    body: getMegaSource(),
-  //  }).promise()
-  //})
+  it.skip('should handle large uploads', () => {
+    return send({
+      method: 'POST',
+      body: getMegaSource(),
+    }).promise()
+  })
 
   it('should handle large downloads', () => {
     return send({}).to({
@@ -220,19 +220,19 @@ describe('Round trips', function() {
   })
 
   // TODO: I can't figure out why this is failing.
-  //it('should simulate slow upload', () => {
-  //  let start = Date.now()
-  //  return send({
-  //    method: 'POST',
-  //    body: getMegaSource(),
-  //  }).through('request', function*(req) {
-  //    req.slow({ rate: 1024000 })
-  //  }).promise().then(() => {
-  //    let end = Date.now()
-  //      , diff = end - start
-  //    assert.ok(diff >= 50, `took ${diff}ms`)
-  //  })
-  //})
+  it.skip('should simulate slow upload', () => {
+    let start = Date.now()
+    return send({
+      method: 'POST',
+      body: getMegaSource(),
+    }).through('request', function*(req) {
+      req.slow({ rate: 1024000 })
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 50, `took ${diff}ms`)
+    })
+  })
 
   it('should simulate slow download', () => {
     let start = Date.now()

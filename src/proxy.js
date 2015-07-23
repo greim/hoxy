@@ -71,9 +71,7 @@ let otherIntercept = (() => {
     if (tester === undefined) { return true }
     if (tester instanceof RegExp) { return tester.test(testee) }
     if (isUrl) { return getUrlTester(tester)(testee) }
-    /*eslint-disable */
-    return tester == testee // intentional double-equals
-    /*eslint-enable */
+    return tester == testee // eslint-disable-line eqeqeq
   }
   return function(opts, intercept) {
     return function(req, resp, cycle) {

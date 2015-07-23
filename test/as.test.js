@@ -202,17 +202,17 @@ describe('Load data as type', function() {
     }).promise()
   })
 
-  it.skip('should load reddit', () => {
-    return send({}).through('request', (req) => {
-      req.hostname = 'www.reddit.com'
-      req.port = 80
-    }).through({
-      phase: 'response',
-      as: '$',
-    }, (req, resp) => {
-      resp.$('title').text('Unicorns!')
-    }).promise()
-  })
+  //it('should load reddit', () => {
+  //  return send({}).through('request', (req) => {
+  //    req.hostname = 'www.reddit.com'
+  //    req.port = 80
+  //  }).through({
+  //    phase: 'response',
+  //    as: '$',
+  //  }, (req, resp) => {
+  //    resp.$('title').text('Unicorns!')
+  //  }).promise()
+  //})
 
   it('should intercept response DOM', () => {
     return send({}).to({
