@@ -13,7 +13,7 @@
     "test": "node node_modules/.bin/mocha --compilers js:babel/register --bail --timeout 3000",
     "compile": "node node_modules/.bin/babel src --out-dir lib --optional runtime",
     "prepublish": "npm run compile",
-    "lint": "eslint ./src ./test"
+    "lint": "eslint ./src"
   },
   "keywords": [
     "develop",
