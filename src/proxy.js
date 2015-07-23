@@ -372,9 +372,9 @@ export default class Proxy extends EventEmitter {
     return co(function*() {
       cycle._setPhase(phase)
       for (let intercept of intercepts) {
-        const stopLogging = self._logLongTakingIntercept(phase, req);
+        const stopLogging = self._logLongTakingIntercept(phase, req)
         yield adapt.method(intercept, 'call', cycle, req, resp)
-        stopLogging();
+        stopLogging()
       }
     })
   }
@@ -385,11 +385,11 @@ export default class Proxy extends EventEmitter {
         level: 'debug',
         message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
       })
-    }, 5000);
+    }, 5000)
 
     return function stopLogging() {
       clearTimeout(t)
-    };
+    }
   }
 }
 
