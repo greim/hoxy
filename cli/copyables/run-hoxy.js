@@ -9,7 +9,7 @@
 
 var hoxy = require('hoxy');
 var parseArgs = require('minimist');
-var _ = require('lodash-node');
+var _ = require('lodash');
 var config = _.extend({port:8080},require('./hoxy.json'));
 
 // CLI args override hoxy.json properties

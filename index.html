@@ -18,26 +18,26 @@
 <h1 id="introduction" data-tldr="Documentation and examples.">Hoxy, the Web-Hacking Proxy</h1>
 
 <p>
-  Hoxy is two things:
+  Hoxy is an http hacking tool for JavaScript programmers.
+  It operates in the same space as Charles or Fiddler, but rather than having a GUI, it exposes an API for programmatically manipulating HTTP traffic.
+  A few key features:
 </p>
 
-<ol>
-  <li>A web-debugging proxy API for node. (<code>npm install hoxy</code>)</li>
-  <li>A CLI for quickly scaffolding up custom proxies. (<code>npm install -g hoxy</code>)</li>
-</ol>
-
-<p>
-  The CLI is <a href="#command-line">documented below</a>.
-  The API provides the basis for the CLI, and otherwise provides the building blocks for building arbitrary web-debugging proxies.
-  Using the API, you can spin up a proxy in just a few lines of code:
-</p>
+<ul>
+  <li>Inspect and manipulate URLs, headers, status codes, etc.</li>
+  <li>Support for direct and reverse proxying.</li>
+  <li>Support for HTTPS proxying.</li>
+  <li>Manipulate request and response bodies as JSON, jQuery (cheerio), etc.</li>
+  <li>Simulate latency and low-bandwidth connections.</li>
+  <li>Swap in local files for remote ones.</li>
+</ul>
 
 <pre class="language-javascript code">
   var hoxy = require('hoxy');
 
-  var proxy = new hoxy.Proxy().listen(8080);
+  var proxy = hoxy.createServer().listen(8080);
 
-  proxy.intercept('request', function(req, resp){
+  proxy.intercept('request', function(req, resp) {
     console.log('request made to: ' + req.fullUrl());
   });
 </pre>
@@ -51,7 +51,7 @@
 
 <p>
   Hoxy is available on both <a href="https://www.npmjs.org/package/hoxy">npm</a> and <a href="https://github.com/greim/hoxy">github</a>.
-  Hoxy has been tested on node@0.10.x, node@0.11.x, and iojs@1.0.x.
+  Tests pass on recent node and io.js.
 </p>
 
 <pre class="code">
@@ -65,8 +65,7 @@
 <h2 id="how-it-works">How it works</h2>
 
 <p>
-  Hoxy functions as a normal proxy
-  standing between the client and server.
+  Hoxy functions as a normal proxy standing between the client and server.
   You intercept traffic during either the request or response phase, or both.
   The <a href="#phase-lifecycle">phase lifecycle section</a> contains a more complete description, but here's a simplified illustration.
 </p>
@@ -83,9 +82,9 @@
 
 <ol>
   <li>Client sends request.</li>
-  <li>Hoxy lets you intercept the request.</li>
+  <li>Hoxy intercepts the request.</li>
   <li>Server receives request and sends response.</li>
-  <li>Hoxy lets you intercept the response.</li>
+  <li>Hoxy intercepts the response.</li>
   <li>Client receives response.</li>
 </ol>
 
@@ -98,44 +97,31 @@
 </pre>
 
 <p>
-  The object returned from <code>require('hoxy')</code> is the entry point for all hoxy functionality.
-  As of now it only has one property, the <code>Proxy</code> constructor, documented below.
+  The object returned from <code>require('hoxy')</code> is just a namespace.
 </p>
 
 <h2 id="class-proxy">Class Proxy</h2>
 
 <p>
   Represents a proxy server.
+  An instance of this is returned from <code>hoxy.createServer()</code>.
 </p>
 
 <div class="api-detail">
-  <h3 id="new-proxy"><a href="#new-proxy">new hoxy.Proxy(<span class="args">options</span>)</a></h3>
+  <h3 id="new-proxy"><a href="#new-proxy">hoxy.createServer(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Constructs a new proxy with given options.
-      In this example, no options are provided.
+      Factory for a new proxy with given options.
+      All options are optional.
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy();
-    </pre>
-    <p>
-      Create a reverse proxy.
-      Now, instead of configuring your client to proxy through <code>localhost:8080</code>, point your client directly at <code>localhost:8080</code>.
-    </p>
-    <pre class="language-javascript code">
-      var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy({
-        reverse: 'http://example.com'
-      });
-    </pre>
-    <p>
-      Make your proxy use <code>$HTTP_PROXY</code>.
-    </p>
-    <pre class="language-javascript code">
-      var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy({
-        upstreamProxy: process.env.HTTP_PROXY
+      var proxy = hoxy.createServer({
+        upstreamProxy: 'localhost:9090',
+        reverse: 'http://example.com',
+        certAuthority: { key, cert },
+        tls: { key, cert },
+        slow: { rate, latency, up, down }
       });
     </pre>
     <table>
@@ -152,7 +138,7 @@
           <td>
             Optional.
             If present, this proxy will in turn use another proxy.
-            This allows you to use Hoxy in situations where you're already required to use a proxy.
+            This allows Hoxy to play well with other proxies.
             This value should take the form <code>host:port</code>.
           </td>
         </tr>
@@ -162,7 +148,41 @@
             Optional.
             If present, this proxy will run as a reverse proxy for the given server.
             This allows you to point your client directly at the proxy, instead of configuring it in the client's proxy settings.
-            This value should take the form <code>http://host:port</code>.
+            This value should take the form <code>scheme://host:port</code>.
+          </td>
+        </tr>
+        <tr>
+          <td><code>certAuthority&nbsp;{&nbsp;key,&nbsp;cert&nbsp;}</code></td>
+          <td>
+            Optional.
+            If present, this should contain a key/cert combo representing a certificate authority that your client trusts.
+            See <a href="https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js">these instructions</a> for how to generate these files.
+            You'll then need to configure your client to use this proxy for https in addition to http.
+            Once you've got all of that set up, Hoxy will generate fake keys/cert combos for every hostname you visit, caching them in memory for subsequent visits, thus allowing the proxy to handle https requests as cleartext.
+          </td>
+        </tr>
+        <tr>
+          <td><code>tls&nbsp;{&nbsp;key,&nbsp;cert&nbsp;}</code></td>
+          <td>
+            Optional.
+            Should only be used in comination with <code>reverse</code>.
+            If present, causes Hoxy to run as an https server.
+            Passed as <code>opts</code> to <code>https.createServer(opts, function)</code> (see the <a href="https://iojs.org/api/https.html">https module docs</a>).
+          </td>
+        </tr>
+        <tr>
+          <td><code>slow&nbsp;{&nbsp;rate,&nbsp;latency,&nbsp;up,&nbsp;down&nbsp;}</code></td>
+          <td>
+            Optional.
+            <ul>
+              <li><code>latency</code> imposes a delay (in milliseconds) between all requests and responses.</li>
+              <li><code>rate</code> imposes a single rate-limiting bottleneck (in bytes per second) on all throughput.</li>
+              <li><code>up</code> imposes a single rate-limiting bottleneck (in bytes per second) on all uploads.</li>
+              <li><code>down</code> imposes a single rate-limiting bottleneck (in bytes per second) on all downloads.</li>
+            </ul>
+            Note: <code>up</code> and <code>down</code> are independent.
+            However, <code>rate</code> and <code>up</code> (if they both exist) form a pipeline; the slower of the two governing the total speed.
+            The same is true of <code>rate</code> and <code>down</code>.
           </td>
         </tr>
       </tobdy>
@@ -179,7 +199,7 @@
     </p>
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
-      var proxy = new hoxy.Proxy().listen(8080);
+      var proxy = hoxy.createServer().listen(8080);
     </pre>
     <p>
       A callback may be provided, to run when the proxy has started listening.
@@ -187,7 +207,7 @@
     <pre class="language-javascript code">
       var hoxy = require('hoxy');
       var port = 8080;
-      var proxy = new hoxy.Proxy().listen(port, function(){
+      var proxy = hoxy.createServer().listen(port, function() {
         console.log('The proxy is listening on port ' + port + '.');
       });
     </pre>
@@ -201,12 +221,12 @@
   <h3 id="proxy-intercept"><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      Entry point for intercepting and operating on requests and responses.
+      This is <em>the</em> entry point for intercepting and operating on requests and responses.
       This first example intercepts all requests.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', function(req, resp){
-        console.log('request made to: '+req.url);
+      proxy.intercept('request', function(req, resp) {
+        console.log('request made to: ' + req.url);
       });
     </pre>
     <p>
@@ -215,70 +235,103 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request'
-      }, function(req, resp){
+      }, function(req, resp) {
         console.log('request made to: '+req.url);
       });
     </pre>
     <p>
-      Intercept callbacks with arity of three are treated as asynchronous.
-      In this case, call <code>done()</code> to pass control to the next intercept handler.
+      Hoxy waits for an interceptor to finish before proceeding to the next step.
+      That happens naturally when everything's synchronous.
+      But if you want hoxy to wait for async things to finish first, you need to tell it.
+      Generators + promises are currently the easiest way to do this.
+      Simply declare your interceptor a generator, then yield promises from it.
+      Error handling gets rolled up automatically.
+      For more info, check out the <a href="https://www.npmjs.com/package/co">co utility</a> and the <a href="https://github.com/greim/ugly-adapter">ugly-adapter utility</a>.
     </p>
     <pre class="language-javascript code">
-      // make everything slow
-      proxy.intercept('request', function(req, resp, done){
-        setTimeout(done, 1000);
+      proxy.intercept('request', function*(req, resp) {
+        var symbol = yield getSymbol();
+        var price = yield stockPrice(symbol);
+        // do something with "price"
       });
     </pre>
     <p>
-      Admit that you screwed up.
+      If generators aren't an option, returning a promise also works.
     </p>
     <pre class="language-javascript code">
-      // sync
-      proxy.intercept('request', function(req, resp){
-        throw new Error('I screwed up.');
-      });
-
-      // async
-      proxy.intercept('request', function(req, resp, done){
-        setTimeout(function(){
-          done(new Error('I screwed up.'));
-        }, 1000);
+      proxy.intercept('request', function(req, resp) {
+        return getSymbol().then(function(symbol) {
+          return stockPrice(symbol);
+        }).then(function(proce) {
+          // do something with "price"
+        });
       });
     </pre>
     <p>
-      Intercept all <code>GET</code> requests to <code>example.com</code>.
+      The above becomes much easier if/when you can write async functions.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept('request', async function(req, resp) {
+        let symbol = await getSymbol();
+        let price = await stockPrice(symbol);
+        // do something with "price"
+      });
+    </pre>
+    <p>
+    <strong style="color:#900">Warning: deprecated:</strong>
+      If none of the above is an option, callbacks also work.
+      An interceptor with an arity of 3 signals hoxy to wait until you call <code>done()</code>, like below.
+      Just remember to handle your errors!
+      This capability will likely go away in a future major release.
+    </p>
+    <pre class="language-javascript code">
+      proxy.intercept('request', function(req, resp, done) {
+        getSymbol(function(err, symbol) {
+          if (err) { return done(err); }
+          stockPrice(symbol, function(err, price) {
+            if (err) { return done(err); }
+            // do something with "price"
+            done();
+          })
+        })
+      });
+    </pre>
+    <p>
+      Options affect how, or if, interceptors get called.
+      The following will only intercept <code>GET</code> requests to <code>example.com</code>.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         method: 'GET',
         host: 'example.com'
-      }, function(req, resp){
+      }, function(req, resp) {
         console.log('request made to: '+req.url);
       });
     </pre>
     <p>
-      Intercept all <code>text/html</code> responses, exposing the response body as the <code>$</code> variable.
+      Intercept only <code>text/html</code> responses.
+      Expose the response body as a readable/writable <code>$</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
         mimeType: 'text/html',
         as: '$'
-      }, function(req, resp){
+      }, function(req, resp) {
         resp.$('title')
         .text('all your titles are belong to us');
       });
     </pre>
     <p>
-      Intercept <code>UTF-8</code> responses, exposing the response body as the <code>string</code> variable.
+      Intercept only <code>UTF-8</code> responses, exposing the response body as the <code>string</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
         contentType: /utf\-8/i,
         as: 'string'
-      }, function(req, resp){
+      }, function(req, resp) {
         console.log(resp.string);
       });
     </pre>
@@ -292,7 +345,7 @@
         fullUrl: 'http://example.com/api/users/:id',
         mimeType: 'application/json',
         as: 'json'
-      }, function(req, resp){
+      }, function(req, resp) {
         console.log(resp.json.email_address);
       });
     </pre>
@@ -503,7 +556,7 @@
       Or, explicitly handle logging events.
     </p>
     <pre class="language-javascript code">
-      proxy.log('error warn', function(event){
+      proxy.log('error warn', function(event) {
         console.error(event.level + ': ' + event.message);
         if (event.error) console.error(event.error.stack);
       });
@@ -554,8 +607,8 @@
       Finalizes and/or cleans up any resources the proxy uses internally.
     </p>
     <pre class="language-javascript code">
-      proxy.close(function(err){ // optional callback
-        if (err){
+      proxy.close(function(err) { // optional callback
+        if (err) {
           throw err;
         }
         console.log('The proxy is no longer accepting new connections.');
@@ -578,11 +631,6 @@
   <div class="api-detail-content">
     <p>
       Protocol of the request.
-      Includes a colon but not slashes, like <code>'http:'</code> Setting this to <code>'https:'</code> requires providing keys and running the proxy server in encrypted mode.
-    </p>
-    <p>
-      Note, encrypted mode is not yet implemented.
-      At the moment, only <code>http:</code> is supported.
     </p>
   </div>
 </div>
@@ -648,7 +696,7 @@
         method: 'PUT',
         fulUrl: 'http://example.com/users/:id',
         as: 'json'
-      }, function(req, resp){
+      }, function(req, resp) {
         req.json.prefs.subscriptions = 'all';
       });
     </pre>
@@ -670,7 +718,7 @@
         method: 'POST',
         mimeType: 'application/x-www-form-urlencoded',
         as: 'params'
-      }, function(req, resp){
+      }, function(req, resp) {
         console.log(req.params.email);
       });
     </pre>
@@ -693,7 +741,7 @@
         phase: 'request',
         fulUrl: 'http://example.com/users/:id',
         as: 'string'
-      }, function(req, resp){
+      }, function(req, resp) {
         console.log(req.string);
       });
     </pre>
@@ -714,7 +762,7 @@
         method: 'POST',
         fullUrl: 'http://example.com/images',
         as: 'buffers'
-      }, function(req, resp){
+      }, function(req, resp) {
         // req.buffers contains uploaded image
       });
     </pre>
@@ -731,13 +779,13 @@
     </p>
     <pre class="language-javascript code">
       // Simulate upload speed of 10,000 bytes per second
-      proxy.intercept('request', function(req, resp){
+      proxy.intercept('request', function(req, resp) {
         req.slow({rate:10000}); // bytes per second
       });
     </pre>
     <pre class="language-javascript code">
       // Simulate a 500-1000ms delay on every request.
-      proxy.intercept('request', function(req, resp){
+      proxy.intercept('request', function(req, resp) {
         req.slow({latency:randint(500, 1000)});
       });
     </pre>
@@ -754,7 +802,7 @@
     </p>
     <pre class="language-javascript code">
       // Log every request through the proxy.
-      proxy.intercept('request', function(req, resp){
+      proxy.intercept('request', function(req, resp) {
         console.log(req.fullUrl());
       });
     </pre>
@@ -776,7 +824,7 @@
         phase: 'request',
         method: /post|put/i,
         mimeType: 'application/json'
-      }, function(req, resp){
+      }, function(req, resp) {
         req.tee(fs.createWriteStream('./uploaded.json'));
       });
     </pre>
@@ -825,7 +873,7 @@
         phase: 'response',
         fullUrl: 'http://example.com/page.html',
         as: '$'
-      }, function(req, resp){
+      }, function(req, resp) {
         // change the title of the page
         resp.$('title').text('Fake Title!');
       });
@@ -847,7 +895,7 @@
         method: 'GET',
         fullUrl: 'http://example.com/users/123',
         as: 'json'
-      }, function(req, resp){
+      }, function(req, resp) {
         // arbitrarily manipulate the response json
         resp.json.foo = 'bar';
       });
@@ -868,7 +916,7 @@
         phase: 'response',
         fullUrl: 'http://example.com/page.html',
         as: 'string'
-      }, function(req, resp){
+      }, function(req, resp) {
         // print page to log
         console.log(resp.string);
       });
@@ -889,7 +937,7 @@
         phase: 'response',
         fullUrl: 'http://example.com/image.jpg',
         as: 'buffers'
-      }, function(req, resp){
+      }, function(req, resp) {
         // resp.buffers contains a jpg
       });
     </pre>
@@ -906,13 +954,13 @@
     </p>
     <pre class="language-javascript code">
       // Simulate download speed of 100,000 bytes per second
-      proxy.intercept('response', function(req, resp){
+      proxy.intercept('response', function(req, resp) {
         resp.slow({rate:100000}); // bytes per second
       });
     </pre>
     <pre class="language-javascript code">
       // Simulate a 500-1000ms delay on every response.
-      proxy.intercept('response', function(req, resp){
+      proxy.intercept('response', function(req, resp) {
         resp.slow({latency:randint(500, 1000)});
       });
     </pre>
@@ -932,7 +980,7 @@
       proxy.intercept({
         phase: 'response',
         mimeType: 'image/gif'
-      }, function(req, resp){
+      }, function(req, resp) {
         resp.tee(fs.createWriteStream('./image.gif'));
       });
     </pre>
@@ -948,20 +996,21 @@
 </p>
 
 <div class="api-detail">
-  <h3 id="cycle-serve"><a href="#cycle-serve">this.serve(<span class="args">options, callback</span>)</a></h3>
+  <h3 id="cycle-serve"><a href="#cycle-serve">this.serve(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Provisions responses from the local filesystem.
       Generally, the reason you'd do this is to be able to edit those files locally and test them as if they were live on the remote server.
       This action populates the response object; see <a href="#response-population">response population</a> for more info.
+      The completion of this action is asynchronous, so <code>serve()</code> returns a promise.
       Example.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
-      }, function(req, resp, done){
-        this.serve('/Users/gr123/test/main.js', done);
+      }, function(req, resp) {
+        return this.serve('/Users/gr123/test/main.js');
       });
     </pre>
     <p>
@@ -971,11 +1020,9 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
-      }, function(req, resp, done){
-        this.serve({
+      }, function(req, resp) {
+        return this.serve({
           path: '/Users/gr123/test/main.js'
-        }, function(err){
-          done(err);
         });
       });
     </pre>
@@ -1028,7 +1075,7 @@
               <li>
                 <code>overlay</code> -
                 Overlays the local docroot on top of the remote one.
-                In other words, if a requested file doesn't exist locally, it becomes a no-op, allowing the proxy to "see through" to the one on the remote server.
+                In other words, if a requested file doesn't exist locally, the request will transparently fall through to the remote server.
               </li>
               <li>
                 <code>mirror</code> -
@@ -1041,9 +1088,7 @@
       </tbody>
     </table>
     <p>
-      <code>callback</code> is called after the response has been populated.
-      If an error occurred, the error is passed to the callback, otherwise no arguments are passed.
-      Note that a 404 response is <em>not</em> considered an error in this case.
+      The returned promise resolves after the response has been populated.
       There are at least three use cases worth mentioning.
     </p>
     <p>
@@ -1060,8 +1105,8 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/js/main.js'
-      }, function(req, resp, done){
-        this.serve(__dirname + '/main.js', done);
+      }, function(req, resp) {
+        return this.serve(__dirname + '/main.js');
       });
     </pre>
     <p>
@@ -1083,11 +1128,11 @@
         phase: 'request',
         host: 'example.com',
         url: /^\/js\/.*/
-      }, function(req, resp, done){
-        this.serve({
+      }, function(req, resp) {
+        return this.serve({
           docroot: __dirname,
           strategy: 'overlay'
-        }, done);
+        });
       });
     </pre>
     <p>
@@ -1100,11 +1145,11 @@
         phase: 'request',
         host: 'example.com',
         url: /^\/js\/.*/
-      }, function(req, resp, done){
-        this.serve({
+      }, function(req, resp) {
+        return this.serve({
           docroot: __dirname,
           strategy: 'mirror'
-        }, done);
+        });
       });
     </pre>
   </div>
@@ -1120,12 +1165,12 @@
     </p>
     <pre class="language-javascript code">
       ['request','request-sent','response','response-sent']
-      .forEach(function(phase){
-        proxy.intercept(phase, function(){
+      .forEach(function(phase) {
+        proxy.intercept(phase, function() {
           this.data(phase, Date.now());
         });
       });
-      proxy.intercept('response-sent', function(){
+      proxy.intercept('response-sent', function() {
         var reqReceived = this.data('request');
         var reqSent = this.data('request-sent');
         var respReceived = this.data('response');
@@ -1396,7 +1441,7 @@
 </p>
 
 <pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp){
+  proxy.intercept('request', function(req, resp) {
     response.string = 'Hello';
     // The response is now populated so the
     // server call is skipped. Status code will
@@ -1405,7 +1450,7 @@
 </pre>
 
 <pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp){
+  proxy.intercept('request', function(req, resp) {
     response.statusCode = 200;
     // The response is now populated so the
     // server call is skipped. Response body
@@ -1414,7 +1459,7 @@
 </pre>
 
 <pre class="language-javascript code">
-  proxy.intercept('response', function(req, resp){
+  proxy.intercept('response', function(req, resp) {
     response.string = 'Hello';
     // The response was already populated,
     // we just overwrite its body. Status
@@ -1423,7 +1468,7 @@
 </pre>
 
 <pre class="language-javascript code">
-  proxy.intercept('response', function(req, resp){
+  proxy.intercept('response', function(req, resp) {
     response.statusCode = 666;
     // The response was already populated,
     // we just overwrote the status. I
@@ -1444,11 +1489,11 @@
 </p>
 
 <pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp){
+  proxy.intercept('request', function(req, resp) {
     req.headers['cache-control'] = undefined;
   });
 
-  proxy.intercept('request', function(req, resp){
+  proxy.intercept('request', function(req, resp) {
     console.log(req.headers['cache-control']); // undefined
   });
 </pre>
@@ -1458,14 +1503,14 @@
 </p>
 
 <pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp){
+  proxy.intercept('request', function(req, resp) {
     req.hostname = 'example.com';
   });
 
   proxy.intercept({
     phase: 'request',
     hostname: 'other.com'
-  }, function(req, resp){
+  }, function(req, resp) {
     // never called!
   });
 </pre>
@@ -1479,12 +1524,12 @@
     phase: 'response',
     mimeType: 'application/json',
     as: 'json'
-  }, function(req, resp){ ... });
+  }, function(req, resp) { ... });
 
   proxy.intercept({
     phase: 'response',
     mimeType: 'application/json'
-  }, function(req, resp){
+  }, function(req, resp) {
     console.log(typeof resp.json); // 'object'
   });
 
@@ -1492,12 +1537,12 @@
     phase: 'response',
     mimeType: 'application/json',
     as: 'string'
-  }, function(req, resp){ ... });
+  }, function(req, resp) { ... });
 
   proxy.intercept({
     phase: 'response',
     mimeType: 'application/json'
-  }, function(req, resp){
+  }, function(req, resp) {
     console.log(typeof resp.json); // 'undefined'
     console.log(typeof resp.string); // 'string'
   });
@@ -1525,9 +1570,10 @@
 <h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>
 
 <ul>
-  <li>Copyright &copy; 2014 by <a href="https://github.com/greim">Greg Reimer</a></li>
+  <li>Copyright &copy; 2015 by <a href="https://github.com/greim">Greg Reimer</a></li>
   <li>MIT License</li>
   <li><a href="https://github.com/greim/hoxy">Project on GitHub</a></li>
+  <li><a href="https://www.npmjs.org/package/hoxy">Project on npm</a></li>
 </ul>
 
 <ul id="nav"></ul>
