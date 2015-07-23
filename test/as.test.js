@@ -65,12 +65,12 @@ describe('Load data as type', function() {
 
   it('should have undefined values for things', () => {
     return send({}).through('request', function(req, resp) {
-      assert.strictEqual(req.buffers, undefined)
+      assert.strictEqual(req.buffer, undefined)
       assert.strictEqual(req.string, undefined)
       assert.strictEqual(req.$, undefined)
       assert.strictEqual(req.json, undefined)
       assert.strictEqual(req.params, undefined)
-      assert.strictEqual(resp.buffers, undefined)
+      assert.strictEqual(resp.buffer, undefined)
       assert.strictEqual(resp.string, undefined)
       assert.strictEqual(resp.$, undefined)
       assert.strictEqual(resp.json, undefined)
