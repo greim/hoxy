@@ -7,7 +7,7 @@ import assert from 'assert'
 import querystring from 'querystring'
 import send from './lib/send'
 import fs from 'fs'
-import streams from '../lib/streams'
+import streams from '../src/streams'
 
 describe('Load data as type', function() {
 

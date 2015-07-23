@@ -5,7 +5,7 @@
 
 import assert from 'assert'
 import send from './lib/send'
-import wait from '../lib/wait'
+import wait from '../src/wait'
 import co from 'co'
 
 describe('pseudo-synchronous', function(){

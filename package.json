@@ -1,14 +1,13 @@
 {
   "name": "hoxy",
-  "version": "2.2.4",
+  "version": "3.0.0",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
   "repository": {
     "type": "git",
     "url": "git@github.com:greim/hoxy.git"
   },
-  "bin": "./cli/hoxy-cli.js",
-  "main": "./index",
+  "main": "./lib/main",
   "scripts": {
     "test": "node node_modules/.bin/mocha --compilers js:babel/register --bail --timeout 3000",
     "compile": "node node_modules/.bin/babel src --out-dir lib --optional runtime",

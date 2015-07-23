@@ -4,8 +4,8 @@
  */
 
 var assert = require('assert')
-var Response = require('../lib/response')
-var streams = require('../lib/streams')
+var Response = require('../src/response')
+var streams = require('../src/streams')
 
 function getResponseData(){
   var data = streams.from([

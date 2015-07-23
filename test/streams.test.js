@@ -4,7 +4,7 @@
  */
 
 import assert from 'assert'
-import streams from '../lib/streams'
+import streams from '../src/streams'
 import getMegaSource from './lib/megabyte-stream'
 
 describe('Streams', function() {

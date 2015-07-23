@@ -18,7 +18,7 @@
 <h1 id="introduction" data-tldr="Documentation and examples.">Hoxy, the Web-Hacking Proxy</h1>
 
 <p>
-  Hoxy is an http hacking tool for JavaScript programmers.
+  Hoxy is an HTTP hacking tool for JavaScript programmers.
   It operates in the same space as Charles or Fiddler, but rather than having a GUI, it exposes an API for programmatically manipulating HTTP traffic.
   A few key features:
 </p>
@@ -43,8 +43,8 @@
 </pre>
 
 <p>
-  After running the above code, configure your web client to proxy through <code>yourmachine:8080</code>.
-  As long as you know JavaScript and HTTP, you can programmatically inspect and manipulate your own web traffic in arbitrary ways.
+  After running the above, configure your client to proxy through <code>yourmachine:8080</code>.
+  As long as you know JavaScript and HTTP, you can inspect and manipulate your own web traffic in arbitrary ways.
 </p>
 
 <h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
@@ -212,7 +212,7 @@
       });
     </pre>
     <p>
-      This method will pass arguments to Node&apos;s <a href="http://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback">server API</a>.
+      This method simply passes its arguments to Node&apos;s <a href="http://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback"><code>server.listen()</code> method</a>.
     </p>
   </div>
 </div>
@@ -225,7 +225,7 @@
       This first example intercepts all requests.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', req => console.log(`request: ${req.url}`));
+      proxy.intercept('request', req => console.log(req.url));
     </pre>
     <p>
       This is more verbose, but identical to the above.
@@ -234,13 +234,13 @@
       proxy.intercept({
         phase: 'request'
       }, function(req, resp, cycle) {
-        console.log('request: ' + req.url);
+        console.log(req.url);
       });
     </pre>
     <h4>Interceptors</h4>
     <p>
-      The callback passed to <code>intercept()</code> (AKA and interceptor) receives three arguments <code>(req, resp, cycle)</code> which are instances of classes described below.
-      <code>cycle</code> is also passed as the context.
+      The callback passed to <code>intercept()</code> (AKA the <em>interceptor</em>) receives three arguments <code>(req, resp, cycle)</code> which are instances of classes described below.
+      <code>cycle</code> is also passed as context.
       Thus:
     </p>
     <pre class="language-javascript code">
@@ -250,10 +250,10 @@
     </pre>
     <h4>Sync versus async interceptors</h4>
     <p>
-      Interceptors run in series.
-      That happens naturally when everything's synchronous.
-      But if you want it to wait for async things to finish first, your interceptor should return either a promise or an iterator (iterators simply get <a href="https://www.npmjs.com/package/co">converted into promises</a>).
-      In that case, the next interceptor won't run until the promise resolves.
+      Hoxy internally runs everything sequentially in series, including interceptors.
+      That happens naturally when your interceptor logic is synchronous.
+      But if it's asynchronous, you must signal that by returning a promise.
+      As long as you do that, Hoxy will wait until the promise resolves and things will flow serially.
     </p>
     <pre class="language-javascript code">
       proxy.intercept('request', function(req, resp, cycle) {
@@ -266,32 +266,41 @@
       });
     </pre>
     <p>
-      In current versions of io.js (or in a transpiled scenario, or running Node 0.11 or higher under the <code>--harmony</code> flag), generators can be used, which make async much easier.
-      <a href="https://www.npmjs.com/package/co">co</a> is used behind the scenes to run the iterator returned by your generator.
-      Note: You must only yield <em>promises</em> from your generator.
+      Future versions of JavaScript will allow <a href="https://github.com/lukehoban/ecmascript-asyncawait">async functions</a>.
+      Some transpilers allow you to use this syntax today.
+      These can be used as interceptors, too.
+      Written this way, your logic and your error handling are much cleaner.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', function*(req, resp, cycle) {
-        // this is a generator, which returns an iterator
-        var thingA = yield getThingA();
-        var thingB = yield getThingB(thingA);
+      proxy.intercept('request', async function(req, resp, cycle) {
+        // this is an async function
+        let thingA = await getThingA();
+        let thingB = await getThingB(thingA);
         // do something with "thingB"
       });
     </pre>
     <p>
-      Future versions of JavaScript will allow <em>async functions</em>.
-      Some transpilers allow you to use this syntax today.
-      These can be used as interceptors, too.
-      In fact, Hoxy can't tell the difference between non-async interceptors which explicitly return promises, and async interceptors which implicitly return promises.
+      In current versions of io.js, generators can be used as a stand-in for async functions, but with the benefit of being natively-supported, spec-valid ES6 syntax.
+      You must only yield <em>promises</em> from your generator.
+      See <a href="https://www.npmjs.com/package/co">co</a> for more details.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', async function(req, resp, cycle) {
-        // this is an async function, which returns a promise
-        var thingA = await getThingA();
-        var thingB = await getThingB(thingA);
+      proxy.intercept('request', function*(req, resp, cycle) {
+        // this is a generator
+        let thingA = yield getThingA();
+        let thingB = yield getThingB(thingA);
         // do something with "thingB"
       });
     </pre>
+    <p>
+      <strong>Note:</strong> Strictly speaking, Hoxy doesn't care whether your interceptor is an async function or a generator.
+      It only cares what kind of thing the return value is:
+    </p>
+    <ul>
+      <li>Promise: wait for it to resolve, then  proceed.</li>
+      <li>Iterator: turn it into a promise, wait for it to resolve, then  proceed.</li>
+      <li>None of the above: proceed immediately.</li>
+    </ul>
     <h4>Options</h4>
     <p>
       Options affect how, or if, interceptors get called.
@@ -1174,153 +1183,6 @@
   </div>
 </div>
 
-<h2 id="command-line">Command Line Interface</h2>
-
-<p>
-  In addition to a programming API, Hoxy provides a command line interface.
-  The CLI provides a way to quickly get up and running with a web-debugging proxy.
-  To install it on your system, do:
-</p>
-
-<pre class="code">
-  $ npm install -g hoxy
-</pre>
-
-<p>
-  ...now the executable <code>'hoxy'</code> is installed in your environment.
-  Here are its subcommands.
-</p>
-
-<div class="api-detail">
-  <h3 id="hoxy-init">hoxy init</h3>
-  <p>
-    Scaffolds up a web-debugging project in the current directory so that you can begin debugging immediately.
-  </p>
-  <pre class="code">
-    $ hoxy init
-  </pre>
-  <p>
-    <code>hoxy init</code> adds the following files to the current directory, if they don't already exist:
-  </p>
-  <ul>
-    <li><code>package.json</code>* - Minimal package info (you can customize this).</li>
-    <li><code>hoxy.json</code>* - Configuration for a hoxy instance (you can customize this).</li>
-    <li><code>run-hoxy.js</code>* - Launches a basic web proxy (you can customize this).</li>
-    <li><code>.gitignore</code> - Convenience, in case you want to <code>git init</code> later.</li>
-  </ul>
-  <p>
-    * If one of these already exists, no changes are made to the current directory and hoxy exits with an error.
-  </p>
-  <table>
-    <caption>Command Line Options</caption>
-    <thead>
-      <tr>
-        <th>name</th>
-        <th>description</th>
-        <th>value</th>
-      </tr>
-    </thead>
-    <tobdy>
-      <tr>
-        <td class="option"><code>--port</code></td>
-        <td>
-          Saved as the <code>port</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          Number.
-          Positive integer greater than zero.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--upstream-proxy</code></td>
-        <td>
-          Saved as the <code>upstreamProxy</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>host:port</em> combination.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--reverse</code></td>
-        <td>
-          Saved as the <code>reverse</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>scheme://host:port</em> combination.
-        </td>
-      </tr>
-    </tobdy>
-  </table>
-  <p>
-    See the <a href="#cli-workflow">CLI workflow section</a> for more info.
-  </p>
-</div>
-
-<div class="api-detail">
-  <h3 id="hoxy-run">hoxy run</h3>
-  <p>
-    Runs the project as you're developing it by automatically restarting the proxy whenever you resave the code.
-    This avoids having to manually stop and restart the server a lot.
-    This is accomplished using <a href="https://www.npmjs.org/package/nodemon">nodemon</a>.
-  </p>
-  <pre class="code">
-    $ hoxy run
-  </pre>
-  <table>
-    <caption>Command Line Options</caption>
-    <thead>
-      <tr>
-        <th>name</th>
-        <th>description</th>
-        <th>value</th>
-      </tr>
-    </thead>
-    <tobdy>
-      <tr>
-        <td class="option"><code>--port</code></td>
-        <td>
-          Overrides the <code>port</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          Number.
-          Positive integer greater than zero.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--upstream-proxy</code></td>
-        <td>
-          Overrides the <code>upstreamProxy</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>host:port</em> combination.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--reverse</code></td>
-        <td>
-          Overrides the <code>reverse</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>http://host:port</em> combination.
-        </td>
-      </tr>
-    </tobdy>
-  </table>
-  <p>
-    See the <a href="#cli-workflow">CLI workflow section</a> for more info.
-  </p>
-</div>
-
 <h1 id="appendix" data-tldr="Extensive info on various topics.">Appendix</h1>
 
 <h2 id="phase-lifecycle" data-tldr="How phases work.">Phase lifecycle</h2>
@@ -1541,23 +1403,108 @@
   });
 </pre>
 
-<h2 data-tldr="Common workflow patterns." id="cli-workflow">CLI Workflow</h2>
+<h2 id="incantations">Incantations</h2>
 
 <p>
-  Using the <a href="#command-line">CLI</a>, A typical workflow might look like this:
+  To a newcomer, Hoxy may seem like magic cargo from the sky gods.
+  In reality, it has a fairly simple core architecture, and works in a predictable way.
+  Once you understand that, you can do quite a few things with it.
+  However, for the purpose of illustration, we'll just hand-wave all that away and list a few spells you can cast using Hoxy.
 </p>
-<pre class="code">
-  $ hoxy init
-  $ npm install
-  $ hoxy run
-</pre>
+
+<h3 id="unicorns">Unicorns!</h3>
+
 <p>
-  ...after which you'd open <code>run-hoxy.js</code> in your editor and begin customizing it.
-  Each time you save, the proxy server will automatically restart.
-  The command line options for <a href="#hoxy-init"><code>hoxy init</code></a> and <a href="#hoxy-run"><code>hoxy run</code></a> are identical.
-  In former case, they control the defaults for the project.
-  In the latter, they override the defaults.
-  In both cases they're optional.
+  Make all titles say "Unicorns!" by manipulating the response as DOM.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept({
+    phase: 'response',
+    mimeType: 'text/html',
+    as: '$'
+  }, function(req, resp) {
+    resp.$('title').text('Unicorns!')
+  });
+</pre>
+
+<h3 id="slow-connection">Slow Connection</h3>
+
+<p>
+  Simulate a slow connection.
+  This is done at the proxy level since two simultaneous requests would share the same connection.
+  Thus for example a limit of 100000 bps for two requests would result in a speed of 50000 bps for each.
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    slow: {
+      up: 10000,
+      down: 100000,
+      latency: 50
+    }
+  }).listen(8080)
+</pre>
+
+<h3 id="slow-website">Slow Website</h3>
+
+<p>
+  Simulate a slow website.
+  Make it behave as if just one website were slow.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept({
+    phase: 'response',
+    hostname: 'www.google.com'
+  }, function(req, resp) {
+    resp.slow({ rate: 10000 })
+  });
+</pre>
+
+<h3 id="intercept-https">Intercept HTTPS</h3>
+
+<p>
+  If you want to intercept HTTPS traffic, you can do that too.
+  But you have to jump through some extra hoops.
+  First, create your very own self-signed Certificate Authority.
+</p>
+
+<pre class="code">
+  # Create the key
+  openssl genrsa -out ~/.ssh/my-private-root-ca.key.pem 2048
+  # Create the cert
+  openssl req -x509 -new -nodes -key ~/.ssh/my-private-root-ca.key.pem -days 1024 -out ~/.ssh/my-private-root-ca.crt.pem -subj "/C=US/ST=Utah/L=Provo/O=ACME Signing Authority Inc/CN=example.com"
+</pre>
+
+<p>
+  Next, add the above root cert to your list of trusted cert authorities.
+  How to do this varies from client to client and platform to platform.
+  Firefox maintains its own trusted list.
+  Chrome on OS X uses the ones stored in OS X's keychain.
+  Describing them all is beyond the scope of these docs.
+</p>
+
+<pre class="code">
+  ...make it trust the stuff...
+</pre>
+
+<p>
+  Next, launch Hoxy, passing in that key and cert as a certificate authority.
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    certAuthority: {
+      key: fs.readFileSync('/Users/you/.ssh/my-private-root-ca.key.pem'),
+      cert: fs.readFileSync('/Users/you/.ssh/my-private-root-ca.crt.pem')
+    }
+  }).listen(8080)
+</pre>
+
+<p>
+  Finally, configure your client to proxy both HTTP and HTTPS through <code>localhost:8080</code>.
+  Hoxy will use the fake cert authority to spoof certificates from any HTTPS sites, decrypting and intercepting them as cleartext using the existing intercept API.
 </p>
 
 <h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>

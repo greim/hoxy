@@ -1,7 +1,7 @@
 import co from 'co'
 import http from 'http'
-import hoxy from '../../index'
-import wait from '../../lib/wait'
+import hoxy from '../../src/main'
+import wait from '../../src/wait'
 
 /*
  * Utility for testing hoxy.

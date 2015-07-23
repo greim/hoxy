@@ -6,8 +6,8 @@
 import assert from 'assert'
 import getMegaSource from './lib/megabyte-stream'
 import send from './lib/send'
-import wait from '../lib/wait'
-import streams from '../lib/streams'
+import wait from '../src/wait'
+import streams from '../src/streams'
 
 describe('Round trips', function() {
 

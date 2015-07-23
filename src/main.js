@@ -3,9 +3,9 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var Proxy = require('./lib/proxy')
+import Proxy from './proxy'
 
-module.exports = {
+export default {
   Proxy: Proxy,
   createServer: function(opts) {
     return new Proxy(opts)

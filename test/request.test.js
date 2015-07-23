@@ -4,8 +4,8 @@
  */
 
 import assert from 'assert'
-import Request from '../lib/request'
-import streams from '../lib/streams'
+import Request from '../src/request'
+import streams from '../src/streams'
 
 function getRequestData() {
   let data = streams.from([
