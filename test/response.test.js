@@ -3,20 +3,20 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var assert = require('assert')
-var Response = require('../src/response')
-var streams = require('../src/streams')
+import assert from 'assert'
+import Response from '../src/response'
+import streams from '../src/streams'
 
 function getResponseData(){
-  var data = streams.from([
+  let data = streams.from([
     new Buffer('<!doctype html><html><head></head><body>', 'utf8'),
     new Buffer('<p>foo</p>', 'utf8'),
-    new Buffer('</body></html>', 'utf8')
+    new Buffer('</body></html>', 'utf8'),
   ])
   data.statusCode = 200;
   data.headers = {
     'content-type': 'text/html; charset=utf-8',
-    'content-length': data.size()
+    'content-length': data.size(),
   }
   return data
 }
@@ -24,23 +24,23 @@ function getResponseData(){
 describe('Response', function(){
 
   it('should construct', function(){
-    var resp = new Response()
+    let resp = new Response()
   })
 
   it('should accept raw data', function(){
-    var resp = new Response()
+    let resp = new Response()
     resp._setHttpSource(getResponseData())
   })
 
   it('should get and set headers', function(){
-    var resp = new Response()
-    var data = getResponseData()
+    let resp = new Response()
+    let data = getResponseData()
     resp._setHttpSource(data)
     assert.deepEqual(resp.headers, data.headers)
   })
 
   it('should get and set status code', function(){
-    var resp = new Response()
+    let resp = new Response()
     resp._setHttpSource(getResponseData())
     assert.strictEqual(resp.statusCode, 200)
   })

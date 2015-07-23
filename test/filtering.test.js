@@ -7,7 +7,7 @@ import send from './lib/send'
 import { finish, values } from './lib/expect'
 
 function roundTrip(opts) {
-  var s = send(opts.request || {})
+  let s = send(opts.request || {})
   if (opts.response) { s.to(opts.response) }
   if (opts.client) {
     s.receiving(function*(resp) {

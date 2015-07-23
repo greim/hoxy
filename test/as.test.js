@@ -79,7 +79,7 @@ describe('Load data as type', function() {
   })
 
   it('should intercept request buffer', () => {
-    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    let body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
     return send({
       method: 'POST',
       body,
@@ -97,7 +97,7 @@ describe('Load data as type', function() {
   })
 
   it('should intercept response buffer', () => {
-    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    let body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
     return send({}).to({ body }).through({
       phase: 'response',
       as: 'buffer',
@@ -110,7 +110,7 @@ describe('Load data as type', function() {
   })
 
   it('should intercept request string', () => {
-    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    let body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
     return send({
       method: 'POST',
       body,
@@ -128,7 +128,7 @@ describe('Load data as type', function() {
   })
 
   it('should intercept response string', () => {
-    var body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
+    let body = '<!doctype html><html><head><title>foo</title></head><body><div id="content"></div></body></html>'
     return send({}).to({ body }).through({
       phase: 'response',
       as: 'string',
@@ -258,7 +258,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to server for string', () => {
-    var body = 'abc'
+    let body = 'abc'
     return send({
       method: 'POST',
       body,
@@ -274,7 +274,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to server for $', () => {
-    var body = '<html></html>'
+    let body = '<html></html>'
     return send({
       method: 'POST',
       body,
@@ -290,7 +290,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to server for json', () => {
-    var body = JSON.stringify({ foo: 'bar', baz: 2 })
+    let body = JSON.stringify({ foo: 'bar', baz: 2 })
     return send({
       method: 'POST',
       body,
@@ -306,7 +306,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to server for params', () => {
-    var body = 'foo=bar&baz=qux'
+    let body = 'foo=bar&baz=qux'
     return send({
       method: 'POST',
       body,
@@ -322,7 +322,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to client for string', () => {
-    var body = 'abcdefg'
+    let body = 'abcdefg'
     return send({}).to(function*(req, resp) {
       resp.end(body)
     }).through({
@@ -336,7 +336,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to client for $', () => {
-    var body = '<html></html>'
+    let body = '<html></html>'
     return send({}).to(function*(req, resp) {
       resp.end(body)
     }).through({
@@ -350,7 +350,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to client for json', () => {
-    var body = JSON.stringify({ foo: 'bar', baz: 2 })
+    let body = JSON.stringify({ foo: 'bar', baz: 2 })
     return send({}).to(function*(req, resp) {
       resp.end(body)
     }).through({
@@ -364,7 +364,7 @@ describe('Load data as type', function() {
   })
 
   it('should send content length to client for params', () => {
-    var body = 'foo=bar&baz=qux'
+    let body = 'foo=bar&baz=qux'
     return send({}).to(function*(req, resp) {
       resp.end(body)
     }).through({
@@ -379,7 +379,7 @@ describe('Load data as type', function() {
 
   it('should send html by default', () => {
     // This is valid html but *NOT* xml, because <br> is void.
-    var body = '<html><br></html>'
+    let body = '<html><br></html>'
     return send({}).to({ body }).through({
       phase: 'response',
       as: '$',
@@ -392,7 +392,7 @@ describe('Load data as type', function() {
 
   it('should send xml for mime type xml', () => {
     // This is valid xml but *NOT* html, because <script> is not void.
-    var body = '<html><body><script src="foo"/></body></html>'
+    let body = '<html><body><script src="foo"/></body></html>'
     return send({}).to({
       headers: { 'content-type': 'text/xml' },
       body,
@@ -407,7 +407,7 @@ describe('Load data as type', function() {
   })
 
   it('should parse as html for non-xml mime type', () => {
-    var body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br>.</br></html>'
+    let body = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><br>.</br></html>'
     return send({}).to({
       headers: { 'content-type': 'text/plain' },
       body,
@@ -423,7 +423,7 @@ describe('Load data as type', function() {
 
   it('should parse as html for non-xml mime type', () => {
     // This is valid xml, because all tags must be closed. But it is *NOT* valid html, because <br> is void.
-    var body = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><br>.</br></html>'
+    let body = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"><html><br>.</br></html>'
     return send({}).to({
       headers: { 'content-type': 'text/xml' },
       body,

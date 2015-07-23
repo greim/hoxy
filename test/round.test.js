@@ -12,7 +12,7 @@ import streams from '../src/streams'
 describe('Round trips', function() {
 
   it('should round trip synchronously', () => {
-    var steps = ''
+    let steps = ''
     return send({})
     .through('request', function() { steps += '1' })
     .through('request-sent', function() { steps += '2' })
@@ -25,7 +25,7 @@ describe('Round trips', function() {
   })
 
   it('should round trip asynchronously', () => {
-    var steps = ''
+    let steps = ''
     return send({})
     .through('request', function*() { yield wait(); steps += '1' })
     .through('request-sent', function*() { yield wait(); steps += '2' })
