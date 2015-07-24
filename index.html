@@ -624,7 +624,7 @@
   Represents a request.
   An instance of this is passed as the first argument to every interceptor.
   Altering its values changes what the server sees.
-  If you change the <code>hostname</code>, it changes <em>which</em> server sees the request..
+  If you change the <code>hostname</code>, it changes <em>which</em> server sees the request.
 </p>
 
 <div class="api-detail">
@@ -1406,16 +1406,15 @@
 <h2 id="incantations">Incantations</h2>
 
 <p>
-  To a newcomer, Hoxy may seem like magic cargo from the sky gods.
-  In reality, it has a fairly simple core architecture, and works in a predictable way.
-  Once you understand that, you can do quite a few things with it.
-  However, for the purpose of illustration, we'll just hand-wave all that away and list a few spells you can cast using Hoxy.
+  Hoxy is not Magic Cargo From The Sky Gods&trade;.
+  It has a fairly simple core architecture, and works in a predictable way.
+  In order to assist the training of acolytes, however, the Magic Sky Gods have deigned to provide some basic spells.
 </p>
 
 <h3 id="unicorns">Unicorns!</h3>
 
 <p>
-  Make all titles say "Unicorns!" by manipulating the response as DOM.
+  This incantation makes all titles say "Unicorns!" by manipulating the response as DOM.
 </p>
 
 <pre class="language-javascript code">
@@ -1431,7 +1430,7 @@
 <h3 id="slow-connection">Slow Connection</h3>
 
 <p>
-  Simulate a slow connection.
+  This spell simulates a slow connection.
   This is done at the proxy level since two simultaneous requests would share the same connection.
   Thus for example a limit of 100000 bps for two requests would result in a speed of 50000 bps for each.
 </p>
@@ -1449,8 +1448,8 @@
 <h3 id="slow-website">Slow Website</h3>
 
 <p>
-  Simulate a slow website.
-  Make it behave as if just one website were slow.
+  This spell simulates a slow website.
+  It's as if just one website were slow, even if the rest of them run at normal speed.
 </p>
 
 <pre class="language-javascript code">
@@ -1465,8 +1464,8 @@
 <h3 id="intercept-https">Intercept HTTPS</h3>
 
 <p>
-  If you want to intercept HTTPS traffic, you can do that too.
-  But you have to jump through some extra hoops.
+  There's an incantation for intercepting HTTPS traffic, too.
+  But you have to burn some extra incense.
   First, create your very own self-signed Certificate Authority.
 </p>
 
@@ -1482,7 +1481,7 @@
   How to do this varies from client to client and platform to platform.
   Firefox maintains its own trusted list.
   Chrome on OS X uses the ones stored in OS X's keychain.
-  Describing them all is beyond the scope of these docs.
+  Describing them all is beyond the scope of these docs, suffice to say:
 </p>
 
 <pre class="code">
@@ -1505,6 +1504,65 @@
 <p>
   Finally, configure your client to proxy both HTTP and HTTPS through <code>localhost:8080</code>.
   Hoxy will use the fake cert authority to spoof certificates from any HTTPS sites, decrypting and intercepting them as cleartext using the existing intercept API.
+</p>
+
+<h3 id="http-reverse">Create a reverse proxy</h3>
+
+<p>
+  Suppose you want to intercept your own web traffic to reddit.com.
+  One option is to create a proxy, configure your client to use it, then visit reddit.com.
+  If client configuration isn't feasible, another option is to use a reverse proxy.
+  In this case you'd visit a url like <code>http://localhost:8080/</code> which would basically mirror the content of reddit.com.
+  This is fairly easy to set up:
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    reverse: 'http://www.reddit.com'
+  }).listen(8080)
+</pre>
+
+<p>
+  Now you can just visit <code>http://localhost:8080/</code> and reddit will be there.
+  Strictly speaking, by visiting the proxy directly in your browser rather than configuring it as a proxy, you're depriving the proxy of the scheme ("http:") and host ("www.reddit.com") information in the URL.
+  The <code>reverse</code> option provides those missing pieces of information, allowing you to visit the proxy directly.
+</p>
+
+<h3 id="https-reverse">Create an HTTPS reverse proxy</h3>
+
+<p>
+  Suppose you wanted to reverse proxy to an HTTPS site.
+  In that case you'll likely want the URL in your browser to be HTTPS as well.
+  For that, just provide a key and cert that your client trusts.
+  The instructions above already show how to create your own self-signed root CA.
+  Do that, then use it to create your server's key and cert:
+</p>
+
+<pre class="code">
+  # Create the key
+  openssl genrsa -out ./my-server.key.pem 2048
+  # Create the certificate signing request
+  openssl req -new -key ./my-server.key.pem -out ./my-server.csr.pem -subj "/C=US/ST=Utah/L=Provo/O=ACME Tech Inc/CN=local.ldsconnect.org"
+  # Create the cert
+  openssl x509 -req -in ./my-server.csr.pem -CA ~/.ssh/my-private-root-ca.crt.pem -CAkey ~/.ssh/my-private-root-ca.key.pem -CAcreateserial -out ./my-server.crt.pem -days 500
+</pre>
+
+<p>
+  Then, launch your server with a <code>tls</code> option, like so:
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    reverse: 'https://www.google.com',
+    tls: {
+      key: fs.readFileSync('path/to/my-server.key.pem),
+      cert: fs.readFileSync('path/to/my-server.crt.pem')
+    }
+  }).listen(8080)
+</pre>
+
+<p>
+  The <code>tls</code> option is passed to the underlying Node HTTPS server.
 </p>
 
 <h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>
