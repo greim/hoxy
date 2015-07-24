@@ -27,7 +27,8 @@ Most notably, 2.0 contains:
  
 # Release notes:
 
-* **2.2.5** Fixed a bug where `.buffers` was always undefined. Thanks [@Timwi](https://github.com/Timwi).
+* **2.2.6** Added eslint npm script. Thanks [@nerdbeere](https://github.com/nerdbeere).
+* **2.2.5** Fixed a bug where `.buffer` was always undefined. Thanks [@Timwi](https://github.com/Timwi).
 * **2.2.4** Added babel optional runtime transformer.
 * **2.2.3** Fixed broken reference to lodash-node in CLI.
 * **2.2.2** Updated hoxy version in CLI.
