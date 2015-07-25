@@ -5,6 +5,7 @@
 
 import assert from 'assert'
 import send from './lib/send'
+import hoxy from '../index'
 
 function failAfter(t) {
   return new Promise((res, rej) => {
@@ -322,6 +323,15 @@ describe('send', () => {
       assert.equal(resp.statusCode, 400)
       assert.equal(resp.headers['x-foo'], 'bar')
       assert.equal(resp.body, '123')
+    }).promise()
+  })
+
+  it('should allow tweaking', () => {
+    return send({
+      path: 'http://example.com/',
+      method: 'GET',
+    }).tweak(proxy => {
+      assert.ok(proxy instanceof hoxy.Proxy)
     }).promise()
   })
 })
