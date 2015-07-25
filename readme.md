@@ -28,6 +28,7 @@ Notable changes:
 
 # Release notes:
 
+* **2.3.0** Added getter and setter for proxy-level slow options.
 * **2.2.6** Added eslint npm script. Thanks [@nerdbeere](https://github.com/nerdbeere).
 * **2.2.5** Fixed a bug where `.buffer` was always undefined. Thanks [@Timwi](https://github.com/Timwi).
 * **2.2.4** Added babel optional runtime transformer.

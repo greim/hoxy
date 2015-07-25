@@ -183,6 +183,7 @@
             Note: <code>up</code> and <code>down</code> are independent.
             However, <code>rate</code> and <code>up</code> (if they both exist) form a pipeline; the slower of the two governing the total speed.
             The same is true of <code>rate</code> and <code>down</code>.
+            These properties can also be get/set by using <code>proxy.slow()</code>.
           </td>
         </tr>
       </tobdy>
@@ -214,6 +215,26 @@
     <p>
       This method simply passes its arguments to Node&apos;s <a href="http://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback"><code>server.listen()</code> method</a>.
     </p>
+  </div>
+</div>
+
+<div class="api-detail">
+  <h3 id="proxy-slow"><a href="#proxy-slow">proxy.slow(<span class="args">[options]</span>)</a></h3>
+  <div class="api-detail-content">
+    <p>
+      Get/set proxy-level slow options.
+      If <code>options</code> is provided, it's a setter.
+    </p>
+    <pre class="language-javascript code">
+      proxy.slow({ rate, latency, up, down });
+    </pre>
+    <p>
+      Note that the above options are identical to the <code>slow</code> options in the constructor.
+      If <code>options</code> is not provided, it's a getter.
+    </p>
+    <pre class="language-javascript code">
+      var slowOpts = proxy.slow();
+    </pre>
   </div>
 </div>
 

@@ -133,29 +133,7 @@ export default class Proxy extends EventEmitter {
     }
 
     if (opts.slow) {
-      let slow = this._slow = { latency: 0 };
-      ['rate', 'latency', 'up', 'down'].forEach(name => {
-        let val = opts.slow[name]
-        if (val === undefined) { return }
-        if (typeof val !== 'number') {
-          throw new Error(`slow.${name} must be a number`)
-        }
-        if (val < 0) {
-          throw new Error(`slow.${name} must be >= 0`)
-        }
-      })
-      if (opts.slow.rate) {
-        slow.rate = new ThrottleGroup({ rate: opts.slow.rate })
-      }
-      if (opts.slow.latency) {
-        slow.latency = opts.slow.latency
-      }
-      if (opts.slow.up) {
-        slow.up = new ThrottleGroup({ rate: opts.slow.up })
-      }
-      if (opts.slow.down) {
-        slow.down = new ThrottleGroup({ rate: opts.slow.down })
-      }
+      this.slow(opts.slow)
     }
 
     this._tls = opts.tls
@@ -343,6 +321,40 @@ export default class Proxy extends EventEmitter {
         cb(log)
       }
     })
+  }
+
+  slow(opts) {
+    if (opts) {
+      let slow = this._slow = { opts, latency: 0 };
+      ['rate', 'latency', 'up', 'down'].forEach(name => {
+        let val = opts[name]
+        if (val === undefined) { return }
+        if (typeof val !== 'number') {
+          throw new Error(`slow.${name} must be a number`)
+        }
+        if (val < 0) {
+          throw new Error(`slow.${name} must be >= 0`)
+        }
+      })
+      if (opts.rate) {
+        slow.rate = new ThrottleGroup({ rate: opts.rate })
+      }
+      if (opts.latency) {
+        slow.latency = opts.latency
+      }
+      if (opts.up) {
+        slow.up = new ThrottleGroup({ rate: opts.up })
+      }
+      if (opts.down) {
+        slow.down = new ThrottleGroup({ rate: opts.down })
+      }
+    } else {
+      if (!this._slow) {
+        return undefined
+      } else {
+        return this._slow.opts
+      }
+    }
   }
 
   _emitError(ex, phase) {

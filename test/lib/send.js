@@ -42,6 +42,7 @@ class Sender {
     this._clientHandler = () => {}
     this._interceptHandlers = []
     this._prom = new Promise((resolve, reject) => {
+      let proxy = this._proxy = hoxy.createServer(proxyOpts)
       setImmediate(() => {
         let server = http.createServer()
         server.listen(0)
@@ -52,7 +53,6 @@ class Sender {
           }).catch(reject)
         })
         // -----------------
-        let proxy = hoxy.createServer(proxyOpts)
         proxy.listen(0)
         proxy.on('error', reject)
         if (!ignoreInterceptorErrors) {
@@ -141,6 +141,11 @@ class Sender {
 
   promise() {
     return this._prom
+  }
+
+  tweak(fn) {
+    fn(this._proxy)
+    return this
   }
 }
 
