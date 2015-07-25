@@ -43,7 +43,7 @@ export default class Body extends EventEmitter {
 
   get buffer() {
     let src = this._source
-    return src ? src._buffers : undefined
+    return src ? src._buffer : undefined
   }
 
   set buffer(buffer) {

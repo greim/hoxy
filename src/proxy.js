@@ -15,7 +15,6 @@ import adapt from 'ugly-adapter'
 import { SNISpoofer } from './sni-spoofer'
 import net from 'net'
 import https from 'https'
-import _ from 'lodash'
 import { ThrottleGroup } from 'stream-throttle'
 
 function isAsync(fun) {
@@ -64,7 +63,7 @@ function asIntercept(opts, intercept) {
       let args = arguments
       let r = opts.phase === 'request' ? req : resp
       r._load().then(() => {
-        asHandlers[opts.as](r)
+        asHandlers[opts.as](r) //eslint-disable-line no-use-before-define
         origIntercept.apply(this, args)
         done()
       }).catch(done)
@@ -79,7 +78,9 @@ let otherIntercept = (() => {
     if (tester === undefined) { return true }
     if (tester instanceof RegExp) { return tester.test(testee) }
     if (isUrl) { return getUrlTester(tester)(testee) }
+    /*eslint-disable */
     return tester == testee // intentional double-equals
+    /*eslint-enable */
   }
   return function(opts, intercept) {
     let isReq = opts.phase === 'request' || opts.phase === 'request-sent'
@@ -140,29 +141,7 @@ export default class Proxy extends EventEmitter {
     }
 
     if (opts.slow) {
-      let slow = this._slow = { latency: 0 };
-      ['rate', 'latency', 'up', 'down'].forEach(name => {
-        let val = opts.slow[name]
-        if (val === undefined) { return }
-        if (typeof val !== 'number') {
-          throw new Error(`slow.${name} must be a number`)
-        }
-        if (val < 0) {
-          throw new Error(`slow.${name} must be >= 0`)
-        }
-      })
-      if (opts.slow.rate) {
-        slow.rate = new ThrottleGroup({ rate: opts.slow.rate })
-      }
-      if (opts.slow.latency) {
-        slow.latency = opts.slow.latency
-      }
-      if (opts.slow.up) {
-        slow.up = new ThrottleGroup({ rate: opts.slow.up })
-      }
-      if (opts.slow.down) {
-        slow.down = new ThrottleGroup({ rate: opts.slow.down })
-      }
+      this.slow(opts.slow)
     }
 
     this._tls = opts.tls
@@ -353,6 +332,40 @@ export default class Proxy extends EventEmitter {
     })
   }
 
+  slow(opts) {
+    if (opts) {
+      let slow = this._slow = { opts, latency: 0 };
+      ['rate', 'latency', 'up', 'down'].forEach(name => {
+        let val = opts[name]
+        if (val === undefined) { return }
+        if (typeof val !== 'number') {
+          throw new Error(`slow.${name} must be a number`)
+        }
+        if (val < 0) {
+          throw new Error(`slow.${name} must be >= 0`)
+        }
+      })
+      if (opts.rate) {
+        slow.rate = new ThrottleGroup({ rate: opts.rate })
+      }
+      if (opts.latency) {
+        slow.latency = opts.latency
+      }
+      if (opts.up) {
+        slow.up = new ThrottleGroup({ rate: opts.up })
+      }
+      if (opts.down) {
+        slow.down = new ThrottleGroup({ rate: opts.down })
+      }
+    } else {
+      if (!this._slow) {
+        return undefined
+      } else {
+        return this._slow.opts
+      }
+    }
+  }
+
   _emitError(ex, phase) {
     this.emit('log', {
       level: 'error',
@@ -371,16 +384,24 @@ export default class Proxy extends EventEmitter {
     return co(function*() {
       cycle._setPhase(phase)
       for (let intercept of intercepts) {
-        let t = setTimeout(() => {
-          self.emit('log', {
-            level: 'debug',
-            message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
-          })
-        }, 5000)
+        const stopLogging = self._logLongTakingIntercept(phase, req)
         yield adapt.method(intercept, 'call', cycle, req, resp)
-        clearTimeout(t)
+        stopLogging()
       }
     })
+  }
+
+  _logLongTakingIntercept(phase, req) {
+    const t = setTimeout(() => {
+      this.emit('log', {
+        level: 'debug',
+        message: 'an async ' + phase + ' intercept is taking a long time: ' + req.fullUrl(),
+      })
+    }, 5000)
+
+    return function stopLogging() {
+      clearTimeout(t)
+    }
   }
 }
 

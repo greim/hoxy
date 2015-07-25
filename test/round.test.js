@@ -8,6 +8,7 @@ import getMegaSource from './lib/megabyte-stream'
 import send from './lib/send'
 import wait from '../lib/wait'
 import streams from '../lib/streams'
+import hoxy from '../index'
 
 describe('Round trips', function() {
 
@@ -287,7 +288,7 @@ describe('Round trips', function() {
     }).promise()
   })
 
-  it('should simulate proxy-level slow download', () => {
+  it('should simulate proxy-level slow download (1)', () => {
     let start = Date.now()
     let slow = { rate: 1024000 }
     return send({}, false, { slow }).to({
@@ -309,6 +310,33 @@ describe('Round trips', function() {
         , diff = end - start
       assert.ok(diff >= 1000, `took ${diff}ms`)
     })
+  })
+
+  it('should simulate proxy-level slow download with a setter', () => {
+    let start = Date.now()
+    let slow = { rate: 1024000 }
+    return send({}, false).tweak(proxy => {
+      proxy.slow(slow)
+    }).to({
+      body: getMegaSource(),
+    }).promise().then(() => {
+      let end = Date.now()
+        , diff = end - start
+      assert.ok(diff >= 1000, `took ${diff}ms`)
+    })
+  })
+
+  it('should get proxy-level slow opts (1)', () => {
+    let slow = { rate: 1024000 }
+    var proxy = hoxy.createServer({ slow })
+    assert.deepEqual(proxy.slow(), slow)
+  })
+
+  it('should get proxy-level slow opts (2)', () => {
+    let slow = { rate: 1024000 }
+    var proxy = hoxy.createServer()
+    proxy.slow(slow)
+    assert.deepEqual(proxy.slow(), slow)
   })
 
   it('proxy-level rate and down should work together', () => {

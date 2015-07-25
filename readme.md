@@ -24,9 +24,17 @@ Most notably, 2.0 contains:
  * In lieu of calling done(), asynchronous interceptors can return promises or iterators.
  * Refactor and simplification of internals, including streams, async logic, and unit tests.
  * Various bugfixes and performance improvements.
-
+ 
 # Release notes:
 
+* **2.3.0** Added getter and setter for proxy-level slow options.
+* **2.2.6** Added eslint npm script. Thanks [@nerdbeere](https://github.com/nerdbeere).
+* **2.2.5** Fixed a bug where `.buffer` was always undefined. Thanks [@Timwi](https://github.com/Timwi).
+* **2.2.4** Added babel optional runtime transformer.
+* **2.2.3** Fixed broken reference to lodash-node in CLI.
+* **2.2.2** Updated hoxy version in CLI.
+* **2.2.1** Fixed error in npmignore.
+* **2.2.0** Added proxy-level throttling.
 * **2.1.1** Ditched babel require hook and instead use compile/prepublish.
 * **2.1.0** Ability to run reversy proxy as an HTTPS server. Thanks [@snoj](https://github.com/snoj).
 * **2.0.0** Direct HTTPS proxying and improved async support in interceptors. Thanks [@snoj](https://github.com/snoj), [@Phoenixmatrix](https://github.com/Phoenixmatrix), [@sholladay](https://github.com/sholladay) and others for helping with the HTTPS stuff!

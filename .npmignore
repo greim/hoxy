@@ -3,4 +3,4 @@ page-resources/
 index.html
 .eslintrc
 poc.js
-/lib/
+/src/

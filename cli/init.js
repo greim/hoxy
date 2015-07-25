@@ -47,9 +47,9 @@ function getTransferInfo(args){
       version: '0.0.0',
       main: './run-hoxy',
       dependencies: {
-        hoxy: '1.x',
-        minimist: '0.0.x',
-        'lodash-node': '2.3.x'
+        hoxy: '2.x',
+        minimist: '0.x',
+        lodash: '3.x'
       }
     },
     target: targetDir + '/package.json',
