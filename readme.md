@@ -1,17 +1,18 @@
 # Hoxy
 
-An HTTP hacking tool for JavaScript programmers. Document can be found here: http://greim.github.io/hoxy/
+An HTTP hacking tool for JavaScript programmers. Please see the [documentation page](http://greim.github.io/hoxy/) for more info.
 
 ```js
-import { Proxy } from 'hoxy'
-let proxy = new Proxy().listen(8080)
+var hoxy = require('hoxy');
+var proxy = hoxy.createServer().listen(8080);
 proxy.intercept({
   phase: 'response',
   mimeType: 'text/html',
   as: '$'
-}, (req, resp) => {
-  resp.$('title').text('Unicorns!')
-})
+}, function(req, resp) {
+  resp.$('title').text('Unicorns!');
+  // all page titles will now say "Unicorns!"
+});
 ```
 
 # Version 3.0
