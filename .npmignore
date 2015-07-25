@@ -4,3 +4,5 @@ index.html
 .eslintrc
 poc.js
 /src/
+/dev-bin/
+/docs/
