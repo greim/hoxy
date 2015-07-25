@@ -29,7 +29,7 @@ a[href]:hover{
 }
 h1,h2,h3,h4,h5,h6{
     line-height:1.3;
-    color:rgba(0,0,0,0.35);
+    color:rgba(0,0,0,0.45);
     font-weight:normal;
 }
 h1,h2,h3,h4,h5,h6,p,ol,ul,pre,table{

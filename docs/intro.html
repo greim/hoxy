@@ -1,0 +1,50 @@
+<!doctype html>
+<html data-order="100">
+<head></head>
+<body>
+
+<h1 id="introduction" data-tldr="Documentation and examples.">Hoxy, the Web-Hacking Proxy</h1>
+
+<p>
+  Hoxy is an HTTP hacking tool for JavaScript programmers.
+  It operates in the same space as Charles or Fiddler, but rather than having a GUI, it exposes an API for programmatically manipulating HTTP traffic.
+  A few key features:
+</p>
+
+<ul>
+  <li>Inspect and manipulate URLs, headers, status codes, etc.</li>
+  <li>Support for direct and reverse proxying.</li>
+  <li>Support for HTTPS proxying.</li>
+  <li>Manipulate request and response bodies as JSON, jQuery (cheerio), etc.</li>
+  <li>Simulate latency and low-bandwidth connections.</li>
+  <li>Swap in local files for remote ones.</li>
+</ul>
+
+<h2 id="how-it-works">How it works</h2>
+
+<p>
+  Hoxy functions as a normal proxy standing between the client and server.
+  You intercept traffic during either the request or response phase, or both.
+  The <a href="#phase-lifecycle">phase lifecycle section</a> contains a more complete description, but here's a simplified illustration.
+</p>
+
+<pre class="code">
+  time ==>
+  -----------------------
+  server:       3
+  -------------/-\-------
+  hoxy:       2   4
+  -----------/-----\-----
+  client:   1       5
+</pre>
+
+<ol>
+  <li>Client sends request.</li>
+  <li>Hoxy intercepts the request.</li>
+  <li>Server receives request and sends response.</li>
+  <li>Hoxy intercepts the response.</li>
+  <li>Client receives response.</li>
+</ol>
+
+</body>
+</html>
