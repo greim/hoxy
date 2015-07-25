@@ -16,7 +16,7 @@ proxy.intercept({
 
 # Version 3.0
 
-As of August 2015 Hoxy has released version 3.0.
+Hoxy will soon release version 3.0.
 The purpose of this release is to simplify the API and better support ES6.
 Notable changes:
 
@@ -27,7 +27,6 @@ Notable changes:
 
 # Release notes:
 
-* **3.0.0** Removed `done` callback from interceptor signature. Removed CLI. Removed `hoxy.forever()`.
 * **2.2.6** Added eslint npm script. Thanks [@nerdbeere](https://github.com/nerdbeere).
 * **2.2.5** Fixed a bug where `.buffer` was always undefined. Thanks [@Timwi](https://github.com/Timwi).
 * **2.2.4** Added babel optional runtime transformer.
