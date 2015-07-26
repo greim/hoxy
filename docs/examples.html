@@ -3,7 +3,7 @@
 <head></head>
 <body>
 
-<h1 id="examples" data-tldr="Example snippets.">Incantations</h1>
+<h1 id="examples" data-tldr="Snippets of example code.">Incantations</h1>
 
 <p>
   Hoxy is not Magic Cargo From The Sky Gods&trade;.
@@ -23,7 +23,7 @@
     mimeType: 'text/html',
     as: '$'
   }, function(req, resp) {
-    resp.$('title').text('Unicorns!')
+    resp.$('title').text('Unicorns!');
   });
 </pre>
 
@@ -37,12 +37,8 @@
 
 <pre class="language-javascript code">
   hoxy.createServer({
-    slow: {
-      up: 10000,
-      down: 100000,
-      latency: 50
-    }
-  }).listen(8080)
+    slow: { rate: 100000 }
+  }).listen(8080);
 </pre>
 
 <h3 id="slow-website">Slow Website</h3>
@@ -57,7 +53,39 @@
     phase: 'response',
     hostname: 'www.google.com'
   }, function(req, resp) {
-    resp.slow({ rate: 10000 })
+    resp.slow({ rate: 10000 });
+  });
+</pre>
+
+<h3 id="generator-intercept">Generator Interceptors</h3>
+
+<p>
+  One can invoke the deep magic of generator functions.
+  Which are actually just functions that can pause while they're running.
+  This is useful because async stuff can happen while things are paused.
+  But you need to yield promises, which means using an adapter to turn callbacks into promises.
+</p>
+
+<pre class="language-javascript code">
+  var adapt = require('ugly-adapter');
+  var fs = require('fs');
+  proxy.intercept('request', function*(req, resp) {
+    resp.buffer = yield adapt(fs.readFile, 'path/to/unicorns.gif');
+  });
+</pre>
+
+<h3 id="async-intercept">Async Interceptors</h3>
+
+<p>
+  One can invoke the even deeper magic of async functions.
+  Which work a lot like generators behind the scenes.
+</p>
+
+<pre class="language-javascript code">
+  var adapt = require('ugly-adapter');
+  var fs = require('fs');
+  proxy.intercept('request', async function(req, resp) {
+    resp.buffer = await adapt(fs.readFile, 'path/to/unicorns.gif');
   });
 </pre>
 
@@ -99,7 +127,7 @@
       key: fs.readFileSync('/Users/you/.ssh/my-private-root-ca.key.pem'),
       cert: fs.readFileSync('/Users/you/.ssh/my-private-root-ca.crt.pem')
     }
-  }).listen(8080)
+  }).listen(8080);
 </pre>
 
 <p>
@@ -124,7 +152,7 @@ See also: <a href="#https-proxying">basic explanation of HTTPS proxying</a>.
 <pre class="language-javascript code">
   hoxy.createServer({
     reverse: 'http://www.reddit.com'
-  }).listen(8080)
+  }).listen(8080);
 </pre>
 
 <p>
@@ -163,7 +191,7 @@ See also: <a href="#https-proxying">basic explanation of HTTPS proxying</a>.
       key: fs.readFileSync('path/to/my-server.key.pem),
       cert: fs.readFileSync('path/to/my-server.crt.pem')
     }
-  }).listen(8080)
+  }).listen(8080);
 </pre>
 
 <p>

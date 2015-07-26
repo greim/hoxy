@@ -228,14 +228,14 @@
 <p>
 How does HTTPS proxying work in Hoxy?
 First, let's review how HTTPS proxying works in general.
-Suppose you want to insert a proxy between yourself and the website "https://example.com".
+Suppose you want to insert a proxy between yourself and the website <em>https://example.com</em>.
 There are two ways to do this: direct and reverse proxying.
 </p>
 
 <h3 id="direct-https-proxying">Direct HTTPS proxying</h3>
 
 <p>
-To set up a direct HTTPS proxy, you'd launch a proxy on port 8080 and set your browser to proxy through <code>localhost:8080</code>, then visit the site directly into your browser.
+To set up a direct HTTPS proxy, you'd launch a proxy on port 8080 and set your browser to do HTTPS proxying through <code>localhost:8080</code>, then visit the site directly into your browser.
 What happens here differs radically from HTTP proxying.
 During HTTP proxying, the client sends this:
 </p>
@@ -245,7 +245,7 @@ During HTTP proxying, the client sends this:
 </pre>
 
 <p>
-In English this means <em>please go to example.com and get /foo.html for me.</em>
+In English this means <em>go to example.com and get /foo.html for me.</em>
 But during HTTPS proxying, the client sends this:
 </p>
 
@@ -254,7 +254,7 @@ But during HTTPS proxying, the client sends this:
 </pre>
 
 <p>
-Which in English means <em>please connect me to example.com, I want to have a private conversation.</em>
+Which in English means <em>connect me to example.com, I want to have a private conversation.</em>
 Once the proxy establishes the pipe, the client TLS-handshakes the server on that connection.
 Then, it sends normal HTTP traffic over it like this:
 </p>
@@ -314,7 +314,7 @@ This is a separate server instance from the proxy itself and solely exists to sp
 <p>
 Normally, the client would immediately realize something fishy is going on.
 The spoofing server, being TLS, has provided a cert to the client that hasn't been signed by a client-trusted CA.
-Thus, to use Hoxy as an HTTPS direct proxy, you must create your <em>own</em> self-signed root certificate authority, make your client to trust it, then pass it to Hoxy as a startup option.
+Thus, to use Hoxy as an HTTPS direct proxy, you must create your <em>own</em> self-signed root CA, make your client trust it, then pass it to Hoxy as a startup option.
 </p>
 
 <p>
@@ -332,8 +332,11 @@ Neither the client nor the server are the wiser.
 <h3 id="tls-certauthority-diff">"tls" versus "certAuthority"</h3>
 
 <p>
-It should now make sense why launching Hoxy as a reverse HTTPS proxy requires a <code>tls</code> key/cert option, whereas launching as a direct HTTPS proxy requires a <code>certAuthority</code> key/cert option.
-The former is just the Node.js option for running an HTTPS webserver, while the latter is a meta-key/cert combo, used to spoof <em>actual</em> key/cert combos on the fly.
+You may have noticed there are two key/cert options that can be passed to Hoxy, with different names: <code>tls</code> and <code>certAuthority</code>.
+It should now make sense why.
+The former is for reverse proxying, and is just Node's config option for running an HTTPS webserver.
+The latter is for direct proxying.
+It's a meta-key/cert combo, used to spoof <em>actual</em> key/cert combos on the fly.
 Incidentally, these two options are mutually exclusive.
 It wouldn't make sense to use both at the same time.
 </p>

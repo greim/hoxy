@@ -18,7 +18,7 @@ co(function*() {
     , mainPage = yield adapt(fs.readFile, pageName, 'utf8')
     , $ = cheerio.load(mainPage)
 
-  for (var fileName of fileNames) {
+  for (let fileName of fileNames) {
     let page = yield adapt(fs.readFile, path.join(docsDir, fileName), 'utf8')
       , $page = cheerio.load(page)
     pages.push($page)
@@ -32,7 +32,7 @@ co(function*() {
     return a - b
   })
 
-  for (var $page of pages) {
+  for (let $page of pages) {
     $('#target').append($page('body').html())
   }
 
