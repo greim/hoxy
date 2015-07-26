@@ -1,30 +1,31 @@
 # Hoxy
 
-An HTTP hacking tool for JavaScript programmers. Document can be found here: http://greim.github.io/hoxy/
+An HTTP hacking tool for JavaScript programmers. Please see the [documentation page](http://greim.github.io/hoxy/) for more info.
 
 ```js
-import { Proxy } from 'hoxy'
-let proxy = new Proxy().listen(8080)
+var hoxy = require('hoxy');
+var proxy = hoxy.createServer().listen(8080);
 proxy.intercept({
   phase: 'response',
   mimeType: 'text/html',
   as: '$'
-}, (req, resp) => {
-  resp.$('title').text('Unicorns!')
-})
+}, function(req, resp) {
+  resp.$('title').text('Unicorns!');
+  // all page titles will now say "Unicorns!"
+});
 ```
 
-# Version 2.0
+# Version 3.0
 
-As of mid-2015 Hoxy has released version 2.0.
-This release keeps a the API nearly identical to 1.x, but much of the internals are re-written.
-Most notably, 2.0 contains:
+Hoxy will soon release version 3.0.
+The purpose of this release is to simplify the API and better support ES6.
+Notable changes:
 
- * HTTPS direct proxying.
- * In lieu of calling done(), asynchronous interceptors can return promises or iterators.
- * Refactor and simplification of internals, including streams, async logic, and unit tests.
- * Various bugfixes and performance improvements.
- 
+ * A `done` callback is no longer passed as the third arg to interceptors. Interceptor arity is, accordingly, no longer a switch for async behavior. Rather, it solely depends on the return type of the interceptor (i.e. promises or iterators over promises).
+ * The third argument to interceptors is now the `cycle` object, === to `this`. This was based on a suggestion from [@nerdbeere](https://github.com/nerdbeere), with a view toward supporting arrow functions, in which `this` is lexical.
+ * The CLI has been completely removed from the project. The reasoning is that, by simplifying the project, I can more easily maintain it. If there's a need, it can be brought back as a separate npm module. Perhaps somebody else can take that on.
+ * Undocumented `hoxy.forever()` function goes away. 
+
 # Release notes:
 
 * **2.3.0** Added getter and setter for proxy-level slow options.

@@ -1,92 +1,7 @@
 <!doctype html>
-<html>
-<head>
-<title>Documentation - Hoxy</title>
-<meta charset="utf8"/>
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,700italic,700,300' rel='stylesheet' type='text/css'>
-<link href='http://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
-<link href="./page-resources/styles.css" rel="stylesheet" type="text/css">
-<link href="./page-resources/prism.css" rel="stylesheet" type="text/css">
-<script src="./page-resources/jquery.js"></script>
-<script src="./page-resources/de-indent.js"></script>
-<script src="./page-resources/prism.js"></script>
-</head>
+<html data-order="300">
+<head></head>
 <body>
-<div id="outer">
-<div id="inner">
-
-<h1 id="introduction" data-tldr="Documentation and examples.">Hoxy, the Web-Hacking Proxy</h1>
-
-<p>
-  Hoxy is an http hacking tool for JavaScript programmers.
-  It operates in the same space as Charles or Fiddler, but rather than having a GUI, it exposes an API for programmatically manipulating HTTP traffic.
-  A few key features:
-</p>
-
-<ul>
-  <li>Inspect and manipulate URLs, headers, status codes, etc.</li>
-  <li>Support for direct and reverse proxying.</li>
-  <li>Support for HTTPS proxying.</li>
-  <li>Manipulate request and response bodies as JSON, jQuery (cheerio), etc.</li>
-  <li>Simulate latency and low-bandwidth connections.</li>
-  <li>Swap in local files for remote ones.</li>
-</ul>
-
-<pre class="language-javascript code">
-  var hoxy = require('hoxy');
-
-  var proxy = hoxy.createServer().listen(8080);
-
-  proxy.intercept('request', function(req, resp) {
-    console.log('request made to: ' + req.fullUrl());
-  });
-</pre>
-
-<p>
-  After running the above code, configure your web client to proxy through <code>yourmachine:8080</code>.
-  All information flowing through the proxy is exposed as JavaScript variables, allowing you to inspect and manipulate web traffic in arbitrary ways.
-</p>
-
-<h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
-
-<p>
-  Hoxy is available on both <a href="https://www.npmjs.org/package/hoxy">npm</a> and <a href="https://github.com/greim/hoxy">github</a>.
-  Tests pass on recent node and io.js.
-</p>
-
-<pre class="code">
-  $ npm install hoxy
-</pre>
-
-<pre class="language-javascript code">
-  var hoxy = require('hoxy');
-</pre>
-
-<h2 id="how-it-works">How it works</h2>
-
-<p>
-  Hoxy functions as a normal proxy standing between the client and server.
-  You intercept traffic during either the request or response phase, or both.
-  The <a href="#phase-lifecycle">phase lifecycle section</a> contains a more complete description, but here's a simplified illustration.
-</p>
-
-<pre class="code">
-  -----------------------
-  server:       3
-  -------------/-\-------
-  hoxy:       2   4
-  -----------/-----\-----
-  client:   1       5
-  -----------------------
-</pre>
-
-<ol>
-  <li>Client sends request.</li>
-  <li>Hoxy intercepts the request.</li>
-  <li>Server receives request and sends response.</li>
-  <li>Hoxy intercepts the response.</li>
-  <li>Client receives response.</li>
-</ol>
 
 <h1 id="api-documentaiton" data-tldr="Objects, methods, and properties.">API documentaiton</h1>
 
@@ -213,7 +128,7 @@
       });
     </pre>
     <p>
-      This method will pass arguments to Node&apos;s <a href="http://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback">server API</a>.
+      This method simply passes its arguments to Node&apos;s <a href="http://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback"><code>server.listen()</code> method</a>.
     </p>
   </div>
 </div>
@@ -242,13 +157,11 @@
   <h3 id="proxy-intercept"><a href="#proxy-intercept">proxy.intercept(<span class="args">options, handler</span>)</a></h3>
   <div class="api-detail-content">
     <p>
-      This is <em>the</em> entry point for intercepting and operating on requests and responses.
+      This is the entry point for intercepting and operating on requests and responses.
       This first example intercepts all requests.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', function(req, resp) {
-        console.log('request made to: ' + req.url);
-      });
+      proxy.intercept('request', req => console.log(req.url));
     </pre>
     <p>
       This is more verbose, but identical to the above.
@@ -256,109 +169,120 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request'
-      }, function(req, resp) {
-        console.log('request made to: '+req.url);
+      }, function(req, resp, cycle) {
+        console.log(req.url);
       });
     </pre>
+    <h4>Interceptors</h4>
     <p>
-      Hoxy waits for an interceptor to finish before proceeding to the next step.
-      That happens naturally when everything's synchronous.
-      But if you want hoxy to wait for async things to finish first, you need to tell it.
-      Generators + promises are currently the easiest way to do this.
-      Simply declare your interceptor a generator, then yield promises from it.
-      Error handling gets rolled up automatically.
-      For more info, check out the <a href="https://www.npmjs.com/package/co">co utility</a> and the <a href="https://github.com/greim/ugly-adapter">ugly-adapter utility</a>.
+      The callback passed to <code>intercept()</code> (AKA the <em>interceptor</em>) receives three arguments <code>(req, resp, cycle)</code> which are instances of classes described below.
+      <code>cycle</code> is also passed as context.
+      Thus:
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', function*(req, resp) {
-        var symbol = yield getSymbol();
-        var price = yield stockPrice(symbol);
-        // do something with "price"
+      proxy.intercept('request', function(req, resp, cycle) {
+        console.log(this === cycle) // true
       });
     </pre>
+    <h4>Sync versus async interceptors</h4>
     <p>
-      If generators aren't an option, returning a promise also works.
+      Hoxy internally runs everything sequentially in series, including interceptors.
+      That happens naturally when your interceptor logic is synchronous.
+      But if it's asynchronous, you must signal that by returning a promise.
+      As long as you do that, Hoxy will wait until the promise resolves and things will flow serially.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', function(req, resp) {
-        return getSymbol().then(function(symbol) {
-          return stockPrice(symbol);
-        }).then(function(proce) {
-          // do something with "price"
+      proxy.intercept('request', function(req, resp, cycle) {
+        // return a promise from the interceptor
+        return getThingA().then(function(thingA) {
+          return getThingB(thingA);
+        }).then(function(thingB) {
+          // do something with "thingB"
         });
       });
     </pre>
     <p>
-      The above becomes much easier if/when you can write async functions.
+      Future versions of JavaScript will allow <a href="https://github.com/lukehoban/ecmascript-asyncawait">async functions</a>.
+      Some transpilers allow you to use this syntax today.
+      These can be used as interceptors, too.
+      Written this way, your logic and your error handling are much cleaner.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', async function(req, resp) {
-        let symbol = await getSymbol();
-        let price = await stockPrice(symbol);
-        // do something with "price"
+      proxy.intercept('request', async function(req, resp, cycle) {
+        // this is an async function
+        let thingA = await getThingA();
+        let thingB = await getThingB(thingA);
+        // do something with "thingB"
       });
     </pre>
     <p>
-    <strong style="color:#900">Warning: deprecated:</strong>
-      If none of the above is an option, callbacks also work.
-      An interceptor with an arity of 3 signals hoxy to wait until you call <code>done()</code>, like below.
-      Just remember to handle your errors!
-      This capability will likely go away in a future major release.
+      In current versions of io.js, generators can be used as a stand-in for async functions, but with the benefit of being natively-supported, spec-valid ES6 syntax.
+      You must only yield <em>promises</em> from your generator.
+      See <a href="https://www.npmjs.com/package/co">co</a> for more details.
     </p>
     <pre class="language-javascript code">
-      proxy.intercept('request', function(req, resp, done) {
-        getSymbol(function(err, symbol) {
-          if (err) { return done(err); }
-          stockPrice(symbol, function(err, price) {
-            if (err) { return done(err); }
-            // do something with "price"
-            done();
-          })
-        })
+      proxy.intercept('request', function*(req, resp, cycle) {
+        // this is a generator
+        let thingA = yield getThingA();
+        let thingB = yield getThingB(thingA);
+        // do something with "thingB"
       });
     </pre>
+    <p>
+      <strong>Note:</strong> Strictly speaking, Hoxy doesn't care whether your interceptor is an async function or a generator.
+      It only cares what kind of thing the return value is:
+    </p>
+    <ul>
+      <li>Promise: wait for it to resolve, then  proceed.</li>
+      <li>Iterator: turn it into a promise, wait for it to resolve, then  proceed.</li>
+      <li>None of the above: proceed immediately.</li>
+    </ul>
+    <h4>Options</h4>
     <p>
       Options affect how, or if, interceptors get called.
+      Here are a few examples.
       The following will only intercept <code>GET</code> requests to <code>example.com</code>.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
         method: 'GET',
-        host: 'example.com'
-      }, function(req, resp) {
+        hostname: 'example.com'
+      }, function(req, resp, cycle) {
         console.log('request made to: '+req.url);
       });
     </pre>
     <p>
-      Intercept only <code>text/html</code> responses.
-      Expose the response body as a readable/writable <code>$</code> variable.
+      The following only intercepts <code>text/html</code> responses.
+      When it does, it exposes the response body as a readable/writable <code>$</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
         mimeType: 'text/html',
         as: '$'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         resp.$('title')
         .text('all your titles are belong to us');
       });
     </pre>
     <p>
-      Intercept only <code>UTF-8</code> responses, exposing the response body as the <code>string</code> variable.
+      The following only intercepts responses with a declared charset.
+      When it does, it exposes the response body as the <code>string</code> variable.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
-        contentType: /utf\-8/i,
+        contentType: /charset/i,
         as: 'string'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         console.log(resp.string);
       });
     </pre>
     <p>
-      Intercept responses from the users JSON endpoint, exposing the response body as the <code>json</code> variable.
-      Use a <a href="https://github.com/bjoerge/route-pattern">URL pattern</a> to match the endpoint URL instead of a regex.
+      The following only intercepts responses from an <code>/api/users</code> JSON endpoint.
+      When it does, it exposes the response body as the <code>json</code> variable.
+      It uses a <a href="https://github.com/bjoerge/route-pattern">URL pattern</a> to match the endpoint URL instead of a regex.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
@@ -366,12 +290,12 @@
         fullUrl: 'http://example.com/api/users/:id',
         mimeType: 'application/json',
         as: 'json'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         console.log(resp.json.email_address);
       });
     </pre>
     <table>
-      <caption>Options</caption>
+      <caption>Option Descriptions</caption>
       <thead>
         <tr>
           <th>name</th>
@@ -412,7 +336,7 @@
                 See <a href="https://github.com/MatthewMueller/cheerio">cheerio</a>.</li>
               <li><code>'json'</code> - A JS object containing JSON.</li>
               <li><code>'string'</code> - A plain string.</li>
-              <li><code>'buffers'</code> - An array of buffers containing the entity body in its raw binary form.</li>
+              <li><code>'buffer'</code> - A buffer containing the entity body in its raw binary form.</li>
               <li><code>'params'</code> - A JS object containing name/value pairs parsed from the <code>application/x-www-form-urlencoded</code> entity body.</li>
             </ul>
             Use filtering in tandem with these.
@@ -448,14 +372,6 @@
           <td>no</td>
           <td>
             Match the all-uppercase HTTP request method.
-          </td>
-        </tr>
-        <tr>
-          <td><code>host</code></td>
-          <td class="type">string, regexp</td>
-          <td>no</td>
-          <td>
-            Match the value of the host header.
           </td>
         </tr>
         <tr>
@@ -642,9 +558,9 @@
 
 <p>
   Represents a request.
-  An instance of this is passed as the first argument to every intercept handler.
+  An instance of this is passed as the first argument to every interceptor.
   Altering its values changes what the server sees.
-  If you change the <code>hostname</code>, it changes <em>which</em> server sees the request..
+  If you change the <code>hostname</code>, it changes <em>which</em> server sees the request.
 </p>
 
 <div class="api-detail">
@@ -717,7 +633,7 @@
         method: 'PUT',
         fulUrl: 'http://example.com/users/:id',
         as: 'json'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         req.json.prefs.subscriptions = 'all';
       });
     </pre>
@@ -739,7 +655,7 @@
         method: 'POST',
         mimeType: 'application/x-www-form-urlencoded',
         as: 'params'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         console.log(req.params.email);
       });
     </pre>
@@ -762,7 +678,7 @@
         phase: 'request',
         fulUrl: 'http://example.com/users/:id',
         as: 'string'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         console.log(req.string);
       });
     </pre>
@@ -770,11 +686,11 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="request-buffers"><a href="#request-buffers">request.buffers</a></h3>
+  <h3 id="request-buffer"><a href="#request-buffer">request.buffer</a></h3>
   <div class="api-detail-content">
     <p>
-      Request body binary <a href="http://nodejs.org/api/buffer.html">buffer</a> array.
-      This is only present if you intercept the request <code>as:'buffers'</code>.
+      Request body binary <a href="http://nodejs.org/api/buffer.html">buffer</a>.
+      This is only present if you intercept the request <code>as:'buffer'</code>.
       Changes made to this object will be seen by the server.
     </p>
     <pre class="language-javascript code">
@@ -782,9 +698,9 @@
         phase: 'request',
         method: 'POST',
         fullUrl: 'http://example.com/images',
-        as: 'buffers'
-      }, function(req, resp) {
-        // req.buffers contains uploaded image
+        as: 'buffer'
+      }, function(req, resp, cycle) {
+        // req.buffer contains uploaded image
       });
     </pre>
   </div>
@@ -800,13 +716,13 @@
     </p>
     <pre class="language-javascript code">
       // Simulate upload speed of 10,000 bytes per second
-      proxy.intercept('request', function(req, resp) {
+      proxy.intercept('request', function(req, resp, cycle) {
         req.slow({rate:10000}); // bytes per second
       });
     </pre>
     <pre class="language-javascript code">
       // Simulate a 500-1000ms delay on every request.
-      proxy.intercept('request', function(req, resp) {
+      proxy.intercept('request', function(req, resp, cycle) {
         req.slow({latency:randint(500, 1000)});
       });
     </pre>
@@ -823,7 +739,7 @@
     </p>
     <pre class="language-javascript code">
       // Log every request through the proxy.
-      proxy.intercept('request', function(req, resp) {
+      proxy.intercept('request', function(req, resp, cycle) {
         console.log(req.fullUrl());
       });
     </pre>
@@ -845,7 +761,7 @@
         phase: 'request',
         method: /post|put/i,
         mimeType: 'application/json'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         req.tee(fs.createWriteStream('./uploaded.json'));
       });
     </pre>
@@ -856,7 +772,7 @@
 
 <p>
   Represents a response.
-  An instance of this is passed as the second argument to every intercept handler.
+  An instance of this is passed as the second argument to every interceptor.
   This object is unpopulated during the <code>request</code> and <code>request-sent</code> phases.
   Altering its values changes the response to the client.
 </p>
@@ -894,7 +810,7 @@
         phase: 'response',
         fullUrl: 'http://example.com/page.html',
         as: '$'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         // change the title of the page
         resp.$('title').text('Fake Title!');
       });
@@ -916,7 +832,7 @@
         method: 'GET',
         fullUrl: 'http://example.com/users/123',
         as: 'json'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         // arbitrarily manipulate the response json
         resp.json.foo = 'bar';
       });
@@ -937,7 +853,7 @@
         phase: 'response',
         fullUrl: 'http://example.com/page.html',
         as: 'string'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         // print page to log
         console.log(resp.string);
       });
@@ -946,20 +862,20 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="response-buffers"><a href="#response-buffers">response.buffers</a></h3>
+  <h3 id="response-buffer"><a href="#response-buffer">response.buffer</a></h3>
   <div class="api-detail-content">
     <p>
-      Response body binary buffer array.
-      This is only present if you intercept the response <code>as:'buffers'</code>.
+      Response body binary buffer.
+      This is only present if you intercept the response <code>as:'buffer'</code>.
       Changes made to this object will be seen by the client.
     </p>
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'response',
         fullUrl: 'http://example.com/image.jpg',
-        as: 'buffers'
-      }, function(req, resp) {
-        // resp.buffers contains a jpg
+        as: 'buffer'
+      }, function(req, resp, cycle) {
+        // resp.buffer contains a jpg
       });
     </pre>
   </div>
@@ -975,13 +891,13 @@
     </p>
     <pre class="language-javascript code">
       // Simulate download speed of 100,000 bytes per second
-      proxy.intercept('response', function(req, resp) {
+      proxy.intercept('response', function(req, resp, cycle) {
         resp.slow({rate:100000}); // bytes per second
       });
     </pre>
     <pre class="language-javascript code">
       // Simulate a 500-1000ms delay on every response.
-      proxy.intercept('response', function(req, resp) {
+      proxy.intercept('response', function(req, resp, cycle) {
         resp.slow({latency:randint(500, 1000)});
       });
     </pre>
@@ -1001,23 +917,24 @@
       proxy.intercept({
         phase: 'response',
         mimeType: 'image/gif'
-      }, function(req, resp) {
+      }, function(req, resp, cycle) {
         resp.tee(fs.createWriteStream('./image.gif'));
       });
     </pre>
   </div>
 </div>
 
-<h2 id="class-cycle">Class Cycle (this)</h2>
+<h2 id="class-cycle">Class Cycle</h2>
 
 <p>
-  Represents a single request/response cycle.
-  An instance is <code>this</code> in all intercept handler calls, and the <em>same</em> instance is shared across an entire request/response cycle.
+  Represents a whole request/response cycle.
+  A Cycle instance is <code>this</code> in all interceptor calls, and the <em>same</em> instance is shared across an entire request/response cycle.
+  It's also passed as the third argument, in order to support arrow functions.
   It provides a small number of methods not associated specifically to either the request or response.
 </p>
 
 <div class="api-detail">
-  <h3 id="cycle-serve"><a href="#cycle-serve">this.serve(<span class="args">options</span>)</a></h3>
+  <h3 id="cycle-serve"><a href="#cycle-serve">cycle.serve(<span class="args">options</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Provisions responses from the local filesystem.
@@ -1030,8 +947,8 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
-      }, function(req, resp) {
-        return this.serve('/Users/gr123/test/main.js');
+      }, function(req, resp, cycle) {
+        return cycle.serve('/Users/gr123/test/main.js');
       });
     </pre>
     <p>
@@ -1041,8 +958,8 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/main.js'
-      }, function(req, resp) {
-        return this.serve({
+      }, function(req, resp, cycle) {
+        return cycle.serve({
           path: '/Users/gr123/test/main.js'
         });
       });
@@ -1126,8 +1043,8 @@
       proxy.intercept({
         phase: 'request',
         fullUrl: 'http://example.com/js/main.js'
-      }, function(req, resp) {
-        return this.serve(__dirname + '/main.js');
+      }, function(req, resp, cycle) {
+        return cycle.serve(__dirname + '/main.js');
       });
     </pre>
     <p>
@@ -1147,10 +1064,10 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
-        host: 'example.com',
+        hostname: 'example.com',
         url: /^\/js\/.*/
-      }, function(req, resp) {
-        return this.serve({
+      }, function(req, resp, cycle) {
+        return cycle.serve({
           docroot: __dirname,
           strategy: 'overlay'
         });
@@ -1164,10 +1081,10 @@
     <pre class="language-javascript code">
       proxy.intercept({
         phase: 'request',
-        host: 'example.com',
+        hostname: 'example.com',
         url: /^\/js\/.*/
-      }, function(req, resp) {
-        return this.serve({
+      }, function(req, resp, cycle) {
+        return cycle.serve({
           docroot: __dirname,
           strategy: 'mirror'
         });
@@ -1177,439 +1094,44 @@
 </div>
 
 <div class="api-detail">
-  <h3 id="cycle-data"><a href="#cycle-data">this.data(<span class="args">name, [value]</span>)</a></h3>
+  <h3 id="cycle-data"><a href="#cycle-data">cycle.data(<span class="args">name, [value]</span>)</a></h3>
   <div class="api-detail-content">
     <p>
       Stores and retrieves data on a cycle instance.
-      This is useful since the same instance is shared across all intercept handlers for a given request/response cycle, allowing you to share related data across disparate scopes.
+      This is useful since the same instance is shared across all interceptors for a given request/response cycle, allowing you to share related data across disparate scopes.
       With two params this method behaves as a setter, with one param as a getter.
     </p>
     <pre class="language-javascript code">
       ['request','request-sent','response','response-sent']
       .forEach(function(phase) {
-        proxy.intercept(phase, function() {
-          this.data(phase, Date.now());
+        proxy.intercept(phase, function(req, resp, cycle) {
+          cycle.data(phase, Date.now());
         });
       });
-      proxy.intercept('response-sent', function() {
-        var reqReceived = this.data('request');
-        var reqSent = this.data('request-sent');
-        var respReceived = this.data('response');
-        var respSent = this.data('response-sent');
+      proxy.intercept('response-sent', function(req, resp, cycle) {
+        var reqReceived = cycle.data('request');
+        var reqSent = cycle.data('request-sent');
+        var respReceived = cycle.data('response');
+        var respSent = cycle.data('response-sent');
         // now print some profiling data
       });
     </pre>
   </div>
 </div>
 
-<h2 id="command-line">Command Line Interface</h2>
-
-<p>
-  In addition to a programming API, Hoxy provides a command line interface.
-  The CLI provides a way to quickly get up and running with a web-debugging proxy.
-  To install it on your system, do:
-</p>
-
-<pre class="code">
-  $ npm install -g hoxy
-</pre>
-
-<p>
-  ...now the executable <code>'hoxy'</code> is installed in your environment.
-  Here are its subcommands.
-</p>
-
-<div class="api-detail">
-  <h3 id="hoxy-init">hoxy init</h3>
-  <p>
-    Scaffolds up a web-debugging project in the current directory so that you can begin debugging immediately.
-  </p>
-  <pre class="code">
-    $ hoxy init
-  </pre>
-  <p>
-    <code>hoxy init</code> adds the following files to the current directory, if they don't already exist:
-  </p>
-  <ul>
-    <li><code>package.json</code>* - Minimal package info (you can customize this).</li>
-    <li><code>hoxy.json</code>* - Configuration for a hoxy instance (you can customize this).</li>
-    <li><code>run-hoxy.js</code>* - Launches a basic web proxy (you can customize this).</li>
-    <li><code>.gitignore</code> - Convenience, in case you want to <code>git init</code> later.</li>
-  </ul>
-  <p>
-    * If one of these already exists, no changes are made to the current directory and hoxy exits with an error.
-  </p>
-  <table>
-    <caption>Command Line Options</caption>
-    <thead>
-      <tr>
-        <th>name</th>
-        <th>description</th>
-        <th>value</th>
-      </tr>
-    </thead>
-    <tobdy>
-      <tr>
-        <td class="option"><code>--port</code></td>
-        <td>
-          Saved as the <code>port</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          Number.
-          Positive integer greater than zero.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--upstream-proxy</code></td>
-        <td>
-          Saved as the <code>upstreamProxy</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>host:port</em> combination.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--reverse</code></td>
-        <td>
-          Saved as the <code>reverse</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>http://host:port</em> combination.
-        </td>
-      </tr>
-    </tobdy>
-  </table>
-  <p>
-    See the <a href="#cli-workflow">CLI workflow section</a> for more info.
-  </p>
-</div>
-
-<div class="api-detail">
-  <h3 id="hoxy-run">hoxy run</h3>
-  <p>
-    Runs the project as you're developing it by automatically restarting the proxy whenever you resave the code.
-    This avoids having to manually stop and restart the server a lot.
-    This is accomplished using <a href="https://www.npmjs.org/package/nodemon">nodemon</a>.
-  </p>
-  <pre class="code">
-    $ hoxy run
-  </pre>
-  <table>
-    <caption>Command Line Options</caption>
-    <thead>
-      <tr>
-        <th>name</th>
-        <th>description</th>
-        <th>value</th>
-      </tr>
-    </thead>
-    <tobdy>
-      <tr>
-        <td class="option"><code>--port</code></td>
-        <td>
-          Overrides the <code>port</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          Number.
-          Positive integer greater than zero.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--upstream-proxy</code></td>
-        <td>
-          Overrides the <code>upstreamProxy</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>host:port</em> combination.
-        </td>
-      </tr>
-      <tr>
-        <td class="option"><code>--reverse</code></td>
-        <td>
-          Overrides the <code>reverse</code> property in <code>hoxy.json</code>.
-          Optional.
-        </td>
-        <td>
-          String.
-          <em>http://host:port</em> combination.
-        </td>
-      </tr>
-    </tobdy>
-  </table>
-  <p>
-    See the <a href="#cli-workflow">CLI workflow section</a> for more info.
-  </p>
-</div>
-
-<h1 id="appendix" data-tldr="Extensive info on various topics.">Appendix</h1>
-
-<h2 id="phase-lifecycle" data-tldr="How phases work.">Phase lifecycle</h2>
-
-<table>
-  <caption>Full description of phases</caption>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>phase</th>
-      <th>description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1</td>
-      <td>
-        <code>request</code>
-      </td>
-      <td>
-        The proxy has received the request headers, but the request body (if there is one) hasn't started streaming in yet.
-        Or, if you've intercepted a request <code>as:'json'</code> (for example) then the request body will have been fully buffered into memory and be available as <code>request.json</code> (for example).
-        See <a href="#proxy-intercept">intercepts</a> for more info.
-      </td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>
-        <code>request-sent</code>
-      </td>
-      <td>
-        The proxy has finished sending the entire request, including the request body if present, to the server.
-        Everything is read-only during this phase.
-        The main reason for its existence is to be able to measure the time it takes to upload the <code>request</code> by comparing it with the previous phase.
-      </td>
-    </tr>
-    <tr>
-      <td>3</td>
-      <td>
-        <code>response</code>
-      </td>
-      <td>
-        The proxy has received the response headers, but the response body hasn't started streaming in yet.
-        Or, if you've intercepted a response <code>as:'$'</code> (for example) then the response body will have been fully buffered into memory and be available as <code>response.$</code> (for example).
-        See <a href="#proxy-intercept">intercepts</a> for more info.
-      </td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td style="white-space:nowrap">
-        <code>response-sent</code>
-      </td>
-      <td>
-        The proxy has finished sending the entire response, including the response body, to the client.
-        Everything is read-only during this phase.
-        The main reason for its existence is to be able to measure the time it takes to download the <code>response</code> by comparing it with the previous phase.
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<p>
-  Intercept handlers are called in the order of their <code>phase</code>.
-  Intercept handlers of the same <code>phase</code> are called in the order they're declared.
-  <code>request</code> and <code>response</code> objects are either read-only or readable/writable, depending on <code>phase</code>.
-  Attempts to write a read-only thing will fail silently, generating an <a href="#proxy-log"><code>error</code> log event</a>.
-</p>
-
-<table>
-  <thead>
-    <tr>
-      <th rowspan="2" colspan="2">Readability / writability matrix</th>
-      <th colspan="2">Object</th>
-    </tr>
-    <tr>
-      <th><code>request</code></th>
-      <th><code>response</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="4">Phase</th>
-      <th><code>request</code></th>
-      <td><span style="color:#000">writable</span></td>
-      <td><span style="color:#000">writable</span></td>
-    </tr>
-    <tr>
-      <th><code>request-sent</code></th>
-      <td><span style="color:#bbb">read-only</span></td>
-      <td><span style="color:#bbb">read-only</span></td>
-    </tr>
-    <tr>
-      <th><code>response</code></th>
-      <td><span style="color:#bbb">read-only</span></td>
-      <td><span style="color:#000">writable</span></td>
-    </tr>
-    <tr>
-      <th><code>response-sent</code></th>
-      <td><span style="color:#bbb">read-only</span></td>
-      <td><span style="color:#bbb">read-only</span></td>
-    </tr>
-  </tbody>
-</table>
-
-<h2 id="response-population" data-tldr="Suppressing server calls.">Response population</h2>
-
-<p>
-  Hoxy normally populates responses by sending the request to the destination server during the normal request/response lifecycle.
-  Alternatively, if you modify any aspect of the response before this happens (i.e. during the <code>request</code> phase) hoxy treats the <em>entire</em> response as populated, and skips the call to the destination server.
-  If you modify any aspect of the response after this happens  (i.e. during the <code>response</code> phase) it overwrites just that aspect of the response from the server.
-</p>
-
 <pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp) {
-    response.string = 'Hello';
-    // The response is now populated so the
-    // server call is skipped. Status code will
-    // default to 200.
-  });
-</pre>
-
-<pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp) {
-    response.statusCode = 200;
-    // The response is now populated so the
-    // server call is skipped. Response body
-    // defaults to empty.
-  });
-</pre>
-
-<pre class="language-javascript code">
-  proxy.intercept('response', function(req, resp) {
-    response.string = 'Hello';
-    // The response was already populated,
-    // we just overwrite its body. Status
-    // code remains the same.
-  });
-</pre>
-
-<pre class="language-javascript code">
-  proxy.intercept('response', function(req, resp) {
-    response.statusCode = 666;
-    // The response was already populated,
-    // we just overwrote the status. I
-    // wonder how the browser will react
-    // to this unexpected turn of events.
-  });
-</pre>
-
-<h2 id="change-accumulation" data-tldr="Behavior over sequential handlers.">Change accumulation</h2>
-
-<p>
-  Changes to requests and responses are cumulative over the whole request/response cycle.
-  Among other things, this affects loading content <code>as</code> a certain type, and filtering.
-</p>
-
-<p>
-  Change accumulation example.
-</p>
-
-<pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp) {
-    req.headers['cache-control'] = undefined;
-  });
-
-  proxy.intercept('request', function(req, resp) {
-    console.log(req.headers['cache-control']); // undefined
-  });
+  hoxy.createServer({
+    reverse: 'https://www.google.com',
+    tls: {
+      key: fs.readFileSync('path/to/my-server.key.pem),
+      cert: fs.readFileSync('path/to/my-server.crt.pem')
+    }
+  }).listen(8080)
 </pre>
 
 <p>
-  Change accumulation affects filtering.
+  The <code>tls</code> option is passed to the underlying Node HTTPS server.
 </p>
-
-<pre class="language-javascript code">
-  proxy.intercept('request', function(req, resp) {
-    req.hostname = 'example.com';
-  });
-
-  proxy.intercept({
-    phase: 'request',
-    hostname: 'other.com'
-  }, function(req, resp) {
-    // never called!
-  });
-</pre>
-
-<p>
-  Change accumulation affecting <code>as</code> parameters.
-</p>
-
-<pre class="language-javascript code">
-  proxy.intercept({
-    phase: 'response',
-    mimeType: 'application/json',
-    as: 'json'
-  }, function(req, resp) { ... });
-
-  proxy.intercept({
-    phase: 'response',
-    mimeType: 'application/json'
-  }, function(req, resp) {
-    console.log(typeof resp.json); // 'object'
-  });
-
-  proxy.intercept({
-    phase: 'response',
-    mimeType: 'application/json',
-    as: 'string'
-  }, function(req, resp) { ... });
-
-  proxy.intercept({
-    phase: 'response',
-    mimeType: 'application/json'
-  }, function(req, resp) {
-    console.log(typeof resp.json); // 'undefined'
-    console.log(typeof resp.string); // 'string'
-  });
-</pre>
-
-<h2 data-tldr="Common workflow patterns." id="cli-workflow">CLI Workflow</h2>
-
-<p>
-  Using the <a href="#command-line">CLI</a>, A typical workflow might look like this:
-</p>
-<pre class="code">
-  $ hoxy init
-  $ npm install
-  $ hoxy run
-</pre>
-<p>
-  ...after which you'd open <code>run-hoxy.js</code> in your editor and begin customizing it.
-  Each time you save, the proxy server will automatically restart.
-  The command line options for <a href="#hoxy-init"><code>hoxy init</code></a> and <a href="#hoxy-run"><code>hoxy run</code></a> are identical.
-  In former case, they control the defaults for the project.
-  In the latter, they override the defaults.
-  In both cases they're optional.
-</p>
-
-<h2 id="other" data-tldr="Copyright, license, etc.">Other info</h2>
-
-<ul>
-  <li>Copyright &copy; 2015 by <a href="https://github.com/greim">Greg Reimer</a></li>
-  <li>MIT License</li>
-  <li><a href="https://github.com/greim/hoxy">Project on GitHub</a></li>
-  <li><a href="https://www.npmjs.org/package/hoxy">Project on npm</a></li>
-</ul>
-
-<ul id="nav"></ul>
-</div>
-
-<a href="https://github.com/greim/hoxy"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
-
-<script src="./page-resources/docs.js"></script>
 
 </body>
 </html>
-
-
-
-
-
-
-

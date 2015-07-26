@@ -1,0 +1,209 @@
+<!doctype html>
+<html data-order="400">
+<head></head>
+<body>
+
+<h1 id="examples" data-tldr="Snippets of example code.">Incantations</h1>
+
+<p>
+  Hoxy is not Magic Cargo From The Sky Gods&trade;.
+  It has a fairly simple core architecture, and works in a predictable way.
+  In order to assist the training of acolytes, however, the Magic Sky Gods have inspired the prophets to write down these incantations in The Book Of Spells.
+</p>
+
+<h3 id="unicorns">Unicorns!</h3>
+
+<p>
+  This incantation makes all titles say "Unicorns!" by manipulating the response as DOM.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept({
+    phase: 'response',
+    mimeType: 'text/html',
+    as: '$'
+  }, function(req, resp) {
+    resp.$('title').text('Unicorns!');
+  });
+</pre>
+
+<h3 id="slow-connection">Slow Connection</h3>
+
+<p>
+  This spell simulates a slow connection.
+  This is done at the proxy level since two simultaneous requests would share the same connection.
+  Thus for example a limit of 100000 bps for two requests would result in a speed of 50000 bps for each.
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    slow: { rate: 100000 }
+  }).listen(8080);
+</pre>
+
+<h3 id="slow-website">Slow Website</h3>
+
+<p>
+  This spell simulates a slow website.
+  It's as if just one website were slow, even if the rest of them run at normal speed.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept({
+    phase: 'response',
+    hostname: 'www.google.com'
+  }, function(req, resp) {
+    resp.slow({ rate: 10000 });
+  });
+</pre>
+
+<h3 id="generator-intercept">Generator Interceptors</h3>
+
+<p>
+  One can invoke the deep magic of generator functions.
+  Which are actually just functions that can pause while they're running.
+  This is useful because async stuff can happen while things are paused.
+  But you need to yield promises, which means using an adapter to turn callbacks into promises.
+</p>
+
+<pre class="language-javascript code">
+  var adapt = require('ugly-adapter');
+  var fs = require('fs');
+  proxy.intercept({
+    phase: 'response',
+    hostname: 'mysite.com',
+    mimeType: 'text/html',
+    as: '$'
+  }, function*(req, resp) {
+    var headerHtml = yield adapt(fs.readFile, 'path/to/header.html');
+    resp.$('#header').html(headerHtml);
+  });
+</pre>
+
+<h3 id="async-intercept">Async Interceptors</h3>
+
+<p>
+  If one speaks the language of Babel, one can invoke the even deeper magic of async functions.
+</p>
+
+<pre class="language-javascript code">
+  var adapt = require('ugly-adapter');
+  var fs = require('fs');
+  proxy.intercept({
+    phase: 'response',
+    hostname: 'mysite.com',
+    mimeType: 'text/html',
+    as: '$'
+  }, async function(req, resp) {
+    var headerHtml = await adapt(fs.readFile, 'path/to/header.html');
+    resp.$('#header').html(headerHtml);
+  });
+</pre>
+
+<h3 id="intercept-https">Intercept HTTPS</h3>
+
+<p>
+  There's an incantation for intercepting HTTPS traffic, too.
+  But you have to burn some extra incense.
+  First, create your very own self-signed Certificate Authority.
+  (You should only ever need to do this once.)
+</p>
+
+<pre class="code">
+  # Create the key
+  openssl genrsa -out ~/.ssh/my-private-root-ca.key.pem 2048
+  # Create the cert
+  openssl req -x509 -new -nodes -key ~/.ssh/my-private-root-ca.key.pem -days 1024 -out ~/.ssh/my-private-root-ca.crt.pem -subj "/C=US/ST=Utah/L=Provo/O=ACME Signing Authority Inc/CN=example.com"
+</pre>
+
+<p>
+  Next, add the above root cert to your list of trusted cert authorities.
+  How to do this varies.
+  For example, Firefox maintains its own trusted list, while Chrome uses the OS's list.
+  For specific details, consult the Ninth Scroll of P'Ki (or search the web).
+  Once that's done, launch Hoxy, passing in your trusted cert and its private key.
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    certAuthority: {
+      key: fs.readFileSync('/Users/you/.ssh/my-private-root-ca.key.pem'),
+      cert: fs.readFileSync('/Users/you/.ssh/my-private-root-ca.crt.pem')
+    }
+  }).listen(8080);
+</pre>
+
+<p>
+  Finally, configure your client to proxy both HTTP and HTTPS through <code>localhost:8080</code>.
+  Hoxy will use the fake cert authority to spoof certificates from any HTTPS sites it encounters, decrypting and intercepting them as cleartext using the existing intercept API.
+</p>
+
+<p>
+See also: <a href="#https-proxying">basic explanation of HTTPS proxying</a>.
+</p>
+
+<h3 id="http-reverse">Create a reverse proxy</h3>
+
+<p>
+  Suppose you want to intercept your own web traffic to reddit.com.
+  One option is to create a proxy, configure your client to use it, then visit reddit.com.
+  If client configuration isn't feasible, another option is to use a reverse proxy.
+  In this case you'd visit a url like <code>http://localhost:8080/</code> which would basically mirror the content of reddit.com.
+  This is fairly easy to set up:
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    reverse: 'http://www.reddit.com'
+  }).listen(8080);
+</pre>
+
+<p>
+  Now you can visit <code>http://localhost:8080/</code> and reddit will be there.
+  Strictly speaking, by visiting the proxy directly in your browser rather than configuring it as a proxy, you're depriving the proxy of the scheme ("http:") and host ("www.reddit.com") information in the URL.
+  The <code>reverse</code> option provides those missing pieces of information, allowing you to visit the proxy directly.
+</p>
+
+<h3 id="https-reverse">Create an HTTPS reverse proxy</h3>
+
+<p>
+  Suppose you wanted to reverse proxy to an HTTPS site.
+  In that case you'll likely want the URL in your browser to be HTTPS as well.
+  For that, just provide a key and cert that your client trusts.
+  The <a href="#intercept-https">instructions above</a> already show how to create your own self-signed root CA.
+  Do that, then use it to create your server's key and cert:
+</p>
+
+<pre class="code">
+  # Create the key
+  openssl genrsa -out ./my-server.key.pem 2048
+  # Create the certificate signing request
+  openssl req -new -key ./my-server.key.pem -out ./my-server.csr.pem -subj "/C=US/ST=Utah/L=Provo/O=ACME Tech Inc/CN=localhost"
+  # Create the cert
+  openssl x509 -req -in ./my-server.csr.pem -CA ~/.ssh/my-private-root-ca.crt.pem -CAkey ~/.ssh/my-private-root-ca.key.pem -CAcreateserial -out ./my-server.crt.pem -days 500
+</pre>
+
+<p>
+  Then, launch your server with a <code>tls</code> option, like so:
+</p>
+
+<pre class="language-javascript code">
+  hoxy.createServer({
+    reverse: 'https://www.google.com',
+    tls: {
+      key: fs.readFileSync('path/to/my-server.key.pem),
+      cert: fs.readFileSync('path/to/my-server.crt.pem')
+    }
+  }).listen(8080);
+</pre>
+
+<p>
+  The <code>tls</code> option is passed to the underlying Node HTTPS server.
+</p>
+
+<p>
+  See also: <a href="#https-proxying">basic explanation of HTTPS proxying</a>.
+</p>
+
+</body>
+</html>

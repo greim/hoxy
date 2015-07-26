@@ -6,7 +6,7 @@
 import assert from 'assert'
 import { PassThrough } from 'stream'
 import send from './lib/send'
-import streams from '../lib/streams'
+import streams from '../src/streams'
 
 describe('tee', function() {
 

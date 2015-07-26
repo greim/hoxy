@@ -7,7 +7,7 @@ import send from './lib/send'
 import { finish, values } from './lib/expect'
 
 function roundTrip(opts) {
-  var s = send(opts.request || {})
+  let s = send(opts.request || {})
   if (opts.response) { s.to(opts.response) }
   if (opts.client) {
     s.receiving(function*(resp) {
@@ -443,27 +443,6 @@ describe('filtering', function() {
         callback: function() { throw new Error('should not have called intercept') },
       }, {
         opts: { phase: 'request', mimeType: /plain$/ },
-        callback: function() { expect.done() },
-      }],
-    }).then(() => expect.now())
-  })
-
-  it('should filter based on filtering function', () => {
-    let expect = finish()
-    return roundTrip({
-      request: {
-        path: 'http://example.com/foobar',
-        method: 'POST',
-        body: 'abc',
-        headers: {
-          'content-type': 'text/plain; charset=utf-8',
-        },
-      },
-      intercepts: [{
-        opts: { phase: 'request', filter: () => false },
-        callback: function() { throw new Error('should not have called intercept') },
-      }, {
-        opts: { phase: 'request', filter: () => true },
         callback: function() { expect.done() },
       }],
     }).then(() => expect.now())

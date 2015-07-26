@@ -1,0 +1,349 @@
+<!doctype html>
+<html data-order="500">
+<head></head>
+<body>
+
+<h1 id="appendix" data-tldr="Extensive info on various topics.">Appendix</h1>
+
+<h2 id="phase-lifecycle" data-tldr="How phases work.">Phase lifecycle</h2>
+
+<table>
+  <caption>Full description of phases</caption>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>phase</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>
+        <code>request</code>
+      </td>
+      <td>
+        The proxy has received the request headers, but the request body (if there is one) hasn't started streaming in yet.
+        Or, if you've intercepted a request <code>as:'json'</code> (for example) then the request body will have been fully buffered into memory and be available as <code>request.json</code> (for example).
+        See <a href="#proxy-intercept">intercepts</a> for more info.
+      </td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>
+        <code>request-sent</code>
+      </td>
+      <td>
+        The proxy has finished sending the entire request, including the request body if present, to the server.
+        Everything is read-only during this phase.
+        The main reason for its existence is to be able to measure the time it takes to upload the <code>request</code> by comparing it with the previous phase.
+      </td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>
+        <code>response</code>
+      </td>
+      <td>
+        The proxy has received the response headers, but the response body hasn't started streaming in yet.
+        Or, if you've intercepted a response <code>as:'$'</code> (for example) then the response body will have been fully buffered into memory and be available as <code>response.$</code> (for example).
+        See <a href="#proxy-intercept">intercepts</a> for more info.
+      </td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td style="white-space:nowrap">
+        <code>response-sent</code>
+      </td>
+      <td>
+        The proxy has finished sending the entire response, including the response body, to the client.
+        Everything is read-only during this phase.
+        The main reason for its existence is to be able to measure the time it takes to download the <code>response</code> by comparing it with the previous phase.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  Intercept handlers are called in the order of their <code>phase</code>.
+  Intercept handlers of the same <code>phase</code> are called in the order they're declared.
+  <code>request</code> and <code>response</code> objects are either read-only or readable/writable, depending on <code>phase</code>.
+  Attempts to write a read-only thing will fail silently, generating an <a href="#proxy-log"><code>error</code> log event</a>.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2" colspan="2">Readability / writability matrix</th>
+      <th colspan="2">Object</th>
+    </tr>
+    <tr>
+      <th><code>request</code></th>
+      <th><code>response</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="4">Phase</th>
+      <th><code>request</code></th>
+      <td><span style="color:#000">writable</span></td>
+      <td><span style="color:#000">writable</span></td>
+    </tr>
+    <tr>
+      <th><code>request-sent</code></th>
+      <td><span style="color:#bbb">read-only</span></td>
+      <td><span style="color:#bbb">read-only</span></td>
+    </tr>
+    <tr>
+      <th><code>response</code></th>
+      <td><span style="color:#bbb">read-only</span></td>
+      <td><span style="color:#000">writable</span></td>
+    </tr>
+    <tr>
+      <th><code>response-sent</code></th>
+      <td><span style="color:#bbb">read-only</span></td>
+      <td><span style="color:#bbb">read-only</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="response-population" data-tldr="Suppressing server calls.">Response population</h2>
+
+<p>
+  Hoxy normally populates responses by sending the request to the destination server during the normal request/response lifecycle.
+  Alternatively, if you modify any aspect of the response before this happens (i.e. during the <code>request</code> phase) hoxy treats the <em>entire</em> response as populated, and skips the call to the destination server.
+  If you modify any aspect of the response after this happens  (i.e. during the <code>response</code> phase) it overwrites just that aspect of the response from the server.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp, cycle) {
+    response.string = 'Hello';
+    // The response is now populated so the
+    // server call is skipped. Status code will
+    // default to 200.
+  });
+</pre>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp, cycle) {
+    response.statusCode = 200;
+    // The response is now populated so the
+    // server call is skipped. Response body
+    // defaults to empty.
+  });
+</pre>
+
+<pre class="language-javascript code">
+  proxy.intercept('response', function(req, resp, cycle) {
+    response.string = 'Hello';
+    // The response was already populated,
+    // we just overwrite its body. Status
+    // code remains the same.
+  });
+</pre>
+
+<pre class="language-javascript code">
+  proxy.intercept('response', function(req, resp, cycle) {
+    response.statusCode = 666;
+    // The response was already populated,
+    // we just overwrote the status. I
+    // wonder how the browser will react
+    // to this unexpected turn of events.
+  });
+</pre>
+
+<h2 id="change-accumulation" data-tldr="Behavior over sequential handlers.">Change accumulation</h2>
+
+<p>
+  Changes to requests and responses are cumulative over the whole request/response cycle.
+  Among other things, this affects loading content <code>as</code> a certain type, and filtering.
+</p>
+
+<p>
+  Change accumulation example.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp, cycle) {
+    req.headers['cache-control'] = undefined;
+  });
+
+  proxy.intercept('request', function(req, resp, cycle) {
+    console.log(req.headers['cache-control']); // undefined
+  });
+</pre>
+
+<p>
+  Change accumulation affects filtering.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept('request', function(req, resp, cycle) {
+    req.hostname = 'example.com';
+  });
+
+  proxy.intercept({
+    phase: 'request',
+    hostname: 'other.com'
+  }, function(req, resp, cycle) {
+    // never called!
+  });
+</pre>
+
+<p>
+  Change accumulation affecting <code>as</code> parameters.
+</p>
+
+<pre class="language-javascript code">
+  proxy.intercept({
+    phase: 'response',
+    mimeType: 'application/json',
+    as: 'json'
+  }, function(req, resp, cycle) { ... });
+
+  proxy.intercept({
+    phase: 'response',
+    mimeType: 'application/json'
+  }, function(req, resp, cycle) {
+    console.log(typeof resp.json); // 'object'
+  });
+
+  proxy.intercept({
+    phase: 'response',
+    mimeType: 'application/json',
+    as: 'string'
+  }, function(req, resp, cycle) { ... });
+
+  proxy.intercept({
+    phase: 'response',
+    mimeType: 'application/json'
+  }, function(req, resp, cycle) {
+    console.log(typeof resp.json); // 'undefined'
+    console.log(typeof resp.string); // 'string'
+  });
+</pre>
+
+<h2 id="https-proxying" data-tldr="How HTTPS proxying works">HTTPS Proxying</h2>
+
+<p>
+How does HTTPS proxying work in Hoxy?
+First, let's review how HTTPS proxying works in general.
+Suppose you want to insert a proxy between yourself and the website <em>https://example.com</em>.
+There are two ways to do this: direct and reverse proxying.
+</p>
+
+<h3 id="direct-https-proxying">Direct HTTPS proxying</h3>
+
+<p>
+To set up a direct HTTPS proxy, you'd launch a proxy on port 8080 and set your browser to do HTTPS proxying through <code>localhost:8080</code>, then visit the site directly into your browser.
+What happens here differs radically from HTTP proxying.
+During HTTP proxying, the client sends this:
+</p>
+
+<pre class="code">
+  GET http://www.example.com/foo.html HTTP/1.1
+</pre>
+
+<p>
+In English this means <em>go to example.com and get /foo.html for me.</em>
+But during HTTPS proxying, the client sends this:
+</p>
+
+<pre class="code">
+  CONNECT example.com:443 HTTP/1.1
+</pre>
+
+<p>
+Which in English means <em>connect me to example.com, I want to have a private conversation.</em>
+Once the proxy establishes the pipe, the client TLS-handshakes the server on that connection.
+Then, it sends normal HTTP traffic over it like this:
+</p>
+
+<pre class="code">
+  GET /foo.html HTTP/1.1
+</pre>
+
+<p>
+...but it's encrypted, so the proxy can't see it.
+Anything might be happening on that connection, from the proxy's POV.
+</p>
+
+<p>
+This is formally known as <a href="https://en.wikipedia.org/wiki/HTTP_tunnel#HTTP_CONNECT_tunneling">HTTP CONNECT tunneling</a>.
+Since the proxy isn't privy to the conversation, there's no need for it to be an HTTPS server itself, even though "https://" appears in the browser's URL bar.
+Its job is just to shovel TCP packets back and forth, which happen to contain undecypherable TLS traffic.
+</p>
+
+<h3 id="reverse-https-proxying">Reverse HTTPS proxying</h3>
+
+<p>
+A reverse HTTPS proxy is a different animal altogether.
+To set it up, you'd launch a proxy on port 8080.
+Since this is a reverse HTTPS proxy, you'll need a few more startup options:
+</p>
+
+<ol>
+  <li>A private key.</li>
+  <li>A certificate signed by the above key, with <code>CN=localhost</code>.</li>
+  <li>The reverse proxy target, consisting of <code>"https://example.com"</code>.</li>
+</ol>
+
+<p>
+The key and the cert in particular are necessary because a reverse proxy—from the client's POV—isn't a proxy at all, but an HTTPS webserver that speaks TLS.
+And because of the constraints of <a href="https://en.wikipedia.org/wiki/Public_key_infrastructure">PKI</a>, the client needs to trust the cert provided above.
+So one of two things needs to happen:
+</p>
+
+<ol>
+  <li>The cert needs to be signed by a known CA, which requires giving somebody money.</li>
+  <li>You must self-sign your own CA, make your client trust it, and sign the above cert with it.</li>
+</ol>
+
+<p>
+Either way you'll end up with a signed, trusted cert and your reverse proxy should work.
+</p>
+
+<h3 id="hoxy-https-proxying">So how does Hoxy figure into this?</h3>
+
+<p>
+Hoxy follows these patterns, but with one major deviation having to do with direct proxying and HTTPS CONNECT tunneling.
+Instead of connecting the client to the remote server, Hoxy connects the client to its own private HTTPS server.
+This is a separate server instance from the proxy itself and solely exists to spoof TLS.
+</p>
+
+<p>
+Normally, the client would immediately realize something fishy is going on.
+The spoofing server, being TLS, has provided a cert to the client that hasn't been signed by a client-trusted CA.
+Thus, to use Hoxy as an HTTPS direct proxy, you must create your <em>own</em> self-signed root CA, make your client trust it, then pass it to Hoxy as a startup option.
+</p>
+
+<p>
+With this in mind, let's rewind to just before the client realizes something fishy is going on.
+Hoxy, having in its possession both the cert AND the private key of a client-trusted CA, will use it to generate <em>spoofed</em> keys and certs, signed by that CA, for each HTTPS domain the client visits.
+From the client's POV now, nothing fishy is going on.
+As far as it knows, its CONNECT requests are being honored by the proxy, and it's talking directly to the remote website in a private channel.
+</p>
+
+<p>
+But in reality, the client is tunneling to an imposter server, its traffic is being decrypted and intercepted, then being re-encrypted and sent onward.
+Neither the client nor the server are the wiser.
+</p>
+
+<h3 id="tls-certauthority-diff">"tls" versus "certAuthority"</h3>
+
+<p>
+You may have noticed there are two key/cert options that can be passed to Hoxy, with different names: <code>tls</code> and <code>certAuthority</code>.
+It should now make sense why.
+The former is for reverse proxying, and is just Node's config option for running an HTTPS webserver.
+The latter is for direct proxying.
+It's a meta-key/cert combo, used to spoof <em>actual</em> key/cert combos on the fly.
+Incidentally, these two options are mutually exclusive.
+It wouldn't make sense to use both at the same time.
+</p>
+
+<p>
+To see some openssl commands and HTTPS proxy specimens, see the <a href="#examples">examples section</a>.
+</p>
+
+</body>
+</html>

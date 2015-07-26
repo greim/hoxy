@@ -3,7 +3,7 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-import { Proxy } from '../index'
+import { Proxy } from '../src/main'
 import send from './lib/send'
 import assert from 'assert'
 

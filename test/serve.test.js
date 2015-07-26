@@ -3,10 +3,10 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var fs = require('fs')
-var assert = require('assert')
-var send = require('./lib/send')
-var adapt = require('ugly-adapter')
+import fs from 'fs'
+import assert from 'assert'
+import send from './lib/send'
+import adapt from 'ugly-adapter'
 
 describe('Serving from local', () => {
 

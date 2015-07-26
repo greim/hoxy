@@ -1,0 +1,44 @@
+<!doctype html>
+<html data-order="200">
+<head></head>
+<body>
+
+<h1 id="getting-started" data-tldr="Installation, etc.">Getting Started</h1>
+
+<p>
+  Hoxy works on Node 0.12.x or higher, and io.js 1.0 or higher.
+  It may work in older Nodes to varying degrees.
+  Here's a quick sample program that tampers with request headers.
+</p>
+
+<pre class="language-javascript code">
+  let hoxy = require('hoxy');
+  let proxy = hoxy.createServer().listen(8080);
+  proxy.intercept('request', req => {
+    req.headers['x-unicorns'] = 'unicorns';
+    // server will now see the "x-unicorns" header
+  });
+</pre>
+
+<p>
+  After running the above, configure your client to proxy through <code>yourmachine:8080</code>.
+  As long as you know JavaScript and HTTP, you can inspect and manipulate your own web traffic in arbitrary ways.
+</p>
+
+<h2 id="installation" data-tldr="Available on npm.">Download &amp; Installation</h2>
+
+<p>
+  Hoxy is available on both <a href="https://www.npmjs.org/package/hoxy">npm</a> and <a href="https://github.com/greim/hoxy">github</a>.
+  Tests pass on recent node and io.js.
+</p>
+
+<pre class="code">
+  $ npm install hoxy
+</pre>
+
+<pre class="language-javascript code">
+  var hoxy = require('hoxy');
+</pre>
+
+</body>
+</html>

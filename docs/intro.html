@@ -1,0 +1,67 @@
+<!doctype html>
+<html data-order="100">
+<head></head>
+<body>
+
+<h1 id="introduction" data-tldr="Documentation and examples.">Hoxy: Introduction</h1>
+
+<p>
+  Hoxy is an HTTP hacking tool for JavaScript programmers.
+  It operates in the same general space as Charles or Fiddler, but rather than having a GUI, it exposes a programming API for tampering with HTTP traffic.
+  A few key features:
+</p>
+
+<ul>
+  <li>Manipulate request and response bodies as jQuery or JSON objects.</li>
+  <li>Inspect and manipulate URLs, headers, status codes, etc.</li>
+  <li>Support for direct and reverse proxying over both HTTP and HTTPS.</li>
+  <li>Simulate latency and low-bandwidth connections.</li>
+  <li>Overlay local filesystems over remote ones.</li>
+</ul>
+
+<p>
+  With a little imagination, the possibilities are limitless.
+  But to get you started, here a few ideas for things you could do.
+</p>
+
+<ul>
+  <li>Replace your Facebook frineds with pictures of unicorns.</li>
+  <li>Add bizarre HTTP request headers to confuse server admins.</li>
+  <li>Strip ads from web pages for personal browsing.</li>
+  <li>Fuzz test your site's load sequence by adding random amounts of latency.</li>
+  <li>Test JavaScript changes in production, without pushing code to production.</li>
+</ul>
+
+<p>
+  These docs are for Hoxy 3.x.
+  See the <a href="#examples">incantations</a> section for code samples.
+</p>
+
+<h2 id="how-it-works">How it works</h2>
+
+<p>
+  Hoxy functions as a normal proxy standing between the client and server.
+  You intercept traffic during either the request or response phase, or both.
+  The <a href="#phase-lifecycle">phase lifecycle section</a> contains a more complete description, but here's a simplified illustration.
+</p>
+
+<pre class="code">
+  time ==>
+  -----------------------
+  server:       3
+  -------------/-\-------
+  hoxy:       2   4
+  -----------/-----\-----
+  client:   1       5
+</pre>
+
+<ol>
+  <li>Client sends request.</li>
+  <li>Hoxy intercepts the request.</li>
+  <li>Server receives request and sends response.</li>
+  <li>Hoxy intercepts the response.</li>
+  <li>Client receives response.</li>
+</ol>
+
+</body>
+</html>

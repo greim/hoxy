@@ -11,65 +11,58 @@ import RoutePattern from 'route-pattern'
 import isTypeXml from './is-xml'
 import { EventEmitter } from 'events'
 import co from 'co'
-import adapt from 'ugly-adapter'
 import { SNISpoofer } from './sni-spoofer'
 import net from 'net'
 import https from 'https'
 import { ThrottleGroup } from 'stream-throttle'
 
-function isAsync(fun) {
-  return fun.length >= 3
+// TODO: test all five for both requet and response
+let asHandlers = {
+  '$': r => {
+    // TODO: test to ensure that parse errors here propagate to error log.
+    // TODO: test to ensure that parse errors here fail gracefully.
+    let contentType = r.headers['content-type']
+    let isXml = isTypeXml(contentType)
+    r.$ = cheerio.load(r._source.toString(), { xmlMode: isXml })
+  },
+  'json': r => {
+    // TODO: test to ensure that parse errors here propagate to error log.
+    // TODO: test to ensure that parse errors here fail gracefully.
+    r.json = JSON.parse(r._source.toString())
+  },
+  'params': r => {
+    // TODO: test to ensure that parse errors here propagate to error log.
+    // TODO: test to ensure that parse errors here fail gracefully.
+    r.params = querystring.parse(r._source.toString())
+  },
+  'buffer': () => {},
+  'string': () => {},
 }
 
-function asyncIntercept(opts, intercept) {
-  let origIntercept = intercept
-  if (!isAsync(intercept)) {
-    intercept = function(req, resp, done) {
-      let result = origIntercept.call(this, req, resp)
-      if (result && typeof result.next === 'function') {
-        co(result).then(() => {
-          done()
-        }, done)
-      } else if (result && typeof result.then === 'function') {
-        result.then(() => {
-          done()
-        }, done)
-      } else {
-        done()
-      }
+function wrapAsync(intercept) {
+  return function(req, resp, cycle) {
+    let result = intercept.call(this, req, resp, cycle)
+    if (result && typeof result.then === 'function') {
+      return result
+    } else if (result && typeof result.next === 'function') {
+      return co(result)
+    } else {
+      return Promise.resolve()
     }
   }
-  return intercept
-}
-
-function filterIntercept(opts, intercept) {
-  if (opts.filter) {
-    let origIntercept = intercept
-    intercept = function(req, resp, done) {
-      if (opts.filter(req, resp)) {
-        origIntercept.apply(this, arguments)
-      } else {
-        done()
-      }
-    }
-  }
-  return intercept
 }
 
 function asIntercept(opts, intercept) {
   if (opts.as) {
-    let origIntercept = intercept
-    intercept = function(req, resp, done) {
-      let args = arguments
+    return co.wrap(function*(req, resp, cycle) {
       let r = opts.phase === 'request' ? req : resp
-      r._load().then(() => {
-        asHandlers[opts.as](r) //eslint-disable-line no-use-before-define
-        origIntercept.apply(this, args)
-        done()
-      }).catch(done)
-    }
+      yield r._load()
+      asHandlers[opts.as](r)
+      intercept.call(this, req, resp, cycle)
+    })
+  } else {
+    return intercept
   }
-  return intercept
 }
 
 let otherIntercept = (() => {
@@ -78,21 +71,19 @@ let otherIntercept = (() => {
     if (tester === undefined) { return true }
     if (tester instanceof RegExp) { return tester.test(testee) }
     if (isUrl) { return getUrlTester(tester)(testee) }
-    /*eslint-disable */
-    return tester == testee // intentional double-equals
-    /*eslint-enable */
+    return tester == testee // eslint-disable-line eqeqeq
   }
   return function(opts, intercept) {
-    let isReq = opts.phase === 'request' || opts.phase === 'request-sent'
-    return function(req, resp, done) {
-      let reqContentType = req.headers['content-type']
-      let respContentType = resp.headers['content-type']
-      let reqMimeType = reqContentType ? reqContentType.replace(ctPatt, '') : undefined
-      let respMimeType = respContentType ? respContentType.replace(ctPatt, '') : undefined
-      let contentType, mimeType
-      contentType = isReq ? reqContentType : respContentType
-      mimeType = isReq ? reqMimeType : respMimeType
-      let isMatch = 1
+    return function(req, resp, cycle) {
+
+      let isReq = opts.phase === 'request' || opts.phase === 'request-sent'
+        , reqContentType = req.headers['content-type']
+        , respContentType = resp.headers['content-type']
+        , contentType = isReq ? reqContentType : respContentType
+        , reqMimeType = reqContentType ? reqContentType.replace(ctPatt, '') : undefined
+        , respMimeType = respContentType ? respContentType.replace(ctPatt, '') : undefined
+        , mimeType = isReq ? reqMimeType : respMimeType
+        , isMatch = 1
 
       isMatch &= test(opts.contentType, contentType)
       isMatch &= test(opts.mimeType, mimeType)
@@ -107,10 +98,11 @@ let otherIntercept = (() => {
       isMatch &= test(opts.method, req.method)
       isMatch &= test(opts.url, req.url, true)
       isMatch &= test(opts.fullUrl, req.fullUrl(), true)
+
       if (isMatch) {
-        intercept.apply(this, arguments)
+        return intercept.call(this, req, resp, cycle)
       } else {
-        done()
+        return Promise.resolve()
       }
     }
   }
@@ -294,9 +286,8 @@ export default class Proxy extends EventEmitter {
         throw new Error('cannot intercept ' + opts.as + ' in phase ' + phase)
       }
     }
-    intercept = asyncIntercept(opts, intercept)
+    intercept = wrapAsync(intercept)
     intercept = asIntercept(opts, intercept) // TODO: test asIntercept this, args, async
-    intercept = filterIntercept(opts, intercept) // TODO: test filterIntercept this, args, async
     intercept = otherIntercept(opts, intercept) // TODO: test otherIntercept this, args, async
     this._intercepts[phase].push(intercept)
   }
@@ -385,7 +376,7 @@ export default class Proxy extends EventEmitter {
       cycle._setPhase(phase)
       for (let intercept of intercepts) {
         const stopLogging = self._logLongTakingIntercept(phase, req)
-        yield adapt.method(intercept, 'call', cycle, req, resp)
+        yield intercept.call(cycle, req, resp, cycle)
         stopLogging()
       }
     })
@@ -408,8 +399,8 @@ export default class Proxy extends EventEmitter {
 // TODO: test direct url string comparison, :id tags, wildcard, regexp
 // TODO: test line direct url string comparison, :id tags, wildcard
 let getUrlTester = (() => {
-  let sCache = {},
-    rCache = {}
+  let sCache = {}
+    , rCache = {}
   return testUrl => {
     if (testUrl instanceof RegExp) {
       if (!rCache[testUrl]) {
@@ -429,26 +420,3 @@ let getUrlTester = (() => {
     }
   }
 })()
-
-// TODO: test all five for both requet and response
-let asHandlers = {
-  '$': r => {
-    // TODO: test to ensure that parse errors here propagate to error log.
-    // TODO: test to ensure that parse errors here fail gracefully.
-    let contentType = r.headers['content-type']
-    let isXml = isTypeXml(contentType)
-    r.$ = cheerio.load(r._source.toString(), { xmlMode: isXml })
-  },
-  'json': r => {
-    // TODO: test to ensure that parse errors here propagate to error log.
-    // TODO: test to ensure that parse errors here fail gracefully.
-    r.json = JSON.parse(r._source.toString())
-  },
-  'params': r => {
-    // TODO: test to ensure that parse errors here propagate to error log.
-    // TODO: test to ensure that parse errors here fail gracefully.
-    r.params = querystring.parse(r._source.toString())
-  },
-  'buffer': () => {},
-  'string': () => {},
-}
