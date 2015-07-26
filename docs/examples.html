@@ -69,23 +69,34 @@
 <pre class="language-javascript code">
   var adapt = require('ugly-adapter');
   var fs = require('fs');
-  proxy.intercept('request', function*(req, resp) {
-    resp.buffer = yield adapt(fs.readFile, 'path/to/unicorns.gif');
+  proxy.intercept({
+    phase: 'response',
+    hostname: 'mysite.com',
+    mimeType: 'text/html',
+    as: '$'
+  }, function*(req, resp) {
+    var headerHtml = yield adapt(fs.readFile, 'path/to/header.html');
+    resp.$('#header').html(headerHtml);
   });
 </pre>
 
 <h3 id="async-intercept">Async Interceptors</h3>
 
 <p>
-  One can invoke the even deeper magic of async functions.
-  Which work a lot like generators behind the scenes.
+  If one speaks the language of Babel, one can invoke the even deeper magic of async functions.
 </p>
 
 <pre class="language-javascript code">
   var adapt = require('ugly-adapter');
   var fs = require('fs');
-  proxy.intercept('request', async function(req, resp) {
-    resp.buffer = await adapt(fs.readFile, 'path/to/unicorns.gif');
+  proxy.intercept({
+    phase: 'response',
+    hostname: 'mysite.com',
+    mimeType: 'text/html',
+    as: '$'
+  }, async function(req, resp) {
+    var headerHtml = await adapt(fs.readFile, 'path/to/header.html');
+    resp.$('#header').html(headerHtml);
   });
 </pre>
 
@@ -107,18 +118,10 @@
 
 <p>
   Next, add the above root cert to your list of trusted cert authorities.
-  How to do this varies from client to client and platform to platform.
-  Firefox maintains its own trusted list.
-  Chrome on OS X uses the ones stored in OS X's keychain.
-  Describing them all is beyond the scope of these docs, suffice to say:
-</p>
-
-<pre class="code">
-  ...make it trust the stuff...
-</pre>
-
-<p>
-  Next, launch Hoxy, passing in that key and cert as a certificate authority.
+  How to do this varies.
+  For example, Firefox maintains its own trusted list, while Chrome uses the OS's list.
+  For specific details, consult the Ninth Scroll of P'Ki (or search the web).
+  Once that's done, launch Hoxy, passing in your trusted cert and its private key.
 </p>
 
 <pre class="language-javascript code">
@@ -132,7 +135,7 @@
 
 <p>
   Finally, configure your client to proxy both HTTP and HTTPS through <code>localhost:8080</code>.
-  Hoxy will use the fake cert authority to spoof certificates from any HTTPS sites, decrypting and intercepting them as cleartext using the existing intercept API.
+  Hoxy will use the fake cert authority to spoof certificates from any HTTPS sites it encounters, decrypting and intercepting them as cleartext using the existing intercept API.
 </p>
 
 <p>
@@ -167,7 +170,7 @@ See also: <a href="#https-proxying">basic explanation of HTTPS proxying</a>.
   Suppose you wanted to reverse proxy to an HTTPS site.
   In that case you'll likely want the URL in your browser to be HTTPS as well.
   For that, just provide a key and cert that your client trusts.
-  The instructions above already show how to create your own self-signed root CA.
+  The <a href="#intercept-https">instructions above</a> already show how to create your own self-signed root CA.
   Do that, then use it to create your server's key and cert:
 </p>
 
@@ -175,7 +178,7 @@ See also: <a href="#https-proxying">basic explanation of HTTPS proxying</a>.
   # Create the key
   openssl genrsa -out ./my-server.key.pem 2048
   # Create the certificate signing request
-  openssl req -new -key ./my-server.key.pem -out ./my-server.csr.pem -subj "/C=US/ST=Utah/L=Provo/O=ACME Tech Inc/CN=local.ldsconnect.org"
+  openssl req -new -key ./my-server.key.pem -out ./my-server.csr.pem -subj "/C=US/ST=Utah/L=Provo/O=ACME Tech Inc/CN=localhost"
   # Create the cert
   openssl x509 -req -in ./my-server.csr.pem -CA ~/.ssh/my-private-root-ca.crt.pem -CAkey ~/.ssh/my-private-root-ca.key.pem -CAcreateserial -out ./my-server.crt.pem -days 500
 </pre>

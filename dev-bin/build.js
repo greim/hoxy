@@ -33,6 +33,14 @@ co(function*() {
   })
 
   for (let $page of pages) {
+    $page('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]').each((idx, elem) => {
+      let $elem = $page(elem)
+        , id = $elem.attr('id')
+      $elem.append(`<a href="#${id}" class="permalink" title="permalink">#</a>`)
+    })
+  }
+
+  for (let $page of pages) {
     $('#target').append($page('body').html())
   }
 
