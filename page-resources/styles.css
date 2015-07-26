@@ -40,6 +40,9 @@ a[href].permalink{
     margin-left:.3em;
     text-decoration: none;
 }
+a[href].permalink:after{
+    content:'#';
+}
 h1:hover a[href].permalink,
 h2:hover a[href].permalink,
 h3:hover a[href].permalink,
