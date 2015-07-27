@@ -17,8 +17,8 @@ proxy.intercept({
 
 # Version 3.0
 
-Hoxy will soon release version 3.0.
-The purpose of this release is to simplify the API and better support ES6.
+Hoxy has released version 3.0.
+This release simplifies the API and better supports ES6.
 Notable changes:
 
  * A `done` callback is no longer passed as the third arg to interceptors. Interceptor arity is, accordingly, no longer a switch for async behavior. Rather, it solely depends on the return type of the interceptor (i.e. promises or iterators over promises).
