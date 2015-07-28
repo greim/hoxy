@@ -64,8 +64,7 @@ function asIntercept(opts, intercept) {
       let r = opts.phase === 'request' ? req : resp
       r._load().then(() => {
         asHandlers[opts.as](r) //eslint-disable-line no-use-before-define
-        origIntercept.apply(this, args)
-        done()
+        origIntercept.apply(this, args, done)
       }).catch(done)
     }
   }
