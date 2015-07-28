@@ -58,7 +58,7 @@ function asIntercept(opts, intercept) {
       let r = opts.phase === 'request' ? req : resp
       yield r._load()
       asHandlers[opts.as](r)
-      intercept.call(this, req, resp, cycle)
+      yield intercept.call(this, req, resp, cycle)
     })
   } else {
     return intercept

@@ -7,7 +7,7 @@ import assert from 'assert'
 import send from './lib/send'
 import { finish } from './lib/expect'
 
-describe.only('logging', () => {
+describe('logging', () => {
 
   it('should log errors in faulty request interceptors', () => {
     let expect = finish()
@@ -99,5 +99,20 @@ describe.only('logging', () => {
     }).through('response', function() {
       // do nothing
     }).promise()
+  })
+
+  it('should log errors in faulty async response interceptors as buffer', () => {
+    let expect = finish()
+    return send({}, true).tweak(proxy => {
+      proxy.log('error', ev => {
+        assert.strictEqual(ev.level, 'error')
+        expect.done()
+      })
+    }).through({
+      phase: 'response',
+      as: 'buffer',
+    }, function*() {
+      yield Promise.reject(new Error('fake'))
+    }).promise().then(() => expect.now())
   })
 })
