@@ -30,6 +30,7 @@ Notable changes:
 
 * **3.0.1** Fixed bug where `as` intercepts weren't catching async errors properly.
 * **3.0.0** Simplify the API and better support ES6.
+* **2.3.1** Back-ported 3.0.1 async `as` intercept fix.
 * **2.3.0** Added getter and setter for proxy-level slow options.
 * **2.2.6** Added eslint npm script. Thanks [@nerdbeere](https://github.com/nerdbeere).
 * **2.2.5** Fixed a bug where `.buffer` was always undefined. Thanks [@Timwi](https://github.com/Timwi).
