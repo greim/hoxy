@@ -7,7 +7,7 @@ import assert from 'assert'
 import send from './lib/send'
 import { finish } from './lib/expect'
 
-describe('logging', () => {
+describe.only('logging', () => {
 
   it('should log errors in faulty request interceptors', () => {
     let expect = finish()
@@ -25,6 +25,30 @@ describe('logging', () => {
     let expect = finish()
     return send({}, true).tweak(proxy => {
       proxy.log('error', ev => {
+        assert.strictEqual(ev.level, 'error')
+        expect.done()
+      })
+    }).through('response', function() {
+      throw new Error('fake')
+    }).promise().then(() => expect.now())
+  })
+
+  it('should log errors in faulty request interceptors with multiple log levels', () => {
+    let expect = finish()
+    return send({}, true).tweak(proxy => {
+      proxy.log('error warn', ev => {
+        assert.strictEqual(ev.level, 'error')
+        expect.done()
+      })
+    }).through('request', function() {
+      throw new Error('fake')
+    }).promise().then(() => expect.now())
+  })
+
+  it('should log errors in faulty response interceptors with multiple log levels', () => {
+    let expect = finish()
+    return send({}, true).tweak(proxy => {
+      proxy.log('error warn', ev => {
         assert.strictEqual(ev.level, 'error')
         expect.done()
       })
