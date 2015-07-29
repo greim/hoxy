@@ -41,28 +41,30 @@ describe('reverse', function() {
   it('should use a reverse proxy', done => {
     let server = http.createServer((req, res) => {
       res.end(req.url)
-    }).listen(0)
-    server.on('error', done)
-    let serverAddr = server.address()
+    }).listen(0, 'localhost', () => {
+      server.on('error', done)
+      let serverAddr = server.address()
 
-    let proxy = new Proxy({
-      reverse: `http://localhost:${serverAddr.port}`,
-    }).listen(0)
-    proxy.intercept('request', function(req) {
-      req.headers['x-foo'] = 'bar'
-    })
-    proxy.on('error', done)
-    let proxyAddr = proxy.address()
+      let proxy = new Proxy({
+        reverse: `http://localhost:${serverAddr.port}`,
+      }).listen(0, 'localhost', () => {
+        proxy.intercept('request', function(req) {
+          req.headers['x-foo'] = 'bar'
+        })
+        proxy.on('error', done)
+        let proxyAddr = proxy.address()
 
-    http.get({
-      hostname: proxyAddr.address,
-      port: proxyAddr.port,
-      path: `http://localhost:${serverAddr.port}/foo`,
-    }, res => {
-      streams.collect(res).then(bod => {
-        assert.equal(bod, '/foo')
-        done()
-      }, done)
+        http.get({
+          hostname: proxyAddr.address,
+          port: proxyAddr.port,
+          path: `http://localhost:${serverAddr.port}/foo`,
+        }, res => {
+          streams.collect(res).then(bod => {
+            assert.equal(bod, '/foo')
+            done()
+          }, done)
+        })
+      })
     })
   })
 })

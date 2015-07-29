@@ -7,7 +7,7 @@ import assert from 'assert'
 import { ErrorStream, DestroyStream } from './lib/fail-stream'
 import send from './lib/send'
 
-describe.only('handle errors', function() {
+describe('handle errors', function() {
 
   it('should not crash on request stream emitted error', () => {
     let body = new ErrorStream()

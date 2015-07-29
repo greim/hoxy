@@ -41,7 +41,7 @@ let staticServer = (() => {
     let docroot = req.headers['x-hoxy-static-docroot']
     let stat = getStatic(docroot)
     stat.serve(req, resp)
-  }).listen(0)
+  }).listen(0, 'localhost')
 
   return server
 })()
