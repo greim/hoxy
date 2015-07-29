@@ -28,6 +28,7 @@ Notable changes:
 
 # Release notes:
 
+* **3.0.2** Fix for a Windows EADDRNOTAVAIL error.
 * **3.0.1** Fixed bug where `as` intercepts weren't catching async errors properly.
 * **3.0.0** Simplify the API and better support ES6.
 * **2.3.1** Back-ported 3.0.1 async `as` intercept fix.
