@@ -159,32 +159,29 @@ export default class Cycle extends EventEmitter {
     return this._userData[name]
   }
 
-  serve(opts, cb, ctx) {
+  serve(opts) {
 
-    let prom = co.call(this, function*() {
+    return co.call(this, function*() {
 
       // First, get all our ducks in a row WRT to
       // options, setting variables, etc.
-      ctx = ctx || this
       let req = this._request
       let resp = this._response
       if (typeof opts === 'string') {
         opts = { path: opts }
       }
       opts = _.extend({
-        docroot: '/',
-        path: req.url,
+        docroot: pathTools.normalize('/'),
+        path: pathTools.normalize(url.parse(req.url).pathname),
         strategy: 'replace',
       }, opts)
       let { docroot, path, strategy } = opts
-      if (!/\/$/.test(docroot)) { docroot = docroot + '/' }
-      if (!/^\//.test(path)) { path = '/' + path }
       let headers = _.extend({
         'x-hoxy-static-docroot': docroot,
       }, req.headers)
       delete headers['if-none-match']
       delete headers['if-modified-since']
-      let fullPath = docroot + path.substring(1)
+      let fullPath = pathTools.normalize(docroot + path)
 
       // Now call the static file service.
       let created = yield check(strategy, fullPath, req, this._proxy._upstreamProxy)
@@ -231,15 +228,6 @@ export default class Cycle extends EventEmitter {
         resp._setHttpSource(staticResp)
       }
     })
-    if (typeof cb === 'function') {
-      prom.then(
-        () => cb.call(ctx, null),
-        err => cb.call(ctx, err)
-      )
-      return undefined
-    } else {
-      return prom
-    }
   }
 
   _setPhase(phase) {
