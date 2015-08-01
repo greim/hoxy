@@ -28,6 +28,7 @@ Notable changes:
 
 # Release notes:
 
+* **3.0.3** Fixed `Cycle#serve()` breakage on Windows.
 * **3.0.2** Fix for a Windows EADDRNOTAVAIL error.
 * **3.0.1** Fixed bug where `as` intercepts weren't catching async errors properly.
 * **3.0.0** Simplify the API and better support ES6.
