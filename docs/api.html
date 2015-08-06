@@ -458,15 +458,6 @@
             Same as <code>mimeType</code> but only matches response.
           </td>
         </tr>
-        <tr>
-          <td><code>filter</code></td>
-          <td class="type">function</td>
-          <td>no</td>
-          <td>
-            A function that receives <code>req</code> and <code>resp</code> args, returning <code>true</code> or <code>false</code> depending on whether the intercept should be called.
-            Non-async.
-          </td>
-        </tr>
       </body>
     </table>
   </div>
@@ -1000,6 +991,7 @@
           <td class="type">string</td>
           <td>no</td>
           <td>
+            Mainly relevant when using the <code>docroot</code> option.
             Describes the relationship between the local docroot and the remote one.
             Strictly speaking, this controls what happens when the local docroot is missing a requested file.
             Accepted values:

@@ -22,6 +22,7 @@ import co from 'co'
 import adapt from 'ugly-adapter'
 import wait from './wait'
 import task from './task'
+import UrlPath from './url-path'
 
 let staticServer = (() => {
 
@@ -39,9 +40,10 @@ let staticServer = (() => {
   // Start up the server and serve out of various docroots.
   let server = http.createServer((req, resp) => {
     let docroot = req.headers['x-hoxy-static-docroot']
-    let stat = getStatic(docroot)
+    let pDocroot = new UrlPath(docroot)
+    let stat = getStatic(pDocroot.toSystemPath())
     stat.serve(req, resp)
-  }).listen(0)
+  }).listen(0, 'localhost')
 
   return server
 })()
@@ -159,39 +161,39 @@ export default class Cycle extends EventEmitter {
     return this._userData[name]
   }
 
-  serve(opts, cb, ctx) {
+  serve(opts) {
 
-    let prom = co.call(this, function*() {
+    return co.call(this, function*() {
 
       // First, get all our ducks in a row WRT to
       // options, setting variables, etc.
-      ctx = ctx || this
       let req = this._request
       let resp = this._response
       if (typeof opts === 'string') {
         opts = { path: opts }
       }
       opts = _.extend({
-        docroot: '/',
-        path: req.url,
+        docroot: pathTools.sep,
+        path: url.parse(req.url).pathname,
         strategy: 'replace',
       }, opts)
       let { docroot, path, strategy } = opts
-      if (!/\/$/.test(docroot)) { docroot = docroot + '/' }
-      if (!/^\//.test(path)) { path = '/' + path }
       let headers = _.extend({
         'x-hoxy-static-docroot': docroot,
       }, req.headers)
       delete headers['if-none-match']
       delete headers['if-modified-since']
-      let fullPath = docroot + path.substring(1)
 
       // Now call the static file service.
-      let created = yield check(strategy, fullPath, req, this._proxy._upstreamProxy)
+      let pDocroot = new UrlPath(docroot)
+        , pPath = new UrlPath(path)
+        , pFullPath = pPath.rootTo(pDocroot)
+        , fullSysPath = pFullPath.toSystemPath()
+      let created = yield check(strategy, fullSysPath, req, this._proxy._upstreamProxy)
       if (created) {
         this.emit('log', {
           level: 'info',
-          message: 'copied ' + req.fullUrl() + ' to ' + fullPath,
+          message: 'copied ' + req.fullUrl() + ' to ' + fullSysPath,
         })
       }
       let staticResp = yield new Promise((resolve, reject) => {
@@ -200,7 +202,7 @@ export default class Cycle extends EventEmitter {
           hostname: addr.address,
           port: addr.port,
           headers: headers,
-          path: path,
+          path: pPath.toUrlPath(),
         }, resolve)
         .on('error', reject)
       })
@@ -222,7 +224,7 @@ export default class Cycle extends EventEmitter {
         let message = util.format(
           'Failed to serve static file: %s => %s. Static server returned %d. Strategy: %s',
           req.fullUrl(),
-          fullPath,
+          fullSysPath,
           staticResp.statusCode,
           strategy
         )
@@ -231,15 +233,6 @@ export default class Cycle extends EventEmitter {
         resp._setHttpSource(staticResp)
       }
     })
-    if (typeof cb === 'function') {
-      prom.then(
-        () => cb.call(ctx, null),
-        err => cb.call(ctx, err)
-      )
-      return undefined
-    } else {
-      return prom
-    }
   }
 
   _setPhase(phase) {

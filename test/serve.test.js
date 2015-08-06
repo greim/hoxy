@@ -5,136 +5,153 @@
 
 import fs from 'fs'
 import assert from 'assert'
+import path from 'path'
 import send from './lib/send'
 import adapt from 'ugly-adapter'
 
+const docroot = path.join(__dirname, 'files')
+
+function exists(file) {
+  return new Promise(resolve => {
+    fs.exists(file, resolve)
+  })
+}
+
 describe('Serving from local', () => {
 
-  it('should serve', () => {
-    return send({
-      path: 'http://example.com/abc',
-    }).through('request', function*() {
-      yield this.serve({ docroot: `${__dirname}/files` })
-    }).to(function*() {
-      throw new Error('server hit was not skipped')
-    }).receiving(function*(resp) {
-      assert.strictEqual(resp.body, 'abc2')
-    }).promise()
+  describe('simple file service', () => {
+
+    it('should serve a file', () => {
+      return send({
+        path: 'http://example.com/',
+      }).through('request', function*() {
+        yield this.serve({
+          path: path.join(__dirname, 'files', 'abc'),
+        })
+      }).to(function*() {
+        throw new Error('server hit was not skipped')
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.body, 'abc2')
+      }).promise()
+    })
+
+    it('should serve a file using a string instead of options object', () => {
+      return send({
+        path: 'http://example.com/',
+      }).through('request', function*() {
+        yield this.serve(path.join(__dirname, 'files', 'abc'))
+      }).to(function*() {
+        throw new Error('server hit was not skipped')
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.body, 'abc2')
+      }).promise()
+    })
   })
 
-  it('should not see through to server with serve', () => {
-    return send({
-      path: 'http://example.com/def',
-    }).through('request', function*() {
-      yield this.serve({ docroot: `${__dirname}/files` })
-    }).to(function*() {
-      throw new Error('failed to skip server')
-    }).receiving(function*(resp) {
-      assert.strictEqual(resp.body, '')
-      assert.strictEqual(resp.statusCode, 404, `should have been 404 but was ${resp.statusCode}`)
-    }).promise()
+  describe('replace strategy', () => {
+
+    it('should serve an existing file from a local docroot', () => {
+      return send({
+        path: 'http://example.com/abc',
+      }).through('request', function*() {
+        yield this.serve({ docroot })
+      }).to(function*() {
+        throw new Error('server hit was not skipped')
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.body, 'abc2')
+      }).promise()
+    })
+
+    it('should return 404 when serving non-existant file from local docroot', () => {
+      return send({
+        path: 'http://example.com/def',
+      }).through('request', function*() {
+        yield this.serve({ docroot })
+      }).to(function*() {
+        throw new Error('server hit was not skipped')
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.body, '')
+        assert.strictEqual(resp.statusCode, 404, `should have been 404 but was ${resp.statusCode}`)
+      }).promise()
+    })
   })
 
-  it('should serve with overlay strategy', () => {
-    return send({
-      path: 'http://example.com/abc',
-    }).through('request', function*() {
-      let opts = { docroot: `${__dirname}/files`, strategy: 'overlay' }
-      yield this.serve(opts)
-    }).to(function*() {
-      throw new Error('server hit was not skipped')
-    }).receiving(function*(resp) {
-      assert.strictEqual(resp.body, 'abc2')
-    }).promise()
+  describe('overlay strategy', () => {
+
+    it('should serve an existing file from a local docroot', () => {
+      return send({
+        path: 'http://example.com/abc',
+      }).through('request', function*() {
+        let opts = { docroot, strategy: 'overlay' }
+        yield this.serve(opts)
+      }).to(function*() {
+        throw new Error('server hit was not skipped')
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.body, 'abc2')
+      }).promise()
+    })
+
+    it('should return 200 when serving non-existant file from a local docroot', () => {
+      return send({
+        path: 'http://example.com/def',
+      }).through('request', function*() {
+        let opts = { docroot, strategy: 'overlay' }
+        yield this.serve(opts)
+      }).to({
+        body: '1234',
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.statusCode, 200)
+        assert.strictEqual(resp.body, '1234')
+      }).promise()
+    })
   })
 
-  it('should fallback silently with overlay strategy', () => {
-    return send({
-      path: 'http://example.com/def',
-    }).through('request', function*() {
-      let opts = { docroot: `${__dirname}/files`, strategy: 'overlay' }
-      yield this.serve(opts)
-    }).to({
-      body: '1234',
-    }).receiving(function*(resp) {
-      assert.strictEqual(resp.statusCode, 200)
-      assert.strictEqual(resp.body, '1234')
-    }).promise()
-  })
+  describe('mirror strategy', () => {
 
-  it('should mirror with mirror strategy', () => {
-    return send({
-      path: 'http://example.com/def',
-    }).through('request', function*() {
-      let docroot = `${__dirname}/files`
-        , file = `${docroot}/def`
-        , strategy = 'mirror'
-      yield this.serve({ docroot, strategy })
-      yield adapt(fs.unlink, file)
-    }).to({
-      body: 'def',
-    }).receiving(function*(resp) {
-      assert.strictEqual(resp.body, 'def')
-    }).promise()
-  })
+    it('should copy a file when not found in a local docroot', () => {
+      return send({
+        path: 'http://example.com/def',
+      }).through('request', function*() {
+        let file = path.join(docroot, 'def')
+          , strategy = 'mirror'
+          , fileExists = yield exists(file)
+        assert.ok(!fileExists, 'file existed before mirroring')
+        yield this.serve({ docroot, strategy })
+        yield adapt(fs.unlink, file)
+      }).to({
+        body: 'def',
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.statusCode, 200)
+        assert.strictEqual(resp.body, 'def')
+      }).promise()
+    })
 
-  it('should not re-mirror with mirror strategy', () => {
-    return send({
-      path: 'http://example.com/abc',
-    }).through('request', function*() {
-      let docroot = `${__dirname}/files`
-        , strategy = 'mirror'
-        , file = `${docroot}/abc`
-      let stat1 = yield adapt(fs.stat, file)
-      yield this.serve({ docroot, strategy })
-      let stat2 = yield adapt(fs.stat, file)
-      assert.equal(stat1.mtime.getTime(), stat2.mtime.getTime())
-    }).to(function*() {
-      throw new Error('should not have hit server')
-    }).receiving(function*(resp) {
-      assert.strictEqual(resp.body, 'abc2')
-    }).promise()
+    it('should not re-copy a file when found in a local docroot', () => {
+      return send({
+        path: 'http://example.com/abc',
+      }).through('request', function*() {
+        let strategy = 'mirror'
+          , file = path.join(docroot, 'abc')
+          , stat1 = yield adapt(fs.stat, file)
+        yield this.serve({ docroot, strategy })
+        let stat2 = yield adapt(fs.stat, file)
+        assert.equal(stat1.mtime.getTime(), stat2.mtime.getTime())
+      }).to(function*() {
+        throw new Error('should not have hit server')
+      }).receiving(function*(resp) {
+        assert.strictEqual(resp.statusCode, 200)
+        assert.strictEqual(resp.body, 'abc2')
+      }).promise()
+    })
   })
 
   it('should return a promise', () => {
     return send({
       path: 'http://example.com/abc',
-    }).through('request', function(req, resp, done) {
-      let docroot = `${__dirname}/files`
-      this.serve({ docroot })
-      .then(() => {
-        done()
-      }, done)
-    }).promise()
-  })
-
-  it('should accept a callback', () => {
-    return send({
-      path: 'http://example.com/abc',
-    }).through('request', function(req, resp, done) {
-      let docroot = `${__dirname}/files`
-      this.serve({ docroot }, done)
-    }).promise()
-  })
-
-  it('should not return a promise if callback provided', () => {
-    return send({
-      path: 'http://example.com/abc',
-    }).through('request', function(req, resp, done) {
-      let docroot = `${__dirname}/files`
-        , isPromise = false
-        , checked = false
-      let returned = this.serve({ docroot }, () => {
-        try {
-          assert.ok(checked, 'did not run check')
-          assert.ok(!isPromise, 'returned a promise')
-          done()
-        } catch(ex) {
-          done(ex)
-        }
-      })
-      isPromise = returned && typeof returned.then === 'function'
-      checked = true
+    }).through('request', function() {
+      var prom = this.serve({ docroot })
+      assert.ok(typeof prom.then === 'function')
+      return prom
     }).promise()
   })
 })
