@@ -1,21 +1,35 @@
 # Hoxy
 
-An HTTP hacking tool for JavaScript programmers. Please see the [documentation page](http://greim.github.io/hoxy/) for more info.
+An HTTP hacking tool for JavaScript programmers.
+
+## Full Documentation
+
+http://greim.github.io/hoxy/
+
+## Example
 
 ```js
 var hoxy = require('hoxy');
 var proxy = hoxy.createServer().listen(8080);
 proxy.intercept({
+
+  // intercept during the response phase
   phase: 'response',
+
+  // only intercept html pages
   mimeType: 'text/html',
+
+  // expose the response body as a cheerio object
+  // (cheerio is a jQuery clone)
   as: '$'
 }, function(req, resp) {
+
   resp.$('title').text('Unicorns!');
   // all page titles will now say "Unicorns!"
 });
 ```
 
-# Version 3.0
+## Version 3.0
 
 Hoxy has released version 3.0.
 This release simplifies the API and better supports ES6.
@@ -26,7 +40,7 @@ Notable changes:
  * The CLI has been completely removed from the project. The reasoning is that, by simplifying the project, I can more easily maintain it. If there's a need, it can be brought back as a separate npm module. Perhaps somebody else can take that on.
  * Undocumented `hoxy.forever()` function goes away. 
 
-# Release notes:
+## Release notes:
 
 * **3.0.3** Fixed `Cycle#serve()` breakage on Windows.
 * **3.0.2** Fix for a Windows EADDRNOTAVAIL error.
