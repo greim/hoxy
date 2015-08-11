@@ -475,7 +475,7 @@
       <body>
         <tr>
           <td><code>protocol</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match the request protocol.
@@ -483,7 +483,7 @@
         </tr>
         <tr>
           <td><code>method</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match the all-uppercase HTTP request method.
@@ -491,7 +491,7 @@
         </tr>
         <tr>
           <td><code>hostname</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match the host, not including :port.
@@ -499,7 +499,7 @@
         </tr>
         <tr>
           <td><code>port</code></td>
-          <td class="type">number, string, regexp</td>
+          <td class="type">number, string, regex, function</td>
           <td>no</td>
           <td>
             Match the port number.
@@ -507,7 +507,7 @@
         </tr>
         <tr>
           <td><code>url</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match the request URL.
@@ -517,7 +517,7 @@
         </tr>
         <tr>
           <td><code>fullUrl</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match the full request URL including protocol and hostname.
@@ -527,7 +527,7 @@
         </tr>
         <tr>
           <td><code>contentType</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match the full <code>content-type</code> header of the request or response (depending on the phase).
@@ -535,7 +535,7 @@
         </tr>
         <tr>
           <td><code>requestContentType</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Same as <code>contentType</code> but only matches request.
@@ -543,7 +543,7 @@
         </tr>
         <tr>
           <td><code>responseContentType</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Same as <code>contentType</code> but only matches response.
@@ -551,7 +551,7 @@
         </tr>
         <tr>
           <td><code>mimeType</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Match just the mime type portion of the <code>content-type</code> header of the request or response (depending on the phase). I.e., if the entire header is <code>&quot;text/html; charset=utf-8&quot;</code>, just match the <code>&quot;text/html&quot;</code> part.
@@ -559,7 +559,7 @@
         </tr>
         <tr>
           <td><code>requestMimeType</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Same as <code>mimeType</code> but only matches request.
@@ -567,7 +567,7 @@
         </tr>
         <tr>
           <td><code>responseMimeType</code></td>
-          <td class="type">string, regexp</td>
+          <td class="type">string, regex, function</td>
           <td>no</td>
           <td>
             Same as <code>mimeType</code> but only matches response.
@@ -575,6 +575,14 @@
         </tr>
       </body>
     </table>
+    <p>
+      Note: filtering options can be different types.
+    </p>
+    <ul>
+      <li>string: a loose (<code>==</code>) match.</li>
+      <li>regex: regex match of the string-coerced value.</li>
+      <li>function: truthiness of return value.</li>
+    </ul>
   </div>
 </div>
 
