@@ -70,6 +70,7 @@ let otherIntercept = (() => {
   function test(tester, testee, isUrl) {
     if (tester === undefined) { return true }
     if (tester instanceof RegExp) { return tester.test(testee) }
+    if (typeof tester === 'function') { return !!tester(testee) }
     if (isUrl) { return getUrlTester(tester)(testee) }
     return tester == testee // eslint-disable-line eqeqeq
   }

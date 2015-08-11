@@ -58,6 +58,24 @@ describe('filtering', function() {
     }).then(() => expect.now())
   })
 
+  it('should filter based on function matches on method', () => {
+    let expect = finish()
+    return roundTrip({
+      request: {
+        path: 'http://example.com/foobar',
+        method: 'POST',
+        body: 'abc',
+      },
+      intercepts: [{
+        opts: { phase: 'request', method: method => method === 'GET' },
+        callback: function() { throw new Error('should not have called intercept') },
+      }, {
+        opts: { phase: 'request', method: method => method === 'POST' },
+        callback: function() { expect.done() },
+      }],
+    }).then(() => expect.now())
+  })
+
   it('should filter based on string matches on hostname', () => {
     let expect = values('switch', 'hit')
     return roundTrip({
@@ -112,6 +130,37 @@ describe('filtering', function() {
         },
       }, {
         opts: { phase: 'response', hostname: /^foobar$/ },
+        callback: function(req) {
+          expect.set('hit')
+          req.hostname = this.data('hostname') // put hostname back so send() can finish
+        },
+      }],
+    }).then(() => expect.now())
+  })
+
+  it('should filter based on function matches on hostname', () => {
+    let expect = values('switch', 'hit')
+    return roundTrip({
+      request: {
+        path: 'http://example.com/foobar',
+        method: 'POST',
+        body: 'abc',
+      },
+      intercepts: [{
+        opts: { phase: 'request', hostname: hn => hn === 'google.com' },
+        callback: function() {
+          throw new Error('should not have called intercept')
+        },
+      }, {
+        opts: { phase: 'response' },
+        callback: function(req, resp) {
+          expect.set('switch')
+          // send() resets hostname, so need to do this
+          this.data('hostname', req.hostname)
+          req.hostname = 'foobar'
+        },
+      }, {
+        opts: { phase: 'response', hostname: hn => hn === 'foobar' },
         callback: function(req) {
           expect.set('hit')
           req.hostname = this.data('hostname') // put hostname back so send() can finish
@@ -213,6 +262,37 @@ describe('filtering', function() {
     }).then(() => expect.now())
   })
 
+  it('should filter based on function matches on port', () => {
+    let expect = values('switch', 'hit')
+    return roundTrip({
+      request: {
+        path: 'http://example.com/foobar',
+        method: 'POST',
+        body: 'abc',
+      },
+      intercepts: [{
+        opts: { phase: 'request', port: p => p === 81 },
+        callback: function() {
+          throw new Error('should not have called intercept')
+        },
+      }, {
+        opts: { phase: 'response' },
+        callback: function(req) {
+          expect.set('switch')
+          // send() resets port, so need to do this
+          this.data('port', req.port)
+          req.port = 7777
+        },
+      }, {
+        opts: { phase: 'response', port: p => p === 7777 },
+        callback: function(req) {
+          expect.set('hit')
+          req.port = this.data('port') // put port back so send() can finish
+        },
+      }],
+    }).then(() => expect.now())
+  })
+
   it('should filter based on string matches on url', () => {
     let expect = finish()
     return roundTrip({
@@ -265,6 +345,25 @@ describe('filtering', function() {
         callback: function() { expect.done() },
       }],
     }).then(() => expect.now())
+  })
+
+  it('should filter based on function matches on url', () => {
+    let expect = finish()
+    return send({
+      path: 'http://example.com/foobar',
+      method: 'POST',
+      body: 'abc',
+    }).through({
+      phase: 'request',
+      url: url => url === '/foobaz',
+    }, () => {
+      throw new Error('should not have called intercept')
+    }).through({
+      phase: 'response',
+      url: url => url === '/foobar',
+    }, () => {
+      expect.done()
+    }).promise().then(() => expect.now())
   })
 
   it('should filter based on string matches on fullUrl', () => {
@@ -364,6 +463,25 @@ describe('filtering', function() {
     }).then(() => expect.now())
   })
 
+  it('should filter based on function matches on fullUrl', () => {
+    let expect = finish()
+    return send({
+      path: 'http://example.com/foobar',
+      method: 'POST',
+      body: 'abc',
+    }).through({
+      phase: 'request',
+      fullUrl: url => url.includes('/foobaz'),
+    }, () => {
+      throw new Error('should not have called intercept')
+    }).through({
+      phase: 'response',
+      fullUrl: url => url.includes('/foobar'),
+    }, () => {
+      expect.done()
+    }).promise().then(() => expect.now())
+  })
+
   it('should filter based on string matches on contentType', () => {
     let expect = finish()
     return roundTrip({
@@ -406,6 +524,26 @@ describe('filtering', function() {
     }).then(() => expect.now())
   })
 
+  it('should filter based on function matches on contentType', () => {
+    let expect = finish()
+    return send({
+      path: 'http://example.com/foobar',
+      method: 'POST',
+      body: 'abc',
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
+    }).through({
+      phase: 'request',
+      contentType: t => t === 'text/plain; charset=utf-9',
+    }, () => {
+      throw new Error('should not have called intercept')
+    }).through({
+      phase: 'request',
+      contentType: t => t === 'text/plain; charset=utf-8',
+    }, () => {
+      expect.done()
+    }).promise().then(() => expect.now())
+  })
+
   it('should filter based on string matches on mimeType', () => {
     let expect = finish()
     return roundTrip({
@@ -446,6 +584,26 @@ describe('filtering', function() {
         callback: function() { expect.done() },
       }],
     }).then(() => expect.now())
+  })
+
+  it('should filter based on function matches on mimeType', () => {
+    let expect = finish()
+    return send({
+      path: 'http://example.com/foobar',
+      method: 'POST',
+      body: 'abc',
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
+    }).through({
+      phase: 'request',
+      mimeType: t => t === 'text/plainX',
+    }, () => {
+      throw new Error('should not have called intercept')
+    }).through({
+      phase: 'request',
+      mimeType: t => t === 'text/plain',
+    }, () => {
+      expect.done()
+    }).promise().then(() => expect.now())
   })
 
   it('should filter mimeTypes during appropriate phase', () => {
