@@ -33,6 +33,8 @@
     "strict": 0,
     "no-underscore-dangle": 0,
     "comma-dangle": [2, "always-multiline"],
+    "no-loop-func": 0,
+    "no-process-exit": 0,
     "quotes": [
       2,
       "single"

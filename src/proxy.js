@@ -262,7 +262,7 @@ export default class Proxy extends EventEmitter {
       message: message,
     })
     if (this._tlsSpoofingServer) {
-      this._tlsSpoofingServer.listen(0)
+      this._tlsSpoofingServer.listen(0, 'localhost')
     }
     return this
   }

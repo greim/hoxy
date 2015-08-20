@@ -42,6 +42,7 @@ Notable changes:
 
 ## Release notes:
 
+* **3.1.1** Prevent `EADDRNOTAVAIL` on Windows when using `certAuthority`.
 * **3.1.0** Filtering options now accept functions.
 * **3.0.3** Fixed `Cycle#serve()` breakage on Windows.
 * **3.0.2** Fix for a Windows EADDRNOTAVAIL error.
