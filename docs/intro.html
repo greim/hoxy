@@ -6,17 +6,19 @@
 <h1 id="introduction" data-tldr="Documentation and examples.">Hoxy: Introduction</h1>
 
 <p>
-  Hoxy is an HTTP hacking tool for JavaScript programmers.
-  It operates in the same general space as Charles or Fiddler, but rather than having a GUI, it exposes a programming API for tampering with HTTP traffic.
+  Hoxy is an HTTP hacking API for JavaScript programmers.
+  It operates in the same ballpark as Charles or Fiddler.
   A few key features:
 </p>
 
 <ul>
-  <li>Manipulate request and response bodies as jQuery or JSON objects.</li>
-  <li>Inspect and manipulate URLs, headers, status codes, etc.</li>
-  <li>Support for direct and reverse proxying over both HTTP and HTTPS.</li>
-  <li>Simulate latency and low-bandwidth connections.</li>
-  <li>Overlay local filesystems over remote ones.</li>
+  <li>Intercept requests and/or responses.</li>
+  <li>Observe and alter all aspects of requests/responses.</li>
+  <li>Simulate network slowness and latency.</li>
+  <li>Supports both direct and reverse proxying.</li>
+  <li>Built-in helpers for replacing remote files with local ones.</li>
+  <li>Request/response body types: JSON, string, jQuery, buffer, etc.</li>
+  <li>Supports both HTTP and HTTPS.</li>
 </ul>
 
 <p>
