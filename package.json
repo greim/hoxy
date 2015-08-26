@@ -1,6 +1,6 @@
 {
   "name": "hoxy",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
   "repository": {

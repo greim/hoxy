@@ -322,6 +322,7 @@ export default class Proxy extends EventEmitter {
         cb(log)
       }
     })
+    return this
   }
 
   slow(opts) {
