@@ -233,7 +233,7 @@ export default class Proxy extends EventEmitter {
           , fullUrl = shp + fromClient.url
           , addr = this._server.address()
         let toServer = http.request({
-          host: addr.address,
+          host: 'localhost',
           port: addr.port,
           method: fromClient.method,
           path: fullUrl,
