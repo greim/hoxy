@@ -139,7 +139,7 @@ export default class Body extends EventEmitter {
       }
       return streams.collect(readable)
       .then(buffer => {
-        this.headers['content-encoding'] = undefined
+        delete this.headers['content-encoding'];
         this._source = streams.from(buffer)
       })
     }
