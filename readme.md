@@ -42,6 +42,7 @@ Notable changes:
 
 ## Release notes:
 
+* **3.1.3** Merged [PR #62](https://github.com/greim/hoxy/pull/62). Thanks [jonsharratt](https://github.com/jonsharratt).
 * **3.1.2** Make `Proxy#log()` chainable.
 * **3.1.1** Prevent `EADDRNOTAVAIL` on Windows when using `certAuthority`.
 * **3.1.0** Filtering options now accept functions.
