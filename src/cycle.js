@@ -63,7 +63,7 @@ class ProvisionableRequest {
       opts.path = proxyPath
     }
     this._writable = h.request(opts, this._respProm.resolve)
-    this._writable.on('error', this._respProm.reject)
+    //this._writable.on('error', this._respProm.reject)
   }
 
   send(readable) {
