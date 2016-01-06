@@ -63,10 +63,15 @@ class ProvisionableRequest {
       opts.path = proxyPath
     }
     this._writable = h.request(opts, this._respProm.resolve)
+    this._writable.on('error', err => this._writableError = err);
   }
 
   send(readable) {
     return new Promise((resolve, reject) => {
+      if (this._writableError) {
+        reject(this._writableError);
+        return;
+      }
       this._writable.on('error', reject)
       if (!readable || typeof readable === 'string') {
         this._writable.end(readable || '', resolve)
