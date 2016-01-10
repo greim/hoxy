@@ -3,11 +3,7 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-//import assert from 'assert'
-//import send from './lib/send'
-//import wait from '../src/wait'
-//import co from 'co'
-import hoxy from '../src/main';
+import hoxy from '../src/main'
 import http from 'http'
 
 describe('non-existent servers', function(){
