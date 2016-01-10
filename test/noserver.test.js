@@ -8,10 +8,10 @@ import http from 'http'
 
 describe('non-existent servers', function(){
 
-  it('should foo', done => {
+  it('should emit an error when forwarding a request to a non-existent server', done => {
 
     const proxy = hoxy.createServer({
-      reverse: 'http://sdfkjhsdfdgjhhfs.example.com:8888',
+      reverse: 'http://sdfkjhsdfdgjhhfs:8888',
     })
     proxy.listen(function() {
       const { address, port } = proxy.address()
