@@ -32,7 +32,7 @@ function getRequestData() {
 describe('Request', function() {
 
   it('should construct', function() {
-    new Request()
+    new Request() // eslint-disable-line no-new
   })
 
   it('should accept raw data', function() {
@@ -97,6 +97,40 @@ describe('Request', function() {
     let data = getRequestData()
     req._setHttpSource(data)
     assert.deepEqual(req.headers, data.headers)
+  })
+
+  it('should get original headers', function() {
+    let req = new Request()
+    let data = getRequestData()
+    req._setHttpSource(data)
+    assert.deepEqual(req.origHeaders, data.headers)
+  })
+
+  it('should not set original headers', function() {
+    let req = new Request()
+    let data = getRequestData()
+    req._setHttpSource(data)
+    assert.throws(() => {
+      req.origHeaders = {}
+    })
+  })
+
+  it('original headers are not modified', function() {
+    let req = new Request()
+    let data = getRequestData()
+    req._setHttpSource(data)
+    req.headers.foo = '1234'
+    assert.strictEqual(req.headers.foo, '1234')
+    assert.strictEqual(req.origHeaders.foo, undefined)
+  })
+
+  it('original headers should be frozen', function() {
+    let req = new Request()
+    let data = getRequestData()
+    req._setHttpSource(data)
+    assert.throws(() => {
+      req.origHeaders.foo = '2'
+    })
   })
 
   it('should get and set source', function() {

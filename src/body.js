@@ -10,6 +10,7 @@ import ParamReader from './param-reader'
 import BufferReader from './buffer-reader'
 import zlib from 'zlib'
 import { EventEmitter } from 'events'
+import _ from 'lodash'
 
 export default class Body extends EventEmitter {
 
@@ -80,6 +81,22 @@ export default class Body extends EventEmitter {
 
   set httpVersion(httpVersion) {
     this._setRawDataItem('httpVersion', httpVersion)
+  }
+
+  // -------------------------------------------------
+
+  get headers() {
+    return this._getRawDataItem('headers')
+  }
+
+  set headers(headers) {
+    this._setRawDataItem('headers', _.extend({}, headers))
+  }
+
+  // -------------------------------------------------
+
+  get origHeaders() {
+    return this._getRawDataItem('origHeaders')
   }
 
   // -------------------------------------------------

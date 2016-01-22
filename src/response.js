@@ -36,21 +36,13 @@ export default class Response extends Body {
     this._setRawDataItem('statusCode', code)
   }
 
-  /**
-   * Getter/setter for HTTP response header object.
-   */
-  get headers() {
-    return this._getRawDataItem('headers')
-  }
-
-  set headers(headers) {
-    this._setRawDataItem('headers', _.extend({}, headers))
-  }
-
   _setHttpSource(inResp) {
+    const origHeaders = _.extend({}, inResp.headers)
+    Object.freeze(origHeaders)
     this.httpVersion = inResp.httpVersion
     this.statusCode = inResp.statusCode
     this.headers = inResp.headers
+    this._setRawDataItem('origHeaders', origHeaders)
     inResp._isOriginal = true
     this._source = inResp
   }

@@ -24,7 +24,7 @@ function getResponseData(){
 describe('Response', function(){
 
   it('should construct', function(){
-    let resp = new Response()
+    new Response() // eslint-disable-line no-new
   })
 
   it('should accept raw data', function(){
@@ -37,6 +37,40 @@ describe('Response', function(){
     let data = getResponseData()
     resp._setHttpSource(data)
     assert.deepEqual(resp.headers, data.headers)
+  })
+
+  it('should get original headers', function() {
+    let resp = new Response()
+    let data = getResponseData()
+    resp._setHttpSource(data)
+    assert.deepEqual(resp.origHeaders, data.headers)
+  })
+
+  it('should not set original headers', function() {
+    let resp = new Response()
+    let data = getResponseData()
+    resp._setHttpSource(data)
+    assert.throws(() => {
+      resp.origHeaders = {}
+    })
+  })
+
+  it('original headers are not modified', function() {
+    let resp = new Response()
+    let data = getResponseData()
+    resp._setHttpSource(data)
+    resp.headers.foo = '1234'
+    assert.strictEqual(resp.headers.foo, '1234')
+    assert.strictEqual(resp.origHeaders.foo, undefined)
+  })
+
+  it('original headers should be frozen', function() {
+    let resp = new Response()
+    let data = getResponseData()
+    resp._setHttpSource(data)
+    assert.throws(() => {
+      resp.origHeaders.foo = '2'
+    })
   })
 
   it('should get and set status code', function(){
