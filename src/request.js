@@ -6,6 +6,8 @@
 import Body from './body'
 import _ from 'lodash'
 import url from 'url'
+import querystring from 'querystring'
+import assert from 'assert'
 
 let validProtocols = {
   'http:': true,
@@ -106,6 +108,25 @@ export default class Request extends Body {
     if (!/^\//.test(aUrl)){
       throw new Error('invalid url, must start with /') // TODO: test this
     }
+    this._setRawDataItem('url', aUrl)
+  }
+
+  /**
+   * Getter/setter for URL. Root-relative.
+   */
+  get query(){
+    const aUrl = this._getRawDataItem('url')
+    const pUrl = url.parse(aUrl, true)
+    return pUrl.query || {}
+  }
+
+  set query(params){
+    assert(typeof params === 'object', 'params not an object')
+    let aUrl = this._getRawDataItem('url')
+    const pUrl = url.parse(aUrl, true)
+    const search = querystring.stringify(params)
+    pUrl.search = search
+    aUrl = url.format(pUrl)
     this._setRawDataItem('url', aUrl)
   }
 
