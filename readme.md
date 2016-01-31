@@ -38,10 +38,11 @@ Notable changes:
  * A `done` callback is no longer passed as the third arg to interceptors. Interceptor arity is, accordingly, no longer a switch for async behavior. Rather, it solely depends on the return type of the interceptor (i.e. promises or iterators over promises).
  * The third argument to interceptors is now the `cycle` object, === to `this`. This was based on a suggestion from [@nerdbeere](https://github.com/nerdbeere), with a view toward supporting arrow functions, in which `this` is lexical.
  * The CLI has been completely removed from the project. The reasoning is that, by simplifying the project, I can more easily maintain it. If there's a need, it can be brought back as a separate npm module. Perhaps somebody else can take that on.
- * Undocumented `hoxy.forever()` function goes away. 
+ * Undocumented `hoxy.forever()` function goes away.
 
 ## Release notes:
 
+* **3.2.0** Better error handling. Added `query` getter/setter to request.
 * **3.1.3** Merged [PR #62](https://github.com/greim/hoxy/pull/62). Thanks [jonsharratt](https://github.com/jonsharratt).
 * **3.1.2** Make `Proxy#log()` chainable.
 * **3.1.1** Prevent `EADDRNOTAVAIL` on Windows when using `certAuthority`.
