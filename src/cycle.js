@@ -68,7 +68,6 @@ class ProvisionableRequest {
 
   send(readable) {
     return new Promise((resolve, reject) => {
-      this._writable.on('error', reject)
       if (!readable || typeof readable === 'string') {
         this._writable.end(readable || '', resolve)
       } else {
