@@ -233,7 +233,7 @@ export default class Proxy extends EventEmitter {
           , fullUrl = shp + fromClient.url
           , addr = this._server.address()
         let toServer = http.request({
-          host: addr.address,
+          host: 'localhost',
           port: addr.port,
           method: fromClient.method,
           path: fullUrl,
@@ -262,7 +262,7 @@ export default class Proxy extends EventEmitter {
       message: message,
     })
     if (this._tlsSpoofingServer) {
-      this._tlsSpoofingServer.listen(0)
+      this._tlsSpoofingServer.listen(0, 'localhost')
     }
     return this
   }
@@ -322,6 +322,7 @@ export default class Proxy extends EventEmitter {
         cb(log)
       }
     })
+    return this
   }
 
   slow(opts) {

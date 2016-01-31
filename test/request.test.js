@@ -32,7 +32,7 @@ function getRequestData() {
 describe('Request', function() {
 
   it('should construct', function() {
-    new Request()
+    new Request() //eslint-disable-line no-new
   })
 
   it('should accept raw data', function() {
@@ -89,6 +89,19 @@ describe('Request', function() {
     assert.strictEqual(req.url, '/bar.html')
     assert.throws(function() {
       req.url = 'zzz'
+    }, Error)
+  })
+
+  it('should get and set query', function() {
+    let req = new Request()
+    req._setHttpSource(getRequestData())
+    assert.strictEqual(req.url, '/foo.html')
+    req.query = { bar: 'baz' }
+    assert.strictEqual(req.url, '/foo.html?bar=baz')
+    req.url = '/foo.html?bar=buz'
+    assert.deepEqual(req.query, { bar: 'buz' })
+    assert.throws(function() {
+      req.query = 'zzz'
     }, Error)
   })
 
