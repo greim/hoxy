@@ -235,7 +235,7 @@ There are two ways to do this: direct and reverse proxying.
 <h3 id="direct-https-proxying">Direct HTTPS proxying</h3>
 
 <p>
-To set up a direct HTTPS proxy, you'd launch a proxy on port 8080 and set your browser to do HTTPS proxying through <code>localhost:8080</code>, then visit the site directly into your browser.
+To set up a direct HTTPS proxy, you'd launch a proxy on port 8080 and set your browser to do HTTPS proxying through <code>localhost:8080</code>, then visit the site directly from your browser.
 What happens here differs radically from HTTP proxying.
 During HTTP proxying, the client sends this:
 </p>
@@ -254,7 +254,7 @@ But during HTTPS proxying, the client sends this:
 </pre>
 
 <p>
-Which in English means <em>connect me to example.com, I want to have a private conversation.</em>
+Which in English means <em>connect me to example.com, I want to have a private conversation with them.</em>
 Once the proxy establishes the pipe, the client TLS-handshakes the server on that connection.
 Then, it sends normal HTTP traffic over it like this:
 </p>
