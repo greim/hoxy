@@ -8,7 +8,6 @@ import Response from './response'
 import streams from './streams'
 import awate from 'await'
 import mkdirp from 'mkdirp'
-import _ from 'lodash'
 import { Server as DocRootServer } from 'node-static'
 import http from 'http'
 import https from 'https'
@@ -171,13 +170,13 @@ export default class Cycle extends EventEmitter {
       if (typeof opts === 'string') {
         opts = { path: opts }
       }
-      opts = _.extend({
+      opts = Object.assign({
         docroot: pathTools.sep,
         path: url.parse(req.url).pathname,
         strategy: 'replace',
       }, opts)
       let { docroot, path, strategy } = opts
-      let headers = _.extend({
+      let headers = Object.assign({
         'x-hoxy-static-docroot': docroot,
       }, req.headers)
       delete headers['if-none-match']

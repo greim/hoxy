@@ -5,7 +5,6 @@
 
 import Body from './body'
 import streams from './streams'
-import _ from 'lodash'
 
 /**
  * Represents an HTTP response.
@@ -44,7 +43,7 @@ export default class Response extends Body {
   }
 
   set headers(headers) {
-    this._setRawDataItem('headers', _.extend({}, headers))
+    this._setRawDataItem('headers', Object.assign({}, headers))
   }
 
   _setHttpSource(inResp) {

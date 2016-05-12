@@ -4,7 +4,6 @@
  */
 
 import Body from './body'
-import _ from 'lodash'
 import url from 'url'
 import querystring from 'querystring'
 import assert from 'assert'
@@ -138,7 +137,7 @@ export default class Request extends Body {
   }
 
   set headers(headers){
-    this._setRawDataItem('headers', _.extend({}, headers))
+    this._setRawDataItem('headers', Object.assign({}, headers))
   }
 
   fullUrl(u){
