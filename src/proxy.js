@@ -23,7 +23,11 @@ let asHandlers = {
     // TODO: test to ensure that parse errors here fail gracefully.
     let contentType = r.headers['content-type']
     let isXml = isTypeXml(contentType)
-    r.$ = cheerio.load(r._source.toString(), { xmlMode: isXml })
+    if (cheerio) {
+      r.$ = cheerio.load(r._source.toString(), {xmlMode: isXml})
+    } else {
+      throw new Error("In order to intercept as jQuery DOM object, 'cheerio' must be installed")
+    }
   },
   'json': r => {
     // TODO: test to ensure that parse errors here propagate to error log.
