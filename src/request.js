@@ -9,21 +9,25 @@ import url from 'url'
 import querystring from 'querystring'
 import assert from 'assert'
 
-let validProtocols = {
-  'http:': true,
-  'https:': true,
+let config = {
+  validProtocols: {
+    'http:': true,
+    'https:': true,
+  },
+  removeHeaders: {
+    'accept-encoding': true, // until proxy handles gzip
+    'proxy-connection': true,
+    'proxy-authorization': true,
+  },
+  nonEntityMethods: {
+    GET: true,
+    HEAD: true,
+    TRACE: true,
+  },
 }
 
-let removeHeaders = {
-  'accept-encoding': true, // until proxy handles gzip
-  'proxy-connection': true,
-  'proxy-authorization': true,
-}
-
-let nonEntityMethods = {
-  GET: true,
-  HEAD: true,
-  TRACE: true,
+export function setConfig(_config) {
+    config = _config;
 }
 
 /**
@@ -44,7 +48,7 @@ export default class Request extends Body {
   }
 
   set protocol(protocol){
-    if (!validProtocols.hasOwnProperty(protocol)) {
+    if (!config.validProtocols.hasOwnProperty(protocol)) {
       throw new Error('invalid protocol: ' + protocol) // TODO: test this
     }
     this._setRawDataItem('protocol', protocol)
@@ -211,7 +215,7 @@ export default class Request extends Body {
 
   // TODO: emit debug log events for things that are changed.
   _finalize(){
-    if (nonEntityMethods.hasOwnProperty(this.method)) {
+    if (config.nonEntityMethods.hasOwnProperty(this.method)) {
       this.string = '' // TODO: test
     }
     if (!this._source){
@@ -230,7 +234,7 @@ export default class Request extends Body {
 
     Object.keys(this.headers).forEach(name => {
       // TODO: test
-      if (removeHeaders.hasOwnProperty(name)) {
+      if (config.removeHeaders.hasOwnProperty(name)) {
         delete this.headers[name]
       } else if (this.headers[name] === undefined){
         delete this.headers[name]

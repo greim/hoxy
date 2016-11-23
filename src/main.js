@@ -4,10 +4,12 @@
  */
 
 import Proxy from './proxy'
+import { setConfig } from './request'
 
 export default {
   Proxy: Proxy,
   createServer: function(opts) {
     return new Proxy(opts)
   },
+  setConfig,
 }
