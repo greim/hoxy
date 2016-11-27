@@ -85,6 +85,7 @@ export default class Response extends Body {
         this._source.finalize()
       }
       if (typeof this._source.size === 'function') {
+        delete this.headers['transfer-encoding']
         this.headers['content-length'] = this._source.size()
       }
     }

@@ -1,6 +1,6 @@
 {
   "name": "hoxy",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "author": "Greg Reimer <gregreimer@gmail.com>",
   "description": "Web-hacking proxy API for node",
   "repository": {
@@ -10,7 +10,7 @@
   "main": "./lib/main",
   "scripts": {
     "prepublish": "npm run compile",
-    "test": "mocha --compilers js:babel/register --bail --timeout 3000",
+    "test": "mocha --compilers js:babel/register --timeout 3000",
     "compile": "babel src --out-dir lib --optional runtime",
     "lint": "eslint ./src",
     "docs": "babel-node ./dev-bin/build.js > ./index.html"
