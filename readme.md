@@ -42,6 +42,7 @@ Notable changes:
 
 ## Release notes:
 
+* **3.2.1** Fixed test failures regarding `content-length` and `transfer-encoding` headers.
 * **3.2.0** Better error handling. Added `query` getter/setter to request.
 * **3.1.3** Merged [PR #62](https://github.com/greim/hoxy/pull/62). Thanks [jonsharratt](https://github.com/jonsharratt).
 * **3.1.2** Make `Proxy#log()` chainable.
