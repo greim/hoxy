@@ -241,6 +241,8 @@ export default class Proxy extends EventEmitter {
         }, fromServer => {
           toClient.writeHead(fromServer.statusCode, fromServer.headers)
           fromServer.pipe(toClient)
+        }).on('error', function(e) {
+          console.error('proxy error', e);
         })
         fromClient.pipe(toServer)
       })
