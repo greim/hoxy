@@ -42,6 +42,7 @@ export class SNISpoofer extends EventEmitter {
         locality: 'Provo',
         organization: 'ACME Tech Inc',
         commonName: serverName,
+        altNames: [serverName],
         serviceKey: rootKey,
         serviceCertificate: rootCert,
         serial: Date.now(),
