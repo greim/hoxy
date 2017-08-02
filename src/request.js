@@ -195,18 +195,11 @@ export default class Request extends Body {
     if (port){
       this.port = port
     }
-    //this.port = purl.port || host.port || this._getDefaultPort()
+    //this.port = purl.port || host.port
     this.method = inReq.method
     this.url = purl.path
     inReq._isOriginal = true
     this._source = inReq
-  }
-
-  /**
-   * Returns the default port given the current protocol.
-   */
-  _getDefaultPort(){
-    return this.protocol === 'https:' ? 443 : 80
   }
 
   // TODO: emit debug log events for things that are changed.
