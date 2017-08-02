@@ -263,7 +263,7 @@ export default class Cycle extends EventEmitter {
         protocol: req.protocol,
         proxy: upstreamProxy,
         hostname: req.hostname,
-        port: req.port || req._getDefaultPort(),
+        port: req.port,
         method: req.method,
         path: req.url,
         headers: req.headers,
