@@ -159,7 +159,7 @@ export default class Proxy extends EventEmitter {
       cycle.on('log', log => this.emit('log', log))
 
       co.call(this, function*() {
-        req._setHttpSource(fromClient, opts.reverse)
+        req._setHttpSource(fromClient, this._reverse)
         try { yield this._runIntercepts('request', cycle) }
         catch(ex) { this._emitError(ex, 'request') }
         let partiallyFulfilledRequest = yield cycle._sendToServer()
