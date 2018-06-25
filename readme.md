@@ -1,6 +1,6 @@
 # Hoxy
 
-An HTTP hacking tool for JavaScript programmers.
+Hoxy is an HTTP hacking tool for JavaScript programmers.
 
 ## Full Documentation
 
@@ -82,3 +82,16 @@ Notable changes:
 * **1.0.2** Added `tee()` method to requests and responses, and accompanying tests.
 * **1.0.1** Fixed bug with URL pattern matching, added filtering tests.
 * **1.0.0** Initial release of Hoxy 1.0 rewrite.
+
+# Regarding Development of this Tool
+
+I began writing code for this in 2010 while I worked at Cisco—and later at various startups—to solve my own needs for advanced testing and debugging production websites. The most common—although by no means only—use case for me was swapping in my own JavaScript onto web pages, in order to do rapid debugging without actually pushing console.logs to a staging server or (god forbid!) production. I could just edit a file on my local disk and reload my browser.
+
+This enabled me to act quickly when hard-to-debug production issues arose, which translated into a competitive advantage for both myself and for my company. And then I shared it with the world, because I don't believe life is a zero-sum game. Over time, however, I've used it less and less, for a few reasons:
+
+ 1. **Devtools.** Built-in debuggers got *wayyy* more powerful. Starting in... I want to say 2014 or thereabouts... major browsers started shipping with source-map-enabled debuggers, which allow setting breakpoints and stepping through code in its original, non-uglified form. That was key, and alleviated maybe 80% of what I needed Hoxy for.
+ 1. **HTTPS everywhere.** HTTPS finally became widely used in production somewhere around that same time. Anybody remember Firesheep? Hoxy supports HTTPS proxying, but it involves extra setup, which adds friction to what is already a high-friction tool. Seriously, Hoxy makes it easier, but MITM-hacking your own HTTP traffic isn't exactly the definition of simplicity.
+ 1. **Evergreen browsers.** I'm not going to sit here and claim cross-browser differences don't still plague developers in 2018, but the amount of time I spend on them has definitely gone down. Along those lines, a secondary use case I had for Hoxy was injecting code into certain older, single-digit versions of IE, which had little-to-nothing in the way of devtools capabilities. Nowadays I simply don't bother with those browsers.
+ 1. **Functional programming.** I began using React in 2014, which I consider to be an enabling technology for both learning and using functional programming. FP in turn makes it easier to test, debug, and reason about a piece of code in isolation, rather than in-situ. This even further alleviates the need to use Hoxy to see how a code change behaves in prod, since I can just see what its output would be on any given piece of input.
+
+All of that said, this is still a valuable tool in my toolbox, and I use it when the odd need arises, which at the current rate turns out to be once a year. I'm not putting much time and attention into bug fixes and feature improvements these days, but PRs are always welcome!
