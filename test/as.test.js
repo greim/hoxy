@@ -58,7 +58,7 @@ describe('Load data as type', function() {
       body: 'abcdefg',
     }).through('response', function(req, resp) {
       resp.string = 'foobarbaz'
-    }).receiving(function(resp) {
+    }).receiving(function*(resp) {
       assert.strictEqual(resp.body, 'foobarbaz')
     }).promise()
   })
@@ -230,7 +230,7 @@ describe('Load data as type', function() {
   })
 
   it('should load a reddit-size page', () => {
-    return send({}).to((req, resp) => {
+    return send({}).to(function*(req, resp) {
       resp.writeHead(200, {
         'date': 'Tue, 07 Jul 2015 04:54:21 GMT',
         'content-type': 'text/html; charset=UTF-8',

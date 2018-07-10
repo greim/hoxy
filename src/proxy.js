@@ -203,7 +203,7 @@ export default class Proxy extends EventEmitter {
       let { key, cert } = opts.certAuthority
         , spoofer = new SNISpoofer(key, cert)
         , SNICallback = spoofer.callback()
-        , cxnEstablished = new Buffer(`HTTP/1.1 200 Connection Established\r\n\r\n`, 'ascii')
+        , cxnEstablished = new Buffer('HTTP/1.1 200 Connection Established\r\n\r\n', 'ascii')
 
       spoofer.on('error', err => this.emit('error', err))
       spoofer.on('generate', serverName => {

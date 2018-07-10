@@ -14,7 +14,7 @@ co(function*() {
     , templateName = 'index-template.html'
     , pageName = path.join(docsDir, templateName)
     , noTemplate = name => name !== templateName
-    , fileNames = yield adapt(fs.readdir, docsDir).filter(tester).filter(noTemplate)
+    , fileNames = yield adapt(fs.readdir, docsDir).then((data) => data.filter(tester).filter(noTemplate))
     , mainPage = yield adapt(fs.readFile, pageName, 'utf8')
     , $ = cheerio.load(mainPage)
 
