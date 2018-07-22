@@ -5,6 +5,7 @@
 
 import send from './lib/send'
 import { finish, values } from './lib/expect'
+import assert from 'assert'
 
 function roundTrip(opts) {
   let s = send(opts.request || {})
@@ -662,5 +663,43 @@ describe('filtering', function() {
         callback: function() { throw new Error('should not hit response') },
       }],
     }).then(() => expect.now())
+  })
+
+  it('should match status', async() => {
+    let hit = false;
+    await send({
+      path: 'http://acme.com/foo.html',
+    })
+    .to(function*(req, res) {
+      res.statusCode = 200;
+      res.end('123');
+    })
+    .through({
+      phase: 'response',
+      status: 200,
+    }, function*() {
+      hit = true;
+    })
+    .promise();
+    assert.ok(hit);
+  })
+
+  it('should not match status', async() => {
+    let hit = false;
+    await send({
+      path: 'http://acme.com/foo.html',
+    })
+    .to(function*(req, res) {
+      res.statusCode = 201;
+      res.end('123');
+    })
+    .through({
+      phase: 'response',
+      status: 200,
+    }, function*() {
+      hit = true;
+    })
+    .promise();
+    assert.ok(!hit);
   })
 })

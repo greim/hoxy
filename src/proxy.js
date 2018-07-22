@@ -84,6 +84,8 @@ let otherIntercept = (() => {
         , reqMimeType = reqContentType ? reqContentType.replace(ctPatt, '') : undefined
         , respMimeType = respContentType ? respContentType.replace(ctPatt, '') : undefined
         , mimeType = isReq ? reqMimeType : respMimeType
+        , testStatus = isReq ? undefined : opts.status
+        , actualStatus = isReq ? undefined : resp.statusCode
         , isMatch = 1
 
       isMatch &= test(opts.contentType, contentType)
@@ -98,6 +100,7 @@ let otherIntercept = (() => {
       isMatch &= test(opts.port, req.port)
       isMatch &= test(opts.method, req.method)
       isMatch &= test(opts.url, req.url, true)
+      isMatch &= test(testStatus, actualStatus)
       isMatch &= test(opts.fullUrl, req.fullUrl(), true)
 
       if (isMatch) {

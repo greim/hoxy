@@ -1,6 +1,6 @@
 # Hoxy
 
-Hoxy is an HTTP hacking tool for JavaScript programmers.
+Hoxy is an HTTP traffic-sniffing and manipulation tool for JavaScript programmers.
 
 ## Full Documentation
 
@@ -87,11 +87,11 @@ Notable changes:
 
 I began writing code for this in 2010 while I worked at Cisco—and later at various startups—to solve my own needs for advanced testing and debugging production websites. The most common—although by no means only—use case for me was swapping in my own JavaScript onto web pages, in order to do rapid debugging without actually pushing console.logs to a staging server or (god forbid!) production. I could just edit a file on my local disk and reload my browser.
 
-This enabled me to act quickly when hard-to-debug production issues arose, which translated into a competitive advantage for both myself and for my company. And then I shared it with the world, because I don't believe life is a zero-sum game. Over time, however, I've used it less and less, for a few reasons:
+This enabled me to act quickly when hard-to-debug production issues arose, which translated into a competitive advantage for both myself and my company. Over time, however, I've used it less frequently, for a few reasons:
 
- 1. **Devtools.** Built-in debuggers got *wayyy* more powerful. Starting in... I want to say 2014... major browsers shipped with source-map-enabled debuggers, which allow setting breakpoints and stepping through code in original, non-uglified, non-bundled form. That was key, and alleviated 80% of what I need Hoxy for.
+ 1. **Devtools.** Built-in debuggers got *wayyy* more powerful. Starting in ~2014, major browsers shipped with source-map-enabled debuggers, which allow setting breakpoints and stepping through code in original, non-uglified, non-bundled form. That was key, and alleviated 80% of what I need Hoxy for.
  1. **HTTPS everywhere.** HTTPS became widely used in production during this same period. Hoxy supports HTTPS proxying, but involves extra setup, which adds friction to an already high-friction tool. Seriously, Hoxy makes it easier, but MITM-hacking your own HTTP traffic isn't exactly the definition of ease and simplicity.
- 1. **Evergreen browsers.** While cross-browser differences still affect developers in 2018, the amount of time I spend on them has gone down. Along those lines, a secondary use for Hoxy was injecting code into older, single-digit versions of IE, which had zero devtools capabilities. Nowadays I don't bother with those browsers.
+ 1. **Evergreen browsers.** Happily, the amount of time I spend on cross-browser differences has gone down as of mid 2018. Along those lines, a secondary use for Hoxy was injecting code into older, single-digit versions of IE, which had zero devtools capabilities. Nowadays I simply don't bother with those browsers.
  1. **Functional programming.** React (which I started using in 2014) is an enabling technology for functional programming. FP in turn makes it easier to test, debug, and reason about a piece of code in isolation. This even further alleviates the need to use Hoxy to see how something behaves in prod, since I can just write unit tests, reason about the code in my head, etc.
 
 All of that said, this is still a valuable tool in my toolbox, and I use it when the need arises. I'm not putting much time and attention into bug fixes and feature improvements these days, but PRs are always welcome!
