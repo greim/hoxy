@@ -42,6 +42,7 @@ Notable changes:
 
 ## Release notes:
 
+* **3.3.1** Merged [PR #109](https://github.com/greim/hoxy/pull/109). Thanks [@nerdbeere](https://github.com/nerdbeere).
 * **3.3.0** Ability to filter by status.
 * **3.2.2** Merged [PR #95](https://github.com/greim/hoxy/pull/95). Thanks [devjerry](https://github.com/devjerry).
 * **3.2.1** Fixed test failures regarding `content-length` and `transfer-encoding` headers.
