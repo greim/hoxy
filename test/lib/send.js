@@ -43,8 +43,8 @@ import wait from '../../src/wait'
 class Sender {
 
   constructor(reqInfo, ignoreInterceptorErrors, proxyOpts) {
-    this._serverHandler = (req, resp) => { resp.end('') }
-    this._clientHandler = () => {}
+    this._serverHandler = function*(req, resp) { resp.end('') }
+    this._clientHandler = function*() { }
     this._interceptHandlers = []
     this._prom = new Promise((resolve, reject) => {
       let proxy = this._proxy = hoxy.createServer(proxyOpts)
@@ -102,6 +102,7 @@ class Sender {
           sendBody.pipe(toServer)
         } else {
           if (!sendBody) { sendBody = '' }
+          // TODO: Fix deprecated Buffer warning
           if (!Buffer.isBuffer(sendBody)) { sendBody = new Buffer(sendBody, 'utf8') }
           toServer.end(sendBody)
         }

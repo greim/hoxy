@@ -3,7 +3,8 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-import { Proxy } from '../src/main'
+//import { Proxy } from '../src/main'
+import Proxy from '../src/proxy'
 import streams from '../src/streams'
 import assert from 'assert'
 import http from 'http'
