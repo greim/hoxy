@@ -217,8 +217,10 @@ export default class Proxy extends EventEmitter {
       })
 
       this._server.on('connect', (request, clientSocket, head) => {
+        clientSocket.on('error', err => this.emit('error', err))
         let addr = this._tlsSpoofingServer.address()
         let serverSocket = net.connect(addr.port, addr.address, () => {
+          serverSocket.on('error', err => this.emit('error', err))
           clientSocket.write(cxnEstablished)
           serverSocket.write(head)
           clientSocket
